@@ -193,6 +193,30 @@
   :root[data-theme="harbor"] .row.ai .bubble{ border-radius: var(--bubble-radius) var(--bubble-radius) var(--bubble-radius) var(--bubble-nook); }
   :root[data-theme="harbor"] .row.human.grouped .bubble{ border-top-right-radius: var(--bubble-nook); }
   :root[data-theme="harbor"] .row.ai.grouped .bubble{ border-top-left-radius: var(--bubble-nook); }
+  /* 小弯尾:每组最后一个泡,说话人那一侧的下角长出一个尾巴;同一种磨砂,和泡泡直边无缝拼接 */
+  :root[data-theme="harbor"] .row.human.tail .bubble:not(.att-only){ border-bottom-right-radius: 0; }
+  :root[data-theme="harbor"] .row.ai.tail .bubble:not(.att-only){ border-bottom-left-radius: 0; }
+  :root[data-theme="harbor"] .row.tail .bubble:not(.att-only)::after{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 7px;
+    height: 13px;
+    background: var(--g-fill);
+    -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+    -webkit-mask: var(--tail-shape) center / 100% 100% no-repeat;
+            mask: var(--tail-shape) center / 100% 100% no-repeat;
+    pointer-events: none;
+  }
+  :root[data-theme="harbor"] .row.human.tail .bubble:not(.att-only)::after{
+    right: -7px;
+    --tail-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 13' preserveAspectRatio='none'%3E%3Cpath d='M0 0C0 7 2.4 11.4 7 13H0Z'/%3E%3C/svg%3E");
+  }
+  :root[data-theme="harbor"] .row.ai.tail .bubble:not(.att-only)::after{
+    left: -7px;
+    --tail-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 13' preserveAspectRatio='none'%3E%3Cpath d='M7 0C7 7 4.6 11.4 0 13H7Z'/%3E%3C/svg%3E");
+  }
   :root[data-theme="harbor"] .row .bubble.att-only{ box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
   /* 连续消息各自成泡,间距 5px */
@@ -204,6 +228,7 @@
   :root[data-theme="harbor"] .row .bubble:not(.has-att){
     display: flex;
     align-items: flex-end;
+    align-items: last baseline;
     gap: 8px;
   }
   :root[data-theme="harbor"] .row.human .bubble:not(.has-att){ flex-direction: row-reverse; }
@@ -211,7 +236,7 @@
   :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{
     position: static;
     flex: none;
-    margin: 0 0 2px;
+    margin: 0;
     font-family: var(--font-en);
     font-style: italic;
     font-size: 10px;
