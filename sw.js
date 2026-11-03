@@ -2,12 +2,12 @@
    IMPORTANT: bump CACHE on every front-end change, or installed clients keep the
    old shell (the precached index.html won't refresh until the SW reinstalls). */
 const AI_NAME = "Claude";          // push-title fallback; keep in sync with index.html CONFIG.AI_NAME
-const CACHE = "companion-v5-orion-glass-lace";
+const CACHE = "companion-v6-orion-ribbon";
 const PRECACHE = [
   "./index.html",
   "./chat-light.webp", "./chat-orion.webp",
   "./menu-light.webp", "./menu-orion.webp",
-  "./lace-trim.svg", "./lace-ring.svg",
+  "./ribbon-drift.svg", "./ribbon-bow.svg", "./ribbon-line.svg",
   "./avatar-sea.png",
 ];
 

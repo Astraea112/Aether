@@ -121,9 +121,7 @@
       --text: #E8E8E6;
       --text-soft: #A9A9A6;
       --text-faint: #6F6F6C;
-      --glass-ai: rgba(26,26,29,.64);
-      --glass-human: rgba(92,92,98,.42);
-      --glass-blur: blur(18px) saturate(1.5);
+      --glass-blur: blur(16px) saturate(1.4);
       --bubble-ai-bg: rgba(26,26,29,.88);
       --bubble-ai-fg: #E8E8E6;
       --bubble-human-bg: rgba(70,70,75,.88);
@@ -161,100 +159,170 @@
       --call-hangup-bg: rgba(255,255,255,.06);
       --call-hangup-shadow: rgba(0,0,0,0);
       --info-ring: rgba(255,255,255,.26);
-      --bubble-radius: 19px;
+      --bubble-radius: 12px;
   }
 
-  /* ── ORION 杂志化结构覆盖:细线边框 · 斜体衬线小字 · 去彩色/去投影(仅深色主题作用域) ── */
-  /* ── 液态玻璃 ──
-     思路照液态玻璃笔记的取舍:低 tint、适度 blur、"重点才上玻璃";
-     边缘高光左上强、右下弱,不整圈死白描边(::before 渐变环,mask 挖空中心)。
-     背景是近乎纯黑的星空,折射几乎没东西可"扭",玻璃感主要靠高光与体积,所以纯 CSS 实现,iOS Safari 原生可用。 */
-  [data-theme="harbor"] .bubble,
-  [data-theme="harbor"] .msg-menu-clone{
-    border: 0;
-    -webkit-backdrop-filter: var(--glass-blur);
-            backdrop-filter: var(--glass-blur);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.12),
-      inset 0 -8px 16px rgba(255,255,255,.02),
-      0 10px 28px rgba(0,0,0,.55);
-  }
+  /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
+     原则:星空是世界,缎带只做相框——装饰只出现在包裹内容的边缘,不漂浮在空间里。 */
+
+  /* ── 玻璃 · 线条:0.5px 半透明白描边 + 4–6% 白填充 + 顶缘 1px 微光。
+     你和 Orion 的气泡靠亮度差区分,不靠颜色。 ── */
   [data-theme="harbor"] .row.ai .bubble,
   [data-theme="harbor"] .msg-menu-clone.clone-ai{
-    background:
-      radial-gradient(90% 140% at 12% 0%, rgba(255,255,255,.075), transparent 55%),
-      linear-gradient(170deg, rgba(255,255,255,.04), rgba(255,255,255,0) 55%, rgba(255,255,255,.025)),
-      var(--glass-ai) !important;
+    --g-fill: rgba(255,255,255,.04);
+    --g-line: rgba(255,255,255,.24);
+    --g-hi: rgba(255,255,255,.14);
+    color: #D2D2CF !important;
   }
   [data-theme="harbor"] .row.human .bubble,
   [data-theme="harbor"] .msg-menu-clone.clone-human{
-    background:
-      radial-gradient(90% 150% at 14% 0%, rgba(255,255,255,.17), transparent 58%),
-      linear-gradient(170deg, rgba(255,255,255,.07), rgba(255,255,255,.02) 55%, rgba(255,255,255,.06)),
-      var(--glass-human) !important;
+    --g-fill: rgba(255,255,255,.06);
+    --g-line: rgba(255,255,255,.38);
+    --g-hi: rgba(255,255,255,.24);
+    color: #F5F5F3 !important;
   }
-  [data-theme="harbor"] .bubble::before,
-  [data-theme="harbor"] .msg-menu-clone::before,
-  [data-theme="harbor"] .composer .field::before,
-  [data-theme="harbor"] .floatbtn.send::before{
-    content: "";
-    position: absolute; inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    pointer-events: none;
-    background: linear-gradient(135deg,
-      rgba(255,255,255,.58) 0%,
-      rgba(255,255,255,.16) 20%,
-      rgba(255,255,255,.035) 46%,
-      rgba(255,255,255,.05) 64%,
-      rgba(255,255,255,.30) 100%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask-composite: exclude;
-  }
-  [data-theme="harbor"] .row.ai .bubble::before{ opacity: .8; }
-  [data-theme="harbor"] .bubble.att-only{ -webkit-backdrop-filter: none; backdrop-filter: none; }
-  [data-theme="harbor"] .bubble.att-only::before{ display: none; }
-
-  [data-theme="harbor"] .composer .field{
-    position: relative;
+  :root[data-theme="harbor"] .row .bubble,
+  :root[data-theme="harbor"] .msg-menu-clone{
     border: 0;
-    background:
-      radial-gradient(70% 160% at 10% 0%, rgba(255,255,255,.10), transparent 60%),
-      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015) 55%, rgba(255,255,255,.04)),
-      var(--glass-ai);
-    -webkit-backdrop-filter: blur(22px) saturate(1.6);
-            backdrop-filter: blur(22px) saturate(1.6);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.14),
-      inset 0 -1px 0 rgba(255,255,255,.04),
-      0 14px 34px rgba(0,0,0,.65);
+    background: var(--g-fill) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+    /* 0.5px 发丝描边用 inset spread 画:border 在部分浏览器会被取整成 1px */
+    box-shadow: inset 0 0 0 .5px var(--g-line), inset 0 1px 0 var(--g-hi);
+    padding: 10px 15px 11px;
+    font-family: var(--font-cn);
+    font-size: 14.5px;
+    line-height: 1.82;
+    letter-spacing: .04em;
   }
-  [data-theme="harbor"] .composer .field > *{ position: relative; z-index: 1; }
+  [data-theme="harbor"] .row.ai.tail .bubble,
+  [data-theme="harbor"] .row.human.tail .bubble{ border-radius: var(--bubble-radius); }
+  :root[data-theme="harbor"] .row .bubble.att-only{ border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
-  /* ── 蕾丝 · 只做"镶边":顶栏下沿一条花边 + 大头像外一圈 doily,气泡和输入框保持干净 ── */
-  [data-theme="harbor"] .topbar{ border-bottom: 0; justify-content: flex-start; }
-  [data-theme="harbor"] .topbar::after{
-    content: "";
-    position: absolute; left: 0; right: 0; top: 100%;
-    height: 17px;
-    background: url("lace-trim.svg") repeat-x 0 0 / auto 17px;
-    opacity: .5;
-    pointer-events: none;
+  /* 时间戳挪到气泡外侧:Orion 的在右、你的在左,底边对齐 */
+  [data-theme="harbor"] .bubble .meta{
+    position: absolute;
+    bottom: 3px;
+    margin: 0;
+    font-family: var(--font-en);
+    font-style: italic;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: .04em;
+    color: var(--text-faint);
   }
-  [data-theme="harbor"] .row.ai.tail .bubble{ border-bottom-left-radius: 6px; }
-  [data-theme="harbor"] .row.human.tail .bubble{ border-bottom-right-radius: 6px; }
+  [data-theme="harbor"] .row.ai .bubble .meta{ left: calc(100% + 8px); }
+  [data-theme="harbor"] .row.human .bubble .meta{ right: calc(100% + 8px); }
+  [data-theme="harbor"] .msg-menu-clone .meta{ display: none; }
+
+  /* 输入框 / 按钮:同款玻璃 + 线条 */
+  [data-theme="harbor"] .composer .field,
   [data-theme="harbor"] .login input{
-    border: 1px solid rgba(255,255,255,.12);
-    background:
-      radial-gradient(70% 160% at 10% 0%, rgba(255,255,255,.08), transparent 60%),
-      var(--glass-ai);
-    -webkit-backdrop-filter: blur(18px) saturate(1.5);
-            backdrop-filter: blur(18px) saturate(1.5);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 12px 30px rgba(0,0,0,.55);
+    border: 0;
+    background: rgba(255,255,255,.05);
+    -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.12);
+    border-radius: 14px;
   }
-  [data-theme="harbor"] .login input:focus{ border-color: rgba(255,255,255,.28); }
+  [data-theme="harbor"] .login input:focus,
+  [data-theme="harbor"] .composer .field:focus-within{
+    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.42), inset 0 1px 0 rgba(255,255,255,.14);
+  }
+  [data-theme="harbor"] .composer textarea::placeholder,
+  [data-theme="harbor"] .login input::placeholder{ font-style: italic; letter-spacing: .03em; }
+  [data-theme="harbor"] .floatbtn.send,
+  [data-theme="harbor"] .login button,
+  [data-theme="harbor"] .newmsg-pill{
+    color: #F2F2F0;
+    border: 0;
+    background: rgba(255,255,255,.09);
+    -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.36), inset 0 1px 0 rgba(255,255,255,.18);
+  }
+  [data-theme="harbor"] .floatbtn.send:hover{ color: #fff; }
+  [data-theme="harbor"] .login button{ border-radius: 14px; font-weight: 500; letter-spacing: .3em; }
+  [data-theme="harbor"] .settings-card,
+  [data-theme="harbor"] .action-row,
+  [data-theme="harbor"] .loop-btn,
+  [data-theme="harbor"] .session-new,
+  [data-theme="harbor"] .session-pop,
+  [data-theme="harbor"] .msg-menu-actions,
+  [data-theme="harbor"] .toast,
+  [data-theme="harbor"] .call-ctrl-btn > svg,
+  [data-theme="harbor"] .call-transcript-bar,
+  [data-theme="harbor"] .call-minimize-top{ border-width: .5px; }
+  [data-theme="harbor"] .settings-card,
+  [data-theme="harbor"] .action-row{ box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+
+  /* ── 顶栏:左对齐斜体衬线,下沿一根 0.5px 发丝线 ── */
+  [data-theme="harbor"] .topbar{
+    justify-content: flex-start;
+    border-bottom: .5px solid rgba(255,255,255,.12);
+  }
+
+  /* ── 缎带 · 分隔线:两端细缎带(带 picot 小环边),中央一个极小的结,文字在结下 ── */
+  [data-theme="harbor"] .day,
+  [data-theme="harbor"] .new-divider{
+    position: relative;
+    display: block;
+    align-self: stretch;
+    text-align: center;
+    padding-top: 15px;
+    background: url("ribbon-bow.svg") no-repeat center top / 20px 12.5px;
+    font-size: 11.5px;
+    line-height: 1.2;
+    letter-spacing: .08em;
+    color: var(--text-faint);
+  }
+  [data-theme="harbor"] .day::before,
+  [data-theme="harbor"] .day::after,
+  [data-theme="harbor"] .new-divider::before,
+  [data-theme="harbor"] .new-divider::after{
+    content: "";
+    position: absolute;
+    top: 2.25px;
+    width: auto;
+    height: 6px;
+    background: url("ribbon-line.svg") repeat-x 0 0 / auto 6px;
+    opacity: .5;
+  }
+  [data-theme="harbor"] .day::before,
+  [data-theme="harbor"] .new-divider::before{
+    left: 14%; right: calc(50% + 8px);
+    background-position: right 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 55%);
+            mask-image: linear-gradient(90deg, transparent, #000 55%);
+  }
+  [data-theme="harbor"] .day::after,
+  [data-theme="harbor"] .new-divider::after{
+    right: 14%; left: calc(50% + 8px);
+    -webkit-mask-image: linear-gradient(270deg, transparent, #000 55%);
+            mask-image: linear-gradient(270deg, transparent, #000 55%);
+  }
+
+  /* ── 缎带 · 背景:一条半透明白缎带从右上角斜斜飘进来,贴着右缘;压在星空上、垫在内容下 ── */
+  [data-theme="harbor"] .wall::before,
+  [data-theme="harbor"] .login::before{
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    z-index: -1;
+    width: min(74vw, 520px);
+    aspect-ratio: 600 / 1100;
+    background: url("ribbon-drift.svg") no-repeat right top / contain;
+    opacity: .065;
+    pointer-events: none;
+    transform-origin: 100% 0;
+    animation: ribbonDrift 16s ease-in-out infinite;
+    will-change: transform;
+  }
+  [data-theme="harbor"] .wall::before{ z-index: 0; }
+  @keyframes ribbonDrift{
+    0%, 100%{ transform: none; }
+    50%{ transform: translate3d(-5px, 8px, 0) rotate(-1.4deg) skewY(.6deg); }
+  }
   [data-theme="harbor"] .peerpill{ align-items: flex-start; padding: 0 0 0 clamp(44px, 6vw, 60px); }
   [data-theme="harbor"] .peerpill .name{
     font-family: "Cormorant Garamond", "Noto Serif SC", "Songti SC", "STSong", serif;
@@ -265,26 +333,6 @@
     letter-spacing: .01em;
   }
   [data-theme="harbor"] .peerpill .status{ margin-top: 3px; }
-  [data-theme="harbor"] .login .orb,
-  [data-theme="harbor"] .profile-avatar,
-  [data-theme="harbor"] .incoming-call-avatar{ position: relative; overflow: visible; }
-  [data-theme="harbor"] .login .orb::after,
-  [data-theme="harbor"] .profile-avatar::after,
-  [data-theme="harbor"] .call-avatar-ring::after,
-  [data-theme="harbor"] .incoming-call-avatar::after{
-    content: "";
-    position: absolute;
-    inset: -21.43%;
-    background: url("lace-ring.svg") center / contain no-repeat;
-    opacity: .72;
-    pointer-events: none;
-  }
-  [data-theme="harbor"] .profile-identity{ gap: 26px; padding-left: 14px; }
-  [data-theme="harbor"] .menu-private::after{
-    width: 68px; height: 13px;
-    background: url("lace-trim.svg") repeat-x 100% 0 / auto 13px;
-    opacity: .55;
-  }
   [data-theme="harbor"] .meta{
     font-family: var(--font-en);
     font-style: italic;
@@ -321,24 +369,6 @@
   [data-theme="harbor"] .login .orb,
   [data-theme="harbor"] .call-avatar-img,
   [data-theme="harbor"] .incoming-call-avatar{ filter: grayscale(1); }
-  [data-theme="harbor"] .floatbtn.send{
-    position: relative;
-    color: #fff;
-    background:
-      radial-gradient(110% 90% at 30% 15%, rgba(255,255,255,.30), rgba(255,255,255,.08) 55%, rgba(255,255,255,.12)),
-      rgba(48,48,52,.55);
-    -webkit-backdrop-filter: blur(18px) saturate(1.6);
-            backdrop-filter: blur(18px) saturate(1.6);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.28),
-      0 12px 28px rgba(0,0,0,.6);
-  }
-  [data-theme="harbor"] .floatbtn.send:hover{ color: #fff; }
-  [data-theme="harbor"] .newmsg-pill{
-    background: rgba(0,0,0,.55);
-    border: 1px solid var(--hairline);
-    box-shadow: none;
-  }
   [data-theme="harbor"] .toast{
     background: rgba(8,8,8,.92);
     color: var(--text);
