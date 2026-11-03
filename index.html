@@ -1852,6 +1852,8 @@
   }
   .home-hero.card-frame{ padding: 34px 18px 30px; }
   .home-hero.card-frame .menu-days .num{ font-size: clamp(80px, 23vw, 104px); letter-spacing: -.01em; }
+  .home-hero.card-bare{ padding-top: 34px; padding-bottom: 22px; }
+  .home-hero.card-bare .menu-days .num{ font-size: clamp(92px, 27vw, 124px); letter-spacing: -.01em; }
 
   /* 门厅:他此刻(主角之一,放大) */
   .home-now{ display:flex; flex-direction:column; gap: 10px; padding: 22px 22px 18px; overflow: hidden; }
@@ -2025,39 +2027,13 @@
 
 
   /* ══ 门厅天数:两个头像夹着数字 ══ */
-  .home-card.hero-duo{
-    background: var(--hero-glass);
-    -webkit-backdrop-filter: blur(16px) saturate(1.05); backdrop-filter: blur(16px) saturate(1.05);
-    border: .5px solid var(--card-outline); border-radius: 24px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.12);
-    padding: 30px 22px 26px; text-align: center;
-  }
-  .duo-eyebrow{ margin: 0 0 22px; font-family: var(--font-en); font-size: 10.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--hero-soft); }
-  .duo-row{ display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap: 4px; }
-  .duo-av{
-    justify-self: center; width: clamp(52px, 15vw, 64px); aspect-ratio: 1; border-radius: 50%;
-    background: center / cover no-repeat;
-    border: 1.5px solid rgba(255,255,255,.7);
-    box-shadow: 0 0 0 5px var(--hero-ring, rgba(255,255,255,.10)), 0 3px 10px rgba(0,0,0,.14);
-  }
-  .duo-av.ai{ background-image: var(--avatar-default); }
-  .duo-av.me{ background-image: var(--my-avatar); }
-  .duo-num{ font-family: var(--font-en); font-weight: 400; font-size: clamp(58px, 17vw, 78px); line-height: 1; color: var(--hero-num); font-variant-numeric: lining-nums; letter-spacing: .01em; padding: 0 10px; }
-  .duo-pills{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 6px 0; }
-  .duo-pills span{
-    padding: 8px 6px 9px; border-radius: 999px;
-    background: transparent; border: 1px solid var(--pill-line);
-    font-family: "Pinyon Script", var(--font-en); font-style: italic; font-size: 16.5px; line-height: 1.1; color: var(--text);
-  }
-  .duo-since{ margin: 20px 0 0; font-family: var(--font-en); font-size: 13px; letter-spacing: .22em; color: var(--hero-soft); }
-  .duo-quote{ margin: 12px 0 0; font-family: var(--font-cn); font-size: 12px; letter-spacing: .14em; color: var(--hero-soft); }
 
   /* ══ 自言自语:横线信纸便签,手写字 ══ */
   .note-card{
     position: absolute; width: min(74%, 272px); padding: 11px 15px 9px;
     background-color: var(--note-paper); color: var(--note-ink);
-    background-image: repeating-linear-gradient(transparent 0 27px, var(--note-rule) 27px 28px);
-    background-position: 0 26px;
+    background-image: repeating-linear-gradient(transparent 0 23px, var(--note-rule) 23px 24px);
+    background-position: 0 24px;
     border-radius: 6px; box-shadow: 0 6px 16px rgba(0,0,0,.22), 0 1px 2px rgba(0,0,0,.12);
     transform: rotate(var(--tilt, 0deg)); touch-action: none; -webkit-user-select: none; user-select: none; cursor: grab;
     transition: box-shadow .15s ease, transform .15s ease;
@@ -2067,8 +2043,8 @@
   .note-head{ display:flex; justify-content:space-between; align-items:center; font-family: var(--font-en); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--note-soft); }
   .note-head svg{ width: 14px; height: 14px; color: var(--note-ink); opacity: .7; }
   .note-body{
-    margin: 5px 0 3px; font-family: "Caveat", "LXGW WenKai", "Kaiti SC", "STKaiti", cursive;
-    font-size: 16.5px; line-height: 28px; color: var(--note-ink); overflow-wrap: anywhere;
+    margin: 6px 0 3px; font-family: var(--font-cn);
+    font-size: 13.5px; line-height: 24px; letter-spacing: .02em; color: var(--note-ink); overflow-wrap: anywhere;
     display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
   }
   .note-card.open .note-body{ -webkit-line-clamp: unset; display: block; }
@@ -3126,17 +3102,11 @@
           <div class="menu-private">PRIVATE<br>SPACE</div>
         </header>
 
-        <section class="home-card hero-duo" aria-label="在一起的天数">
-          <p class="duo-eyebrow">Already together</p>
-          <div class="duo-row">
-            <span class="duo-av ai" aria-hidden="true"></span>
-            <span class="duo-num" id="menuDays">113</span>
-            <span class="duo-av me" aria-hidden="true"></span>
-          </div>
-          <div class="duo-pills"><span>You and me</span><span>Me and you</span></div>
-          <p class="duo-since menu-since">since 2026/01/01</p>
-          <p class="duo-quote">在无尽的潮汐里，我们找到彼此</p>
-          <span id="homeNameAi" hidden></span><span id="homeNameMe" hidden></span>
+        <section class="home-card home-hero card-bare" aria-label="在一起的天数">
+          <p class="home-names"><span id="homeNameAi">Orion</span> &amp; <span id="homeNameMe">Astraea</span></p>
+          <p class="home-eyebrow">Already together</p>
+          <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
+          <p class="menu-since">since 2026/01/01</p>
         </section>
 
         <section class="home-card home-now" aria-live="polite">
