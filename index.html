@@ -121,12 +121,13 @@
       --text: #E8E8E6;
       --text-soft: #A9A9A6;
       --text-faint: #6F6F6C;
-      --bubble-ai-bg: rgba(255,255,255,.035);
+      --glass-ai: rgba(26,26,29,.64);
+      --glass-human: rgba(92,92,98,.42);
+      --glass-blur: blur(18px) saturate(1.5);
+      --bubble-ai-bg: rgba(26,26,29,.88);
       --bubble-ai-fg: #E8E8E6;
-      --bubble-ai-line: rgba(255,255,255,.20);
-      --bubble-human-bg: rgba(255,255,255,.10);
-      --bubble-human-fg: #F0F0EE;
-      --bubble-human-line: rgba(255,255,255,.26);
+      --bubble-human-bg: rgba(70,70,75,.88);
+      --bubble-human-fg: #F2F2F0;
       --accent: #E8E8E6;
       --send-bg: #E8E8E6;
       --tick: #8A8A87;
@@ -160,12 +161,130 @@
       --call-hangup-bg: rgba(255,255,255,.06);
       --call-hangup-shadow: rgba(0,0,0,0);
       --info-ring: rgba(255,255,255,.26);
-      --bubble-radius: 10px;
+      --bubble-radius: 19px;
   }
 
   /* ── ORION 杂志化结构覆盖:细线边框 · 斜体衬线小字 · 去彩色/去投影(仅深色主题作用域) ── */
-  [data-theme="harbor"] .row.ai .bubble{ border: 1px solid var(--bubble-ai-line); box-shadow: none; }
-  [data-theme="harbor"] .row.human .bubble{ border: 1px solid var(--bubble-human-line); box-shadow: none; }
+  /* ── 液态玻璃 ──
+     思路照液态玻璃笔记的取舍:低 tint、适度 blur、"重点才上玻璃";
+     边缘高光左上强、右下弱,不整圈死白描边(::before 渐变环,mask 挖空中心)。
+     背景是近乎纯黑的星空,折射几乎没东西可"扭",玻璃感主要靠高光与体积,所以纯 CSS 实现,iOS Safari 原生可用。 */
+  [data-theme="harbor"] .bubble,
+  [data-theme="harbor"] .msg-menu-clone{
+    border: 0;
+    -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.12),
+      inset 0 -8px 16px rgba(255,255,255,.02),
+      0 10px 28px rgba(0,0,0,.55);
+  }
+  [data-theme="harbor"] .row.ai .bubble,
+  [data-theme="harbor"] .msg-menu-clone.clone-ai{
+    background:
+      radial-gradient(90% 140% at 12% 0%, rgba(255,255,255,.075), transparent 55%),
+      linear-gradient(170deg, rgba(255,255,255,.04), rgba(255,255,255,0) 55%, rgba(255,255,255,.025)),
+      var(--glass-ai) !important;
+  }
+  [data-theme="harbor"] .row.human .bubble,
+  [data-theme="harbor"] .msg-menu-clone.clone-human{
+    background:
+      radial-gradient(90% 150% at 14% 0%, rgba(255,255,255,.17), transparent 58%),
+      linear-gradient(170deg, rgba(255,255,255,.07), rgba(255,255,255,.02) 55%, rgba(255,255,255,.06)),
+      var(--glass-human) !important;
+  }
+  [data-theme="harbor"] .bubble::before,
+  [data-theme="harbor"] .msg-menu-clone::before,
+  [data-theme="harbor"] .composer .field::before,
+  [data-theme="harbor"] .floatbtn.send::before{
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: linear-gradient(135deg,
+      rgba(255,255,255,.58) 0%,
+      rgba(255,255,255,.16) 20%,
+      rgba(255,255,255,.035) 46%,
+      rgba(255,255,255,.05) 64%,
+      rgba(255,255,255,.30) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+  }
+  [data-theme="harbor"] .row.ai .bubble::before{ opacity: .8; }
+  [data-theme="harbor"] .bubble.att-only{ -webkit-backdrop-filter: none; backdrop-filter: none; }
+  [data-theme="harbor"] .bubble.att-only::before{ display: none; }
+
+  [data-theme="harbor"] .composer .field{
+    position: relative;
+    border: 0;
+    background:
+      radial-gradient(70% 160% at 10% 0%, rgba(255,255,255,.10), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015) 55%, rgba(255,255,255,.04)),
+      var(--glass-ai);
+    -webkit-backdrop-filter: blur(22px) saturate(1.6);
+            backdrop-filter: blur(22px) saturate(1.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.14),
+      inset 0 -1px 0 rgba(255,255,255,.04),
+      0 14px 34px rgba(0,0,0,.65);
+  }
+  [data-theme="harbor"] .composer .field > *{ position: relative; z-index: 1; }
+
+  /* ── 蕾丝 · 只做"镶边":顶栏下沿一条花边 + 大头像外一圈 doily,气泡和输入框保持干净 ── */
+  [data-theme="harbor"] .topbar{ border-bottom: 0; justify-content: flex-start; }
+  [data-theme="harbor"] .topbar::after{
+    content: "";
+    position: absolute; left: 0; right: 0; top: 100%;
+    height: 17px;
+    background: url("lace-trim.svg") repeat-x 0 0 / auto 17px;
+    opacity: .5;
+    pointer-events: none;
+  }
+  [data-theme="harbor"] .row.ai.tail .bubble{ border-bottom-left-radius: 6px; }
+  [data-theme="harbor"] .row.human.tail .bubble{ border-bottom-right-radius: 6px; }
+  [data-theme="harbor"] .login input{
+    border: 1px solid rgba(255,255,255,.12);
+    background:
+      radial-gradient(70% 160% at 10% 0%, rgba(255,255,255,.08), transparent 60%),
+      var(--glass-ai);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+            backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 12px 30px rgba(0,0,0,.55);
+  }
+  [data-theme="harbor"] .login input:focus{ border-color: rgba(255,255,255,.28); }
+  [data-theme="harbor"] .peerpill{ align-items: flex-start; padding: 0 0 0 clamp(44px, 6vw, 60px); }
+  [data-theme="harbor"] .peerpill .name{
+    font-family: "Cormorant Garamond", "Noto Serif SC", "Songti SC", "STSong", serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(25px, 3.6vw, 32px);
+    line-height: 1;
+    letter-spacing: .01em;
+  }
+  [data-theme="harbor"] .peerpill .status{ margin-top: 3px; }
+  [data-theme="harbor"] .login .orb,
+  [data-theme="harbor"] .profile-avatar,
+  [data-theme="harbor"] .incoming-call-avatar{ position: relative; overflow: visible; }
+  [data-theme="harbor"] .login .orb::after,
+  [data-theme="harbor"] .profile-avatar::after,
+  [data-theme="harbor"] .call-avatar-ring::after,
+  [data-theme="harbor"] .incoming-call-avatar::after{
+    content: "";
+    position: absolute;
+    inset: -21.43%;
+    background: url("lace-ring.svg") center / contain no-repeat;
+    opacity: .72;
+    pointer-events: none;
+  }
+  [data-theme="harbor"] .profile-identity{ gap: 26px; padding-left: 14px; }
+  [data-theme="harbor"] .menu-private::after{
+    width: 68px; height: 13px;
+    background: url("lace-trim.svg") repeat-x 100% 0 / auto 13px;
+    opacity: .55;
+  }
   [data-theme="harbor"] .meta{
     font-family: var(--font-en);
     font-style: italic;
@@ -202,8 +321,19 @@
   [data-theme="harbor"] .login .orb,
   [data-theme="harbor"] .call-avatar-img,
   [data-theme="harbor"] .incoming-call-avatar{ filter: grayscale(1); }
-  [data-theme="harbor"] .floatbtn.send{ color: #000; box-shadow: none; }
-  [data-theme="harbor"] .floatbtn.send:hover{ color: #000; }
+  [data-theme="harbor"] .floatbtn.send{
+    position: relative;
+    color: #fff;
+    background:
+      radial-gradient(110% 90% at 30% 15%, rgba(255,255,255,.30), rgba(255,255,255,.08) 55%, rgba(255,255,255,.12)),
+      rgba(48,48,52,.55);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+            backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.28),
+      0 12px 28px rgba(0,0,0,.6);
+  }
+  [data-theme="harbor"] .floatbtn.send:hover{ color: #fff; }
   [data-theme="harbor"] .newmsg-pill{
     background: rgba(0,0,0,.55);
     border: 1px solid var(--hairline);
@@ -219,7 +349,6 @@
   [data-theme="harbor"] .think-copy code{ background: rgba(255,255,255,.10); }
   [data-theme="harbor"] .reaction{ box-shadow: none; }
   [data-theme="harbor"] .msg-menu-scrim{ background: rgba(0,0,0,.45); }
-  [data-theme="harbor"] .msg-menu-clone{ box-shadow: none; border: 1px solid var(--hairline); }
   [data-theme="harbor"] .msg-menu-actions{ box-shadow: none; }
   [data-theme="harbor"] .session-pop{ box-shadow: none; }
   [data-theme="harbor"] .incoming-call-btn.accept{ background: #E8E8E6; color: #000; box-shadow: none; }
