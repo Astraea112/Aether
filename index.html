@@ -3014,7 +3014,7 @@ const CONFIG = {
 const AI_NAME = CONFIG.AI_NAME, HUMAN_NAME = CONFIG.HUMAN_NAME, APP_NAME = CONFIG.APP_NAME;
 
 const API_BASE = "/relay";       // same-origin; nginx mounts the relay here (RELAY_PUBLIC_PREFIX)
-const USE_MOCK  = true;          // true = self-contained demo with fake data (no backend needed)
+const USE_MOCK  = false;         // true = self-contained demo with fake data (no backend needed)
 const LS_KEY    = "companion_secret";
 
 /* ── 状态 ── */
@@ -3272,25 +3272,28 @@ if (tabbar) tabbar.addEventListener("click", (e) => {
 if (backBtn) backBtn.addEventListener("click", openMenu);
 
 /* ── 共用:读消息、时间、他的名字 ── */
+/* 和聊天渲染器同一套规则:不是 thinking、不是 act,就是一条聊天气泡(relay 的 kind 可能缺省) */
+function isTalk(m){ return !!m && m.kind !== "thinking" && m.kind !== "act"; }
 function talkMessages(){
   try{
-    return chatMessages.filter((m) => m.kind === "user" || m.kind === "reply")
-      .sort((a, b) => new Date(a.ts) - new Date(b.ts));
+    return chatMessages.filter(isTalk).sort((a, b) => (tsMs(a) || 0) - (tsMs(b) || 0));
   }catch(e){ return []; }
 }
 function aiName(){ return (peerNameEl && peerNameEl.textContent.trim()) || AI_NAME; }
-function isToday(ts){ const t = new Date(ts), n = new Date(); return t.toDateString() === n.toDateString(); }
+/* 日期一律按北京时间(TZ),和聊天里的日期分隔一致 */
+function isToday(ts){ return dayKey(ts) === dayKey(Date.now()); }
 function fmtWhen(ts){
   const t = new Date(ts);
   if (isNaN(t)) return "—";
   const diff = Date.now() - t.getTime();
   if (diff < 60e3) return "刚刚";
   if (diff < 3600e3) return Math.floor(diff / 60e3) + " 分钟前";
-  const hm = String(t.getHours()).padStart(2, "0") + ":" + String(t.getMinutes()).padStart(2, "0");
-  const now = new Date(), y = new Date(now); y.setDate(now.getDate() - 1);
-  if (t.toDateString() === now.toDateString()) return "今天 " + hm;
-  if (t.toDateString() === y.toDateString()) return "昨天 " + hm;
-  return (t.getMonth() + 1) + "月" + t.getDate() + "日 " + hm;
+  const hm = fmtTime(t);
+  const k = dayKey(t);
+  if (k === dayKey(Date.now())) return "今天 " + hm;
+  if (k === dayKey(Date.now() - 86400000)) return "昨天 " + hm;
+  const [, mo, d] = k.split("-");
+  return (+mo) + "月" + (+d) + "日 " + hm;
 }
 function loadJSON(key, fallback){ try{ const v = JSON.parse(localStorage.getItem(key) || "null"); return v == null ? fallback : v; }catch(e){ return fallback; } }
 function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ return false; } }
@@ -3301,7 +3304,7 @@ function orionStatus(){
   const msgs = talkMessages();
   const last = msgs[msgs.length - 1];
   if (!last) return { text: "在房间里，等你来", live: false };
-  const ago = Date.now() - new Date(last.ts).getTime();
+  const ago = Date.now() - (tsMs(last) || 0);
   if (last.from === "human" && ago < 15 * 60e3) return { text: "刚看完你的消息", live: true };
   if (last.from === "ai" && ago < 15 * 60e3) return { text: "刚回完你的消息", live: true };
   if (ago > 6 * 3600e3) return { text: "想你了", live: false };
@@ -3310,9 +3313,13 @@ function orionStatus(){
 
 /* ── 门厅 ── */
 function refreshHome(){
-  const now = new Date();
   const dateEl = $("#homeDate");
-  if (dateEl) dateEl.textContent = `${now.getMonth() + 1}月${now.getDate()}日 周${"日一二三四五六"[now.getDay()]}`;
+  if (dateEl){
+    const now = new Date();
+    const [, mo, d] = dayKey(now).split("-");
+    const wd = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: TZ }).format(now);
+    dateEl.textContent = `${+mo}月${+d}日 周${"日一二三四五六"[["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(wd)]}`;
+  }
   const countEl = $("#homeCount");
   if (countEl) countEl.textContent = talkMessages().filter((m) => isToday(m.ts)).length;
   const st = orionStatus();
@@ -3332,14 +3339,17 @@ function sendFromHome(text, out){
   inputEl.value = draft;
   if (!out) return;
   const since = Date.now();
+  let before = new Set();
+  try{ before = new Set(chatMessages.filter((m) => m.from === "ai").map((m) => m._key)); }catch(e){}
   out.textContent = "发给" + aiName() + "了，等他回…";
   clearInterval(out._watch);
   out._watch = setInterval(() => {
     let r = null;
-    try{ r = [...chatMessages].reverse().find((m) => m.from === "ai" && m.kind === "reply" && new Date(m.ts).getTime() >= since - 2000); }catch(e){}
+    try{ r = talkMessages().filter((m) => m.from === "ai" && !before.has(m._key) && (m.text || "").trim()).pop(); }catch(e){}
     if (r){
       const t = (r.text || "").trim();
       out.textContent = aiName() + "：" + (t.length > 80 ? t.slice(0, 80) + "…" : t);
+      if (String(r._key).startsWith("stream:")) return;      // 流式回复还在写,继续跟
       clearInterval(out._watch);
       if (currentTab === "home") refreshHome();
     } else if (Date.now() - since > 120e3){
@@ -3373,7 +3383,7 @@ const LETTER_MIN = 90;                       // 他一次写满这么多字,就�
 const LETTERS_READ_KEY = "companion_letters_read";
 const WALL_KEY = "companion_wall_notes";
 function letters(){
-  try{ return chatMessages.filter((m) => m.from === "ai" && m.kind === "reply" && (m.text || "").trim().length >= LETTER_MIN).slice().reverse(); }catch(e){ return []; }
+  try{ return talkMessages().filter((m) => m.from === "ai" && (m.text || "").trim().length >= LETTER_MIN).reverse(); }catch(e){ return []; }
 }
 function refreshRoom(){
   const st = orionStatus();

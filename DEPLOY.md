@@ -47,6 +47,8 @@ const CONFIG = {
 - 顶栏名字用户还能在「个人信息」页就地改备注，存本机，不影响别人。
 - 想换 App 名字：同时改 `manifest.webmanifest` 的 `name` / `short_name`，和 `sw.js` 顶部的 `AI_NAME`（推送兜底标题）。
 
+**演示模式开关**：`const USE_MOCK = false` —— 必须是 `false` 才会连 relay；改成 `true` 是不需要后端的演示数据（只用于本地看界面）。
+
 **路径**：`const API_BASE = "/relay"` —— 同源相对路径，对应后端 `RELAY_PUBLIC_PREFIX`。若你把 API 挂在别的前缀，改这一处即可（别写死域名）。
 
 **头像 / 图标**：`avatar-sea.png` 是默认头像（抽象海面，用户可在 App 里自己换）；`icon-192/512.png`、`apple-touch-icon.png`、`favicon.png` 是占位「潮汐」图标，换成你自己的同名文件即可。
@@ -109,7 +111,7 @@ const CACHE = "companion-v1";   // ← 每次改前端都要 bump（v1 → v2 �
 
 为匹配「核心聊天」版后端，这些是**占位假按键**，点了只给个 toast 或显示示例数据，不连后端——保留是为了让你照着接自己的功能：
 
-- 菜单页：Movie / Memory / Tides / Room
+- 收藏馆（Archive）：Library 书架 / Movie 电影 两个分区标着「即将开放」
 - 设置页：模型选择 / effort / 上下文阈值 / reset / swap / status（显示示例数字）
 - **相册** `album.html`：完整的相册 UI 空壳，文件头注明了要自己实现的 `/relay/app/album/*` 端点；没接后端时显示密钥门 / 空态。
 
@@ -121,3 +123,19 @@ const CACHE = "companion-v1";   // ← 每次改前端都要 bump（v1 → v2 �
 
 - 别把填好的密钥、你的域名、真实头像/图标提交进公开仓库。
 - `companion_secret` 存在用户浏览器本机；它等于后端 `RELAY_SECRET`，泄露=别人能读你们全部对话。这是单用户模型，一把钥匙代表「就你和你的 AI」。
+
+---
+
+## 9. 门厅 / 房间 / 收藏馆（Aether 新增，**不需要新的后端接口**）
+
+底部悬浮 tab 栏的四页里，除了 Chat 本身，其余数据全部来自已有的聊天记录或本机：
+
+| 功能 | 数据来源 |
+|---|---|
+| 在一起天数、大事记 | `CONFIG.SINCE` |
+| 今天聊了几条、他的状态一行字、上次回你 | 已加载的消息（不是 thinking / act 的都算一条，按北京时间分天） |
+| 戳一戳、今日心情 | 走普通 `POST /app/send` 发一句话（「（戳了戳你）」/ 颜文字），卡片上显示他通过 SSE 回来的那句 |
+| 信箱 Letters | 他一次写满 90 字以上的回复自动收成一封信；已读状态存本机 `companion_letters_read` |
+| 痕迹 | `kind: "act"` 的消息 |
+| 留言墙、心情海、我的头像 | 只存本机 localStorage（`companion_wall_notes` / `companion_mood_log` / `companion_my_avatar`），不上传 |
+
