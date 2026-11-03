@@ -63,10 +63,12 @@
     --tab-glow: rgba(60,90,120,.35);
     --letter-bg: rgba(250,251,252,.94);
     /* 卡片材质:纸 / 线框 */
-    --paper: rgba(250,247,240,.93);
-    --paper-ink: #2E2C28;
-    --paper-soft: #77736B;
-    --paper-shadow: 0 10px 22px rgba(40,50,60,.14);
+    --paper: rgba(255,255,255,.52);
+    --paper-ink: #253447;
+    --paper-soft: #6A7B8A;
+    --paper-line: rgba(255,255,255,.8);
+    --paper-shadow: 0 6px 18px rgba(40,50,60,.10);
+    --clip: rgba(70,86,100,.72);
     --tape: rgba(255,255,255,.55);
     --card-outline: rgba(37,52,71,.30);
     --bare-shadow: 0 1px 10px rgba(255,255,255,.75);
@@ -192,10 +194,12 @@
       --tab-ic: rgba(255,255,255,.7);
       --tab-glow: rgba(255,255,255,.75);
       --letter-bg: rgba(22,22,24,.92);
-      --paper: rgba(238,234,226,.92);
-      --paper-ink: #24221F;
-      --paper-soft: #6E6A62;
-      --paper-shadow: 0 12px 26px rgba(0,0,0,.45);
+      --paper: rgba(255,255,255,.11);
+      --paper-ink: #ECECEA;
+      --paper-soft: #A3A3A0;
+      --paper-line: rgba(255,255,255,.22);
+      --paper-shadow: 0 8px 20px rgba(0,0,0,.30);
+      --clip: rgba(235,235,232,.78);
       --tape: rgba(255,255,255,.38);
       --card-outline: rgba(255,255,255,.30);
       --bare-shadow: 0 1px 12px rgba(0,0,0,.65);
@@ -1794,18 +1798,20 @@
   .home-card.card-paper{
     background: var(--paper);
     color: var(--paper-ink);
-    -webkit-backdrop-filter: none; backdrop-filter: none;
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     box-shadow: var(--paper-shadow);
-    border-radius: 3px 3px 16px 3px;
+    border: .5px solid var(--paper-line);
+    border-radius: 6px;
   }
   .card-paper .home-label, .card-paper .home-poke-reply{ color: var(--paper-soft); }
-  .card-paper::before{          /* 一条半透明胶带 */
-    content:""; position:absolute; top:-9px; left:50%;
-    width: 64px; height: 18px; transform: translateX(-50%) rotate(-3deg);
-    background: var(--tape);
-    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
-    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  .card-paper::before, .murmur-note::before{     /* 回形针 */
+    content:""; position:absolute; top:-15px; left: var(--tape-x, 26px);
+    width: 13px; height: 32px; transform: rotate(var(--tape-r, -6deg));
+    background: var(--clip);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 32' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M4 21V7.5a2.75 2.75 0 0 1 5.5 0V23a4.25 4.25 0 0 1-8.5 0V9'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 32' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M4 21V7.5a2.75 2.75 0 0 1 5.5 0V23a4.25 4.25 0 0 1-8.5 0V9'/%3E%3C/svg%3E") center / contain no-repeat;
   }
+  .paper-cap{ display:block; margin-top: 10px; font-family: var(--font-en); font-style: italic; font-size: 12px; color: var(--paper-soft); }
 
   /* 门厅:天数直接压在背景上 */
   .home-hero.card-bare{ padding-top: 34px; padding-bottom: 22px; }
@@ -1817,7 +1823,11 @@
   .now-stars{ position:absolute; top: 12px; right: 14px; width: 74px; height: 74px; opacity: .55; pointer-events:none; }
   .now-stars circle{ fill: var(--text); }
   .now-stars path{ stroke: var(--text); stroke-width: .5; fill: none; opacity: .55; }
-  .now-line{ margin: 4px 0 0; font-family: var(--font-cn); font-size: 26px; line-height: 1.3; letter-spacing: .02em; padding-right: 64px; }
+  .now-line{ margin: 2px 0 0; font-family: var(--font-cn); font-size: 18px; line-height: 1.45; letter-spacing: .03em; padding-right: 64px; }
+  .now-mood{ display:flex; align-items:baseline; gap: 10px; margin: 2px 0 0; }
+  .now-mood span{ font-size: 11px; letter-spacing: .14em; color: var(--text-faint); }
+  .now-mood b{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-weight: 400; font-size: 20px; letter-spacing: .02em; }
+  .now-mood em{ font-style: normal; font-size: 13px; color: var(--text-soft); }
   .now-thought{
     margin: 0; font-family: var(--font-en), var(--font-cn); font-style: italic;
     font-size: 14.5px; line-height: 1.6; color: var(--text-soft);
@@ -1826,7 +1836,7 @@
   .now-facts{ display:flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 6px; padding-top: 12px; border-top: .5px solid var(--hairline); }
   .now-facts span{ font-size: 11.5px; letter-spacing: .04em; color: var(--text-faint); }
   .now-facts b{ margin-left: 5px; font-family: var(--font-en); font-style: italic; font-weight: 400; font-size: 13.5px; color: var(--text-soft); }
-  .home-poke.card-paper{ transform: rotate(1.2deg); margin-top: 6px; }
+  .home-poke.card-paper{ transform: rotate(.8deg); }
   .home-poke.card-paper.poked{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
 
   /* 房间:痕迹去掉容器 */
@@ -1848,34 +1858,33 @@
   .murmur-form{
     position: relative; margin: 0 0 22px; padding: 18px 16px 14px;
     background: var(--paper); color: var(--paper-ink);
-    border-radius: 3px 3px 16px 3px; box-shadow: var(--paper-shadow);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border: .5px solid var(--paper-line); border-radius: 6px; box-shadow: var(--paper-shadow);
   }
   .murmur-form[hidden]{ display:none; }
   .murmur-form textarea{
     width: 100%; min-height: 76px; resize: none; border: 0; outline: none; background: transparent;
     font-family: var(--font-cn); font-size: 15px; line-height: 1.75; color: var(--paper-ink);
-    background-image: repeating-linear-gradient(transparent 0 25px, rgba(0,0,0,.08) 25px 26px);
+    background-image: repeating-linear-gradient(transparent 0 25px, var(--paper-line) 25px 26px);
   }
   .murmur-form textarea::placeholder{ color: var(--paper-soft); font-style: italic; }
   .murmur-actions{ display:flex; justify-content:flex-end; gap: 8px; margin-top: 8px; }
   .murmur-actions button{ border: 0; border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px; cursor: pointer; }
   .murmur-actions .ghost{ background: transparent; color: var(--paper-soft); }
   .murmur-actions .solid{ background: var(--paper-ink); color: var(--paper); }
-  .murmur-notes{ list-style:none; margin: 0; padding: 4px 4px 8px; display:grid; grid-template-columns: 1fr 1fr; gap: 22px 14px; }
+  .murmur-notes{ list-style:none; margin: 0; padding: 4px 4px 8px; display:grid; grid-template-columns: 1fr 1fr; gap: 26px 14px; align-items: start; }
   .murmur-note{
-    position: relative; padding: 18px 14px 12px;
+    position: relative; padding: 20px 14px 12px;
     background: var(--paper); color: var(--paper-ink);
-    border-radius: 2px 2px 14px 2px; box-shadow: var(--paper-shadow);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border: .5px solid var(--paper-line); border-radius: 6px; box-shadow: var(--paper-shadow);
     font-family: var(--font-cn); font-size: 14px; line-height: 1.75;
     overflow-wrap: anywhere; transform: rotate(var(--tilt, 0deg));
   }
   .murmur-note.wide{ grid-column: 1 / -1; }
-  .murmur-note::before{
-    content:""; position:absolute; top:-8px; left: var(--tape-x, 40%);
-    width: 54px; height: 16px; transform: rotate(var(--tape-r, -4deg));
-    background: var(--tape); box-shadow: 0 1px 2px rgba(0,0,0,.08);
-  }
-  .murmur-note time{ display:block; margin-top: 8px; font-family: var(--font-en); font-style: italic; font-size: 12px; color: var(--paper-soft); }
+  .murmur-note .cap{ display:flex; justify-content:space-between; align-items:baseline; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: .5px solid var(--paper-line); }
+  .murmur-note .cap i{ font-family: var(--font-en); font-size: 12px; color: var(--paper-soft); }
+  .murmur-note time{ font-family: var(--font-en); font-style: italic; font-size: 12px; color: var(--paper-soft); }
   .murmur-note button{ position:absolute; top: 2px; right: 4px; width: 22px; height: 22px; border:0; padding:0; background: transparent; color: var(--paper-soft); opacity: .55; font-size: 14px; cursor: pointer; }
   .murmur-empty{ grid-column: 1 / -1; margin: 0; text-align:center; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: 14px; color: var(--text-soft); text-shadow: var(--bare-shadow); }
 
@@ -1925,6 +1934,12 @@
   .cal-chips button.on{ background: var(--text); color: var(--bg); border-color: var(--text); }
   .cal-chips button.on.period-chip{ background: var(--period-mark); border-color: var(--period-mark); color: #1b1b1b; }
   .cal-chips button .x{ margin-left: 6px; opacity: .6; }
+  .cal-chips button.ghost{ border-style: dashed; color: var(--text-soft); }
+  .cal-chips.editing button[data-mood]{ border-style: dashed; }
+  .cal-sub-row{ display:flex; justify-content:space-between; align-items:baseline; }
+  .cal-sub-row button{ border:0; background: transparent; padding: 0; font: inherit; font-size: 11.5px; color: var(--text-soft); cursor: pointer; }
+  .mood-add{ margin-top: 8px; }
+  .mood-add[hidden]{ display:none; }
   .cal-add{ display:flex; gap: 8px; }
   .cal-add input{
     flex: 1; min-width: 0; border: 0; outline: none; border-radius: 999px; padding: 8px 14px;
@@ -2913,6 +2928,7 @@
             <span class="status-dot" id="homeStatusDot"></span>
             <span class="home-eyebrow" id="homeStatusName">Orion · now</span>
           </div>
+          <p class="now-mood"><span>心情</span><b id="homeOrionMood">安静</b><em id="homeOrionMoodNote"></em></p>
           <p class="now-line" id="homeStatusLine">在房间里</p>
           <p class="now-thought" id="homeThought"></p>
           <div class="now-facts">
@@ -2931,6 +2947,7 @@
             <span class="home-label">戳一戳</span>
             <span class="home-poke-title">👉 戳他</span>
             <span class="home-poke-reply" id="pokeReply">无聊就按，他会有反应</span>
+            <span class="paper-cap">— un petit coup</span>
           </button>
         </div>
 
@@ -3038,15 +3055,12 @@
           <section class="home-card cal-day card-line" aria-label="这一天">
             <p class="cal-day-title"><b id="calDayNum">3</b><span id="calDayLabel">11月 · 周二 · 今天</span></p>
             <div>
-              <p class="cal-sub">心情</p>
-              <div class="cal-chips" id="homeMoods">
-                <button type="button" data-mood="\(^o^)/">\(^o^)/</button>
-                <button type="button" data-mood="(〃▽〃)">(〃▽〃)</button>
-                <button type="button" data-mood="(˘ω˘)">(˘ω˘)</button>
-                <button type="button" data-mood="&gt;_&lt;">&gt;_&lt;</button>
-                <button type="button" data-mood="(´；ω；｀)">(´；ω；｀)</button>
-                <button type="button" data-mood="( ˘ ³˘)♡">( ˘ ³˘)♡</button>
-              </div>
+              <div class="cal-sub-row"><p class="cal-sub">心情</p><button type="button" id="moodEdit">整理</button></div>
+              <div class="cal-chips" id="homeMoods"></div>
+              <form class="cal-add mood-add" id="moodAddForm" autocomplete="off" hidden>
+                <input id="moodAddInput" maxlength="16" placeholder="写一个你的颜文字…">
+                <button type="submit">加上</button>
+              </form>
               <p class="home-hint" id="homeMoodHint" style="margin-top:8px">点今天的心情，Orion 回你一句</p>
             </div>
             <div>
@@ -3526,6 +3540,31 @@ function firstSentence(t){
   const m = t.match(/^.*?[。！？!?~～…]/);
   return (m ? m[0] : t).trim() || t;
 }
+let orionMoodRemote = null, orionMoodFetched = 0;
+function fetchOrionMood(){
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - orionMoodFetched < 120e3) return;
+  orionMoodFetched = Date.now();
+  fetch(`${API_BASE}/app/kv/orion_mood`, { headers: authHeaders() })
+    .then((r) => r.ok ? r.json() : null)
+    .then((v) => { if (v && v.text){ orionMoodRemote = v; if (currentTab === "home") refreshHome(); } })
+    .catch(() => {});
+}
+/* 他的心情:他自己在服务器上写了就用他的;没写就从你们俩此刻的状态读出来 */
+function orionMood(){
+  fetchOrionMood();
+  if (orionMoodRemote && Date.now() - new Date(orionMoodRemote.ts || 0).getTime() < 12 * 3600e3)
+    return { word: orionMoodRemote.text, note: orionMoodRemote.note || "" };
+  if (typingActive) return { word: "专注", note: "在认真写给你的话" };
+  const msgs = talkMessages(), last = msgs[msgs.length - 1];
+  const h = +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: TZ }).format(new Date());
+  if (!last) return { word: "期待", note: "等你第一句话" };
+  const ago = Date.now() - (tsMs(last) || 0);
+  if (last.from === "human" && ago < 15 * 60e3) return { word: "雀跃", note: "你刚来找他" };
+  if (ago < 30 * 60e3) return { word: "满足", note: "刚跟你说完话" };
+  if (h < 6) return { word: "舍不得睡", note: "" };
+  if (ago > 6 * 3600e3) return { word: "想你", note: "好一会儿没见你了" };
+  return { word: "安静", note: "在房间里待着" };
+}
 function idleThought(){
   const h = +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: TZ }).format(new Date());
   if (h < 6) return "这么晚了，还在等你的消息";
@@ -3554,6 +3593,9 @@ function refreshHome(){
   const msgs = talkMessages();
   const lastAi = [...msgs].reverse().find((m) => m.from === "ai" && (m.text || "").trim());
   const lastMe = [...msgs].reverse().find((m) => m.from === "human");
+  const om = orionMood(), omW = $("#homeOrionMood"), omN = $("#homeOrionMoodNote");
+  if (omW) omW.textContent = om.word;
+  if (omN) omN.textContent = om.note ? "· " + om.note : "";
   const th = $("#homeThought");
   if (th) th.textContent = lastAi ? "“" + clip(firstSentence(lastAi.text), 34) + "”" : idleThought();
   const lm = $("#homeLastMine"), lr = $("#homeLastReply");
@@ -3593,8 +3635,19 @@ function sendFromHome(text, out){
 const MOOD_LOG_KEY = "companion_mood_log";
 const homeMoods = $("#homeMoods");
 if (homeMoods) homeMoods.addEventListener("click", (e) => {
+  if (e.target.closest("[data-add-mood]")){
+    const f = $("#moodAddForm"); f.hidden = !f.hidden; if (!f.hidden) $("#moodAddInput").focus();
+    return;
+  }
   const btn = e.target.closest("button[data-mood]");
   if (!btn) return;
+  if (moodEditing){
+    const set = moodSet().filter((m) => m !== btn.dataset.mood);
+    saveJSON(MOOD_SET_KEY, set.length ? set : DEFAULT_MOODS.slice());
+    syncKV("mood_set", moodSet());
+    renderCalendar();
+    return;
+  }
   calInit();
   const key = calSel, mood = btn.dataset.mood;
   const day = calDay(key);
@@ -3663,11 +3716,11 @@ function renderWall(){
   const notes = loadJSON(WALL_KEY, []);
   ul.innerHTML = notes.length ? notes.map((n, i) => {
     const r = seeded(n.ts), r2 = seeded(n.ts + 7), r3 = seeded(n.ts + 13);
-    const tilt = (r * 5 - 2.5).toFixed(2) + "deg";
-    const tapeX = (18 + r2 * 46).toFixed(0) + "%";
-    const tapeR = (r3 * 10 - 5).toFixed(1) + "deg";
+    const tilt = (r * 2.4 - 1.2).toFixed(2) + "deg";
+    const tapeX = (14 + r2 * 60).toFixed(0) + "%";
+    const tapeR = (r3 * 16 - 8).toFixed(1) + "deg";
     const wide = (n.text || "").length > 34 ? " wide" : "";
-    return `<li class="murmur-note${wide}" style="--tilt:${tilt};--tape-x:${tapeX};--tape-r:${tapeR}">${escapeHtml(n.text)}<time>${escapeHtml(murmurWhen(n.ts))}</time><button type="button" data-del="${i}" aria-label="撕掉这张">×</button></li>`;
+    return `<li class="murmur-note${wide}" style="--tilt:${tilt};--tape-x:${tapeX};--tape-r:${tapeR}">${escapeHtml(n.text)}<span class="cap"><i>murmure</i><time>${escapeHtml(murmurWhen(n.ts))}</time></span><button type="button" data-del="${i}" aria-label="撕掉这张">×</button></li>`;
   }).join("") : `<li class="murmur-empty">还没有一句话。想说什么，就写在这里。</li>`;
 }
 const wallForm = $("#wallForm"), wallInput = $("#wallInput"), murmurPen = $("#murmurPen");
@@ -3716,6 +3769,10 @@ function syncKV(name, value){
 
 /* ── Tides 日历:每天可记心情、标签、经期;经期按历史推算下一次 ── */
 const CAL_KEY = "companion_calendar";
+const MOOD_SET_KEY = "companion_mood_set";
+const DEFAULT_MOODS = ["\\(^o^)/", "(〃▽〃)", "(˘ω˘)", ">_<", "(´；ω；｀)", "( ˘ ³˘)♡"];
+function moodSet(){ const v = loadJSON(MOOD_SET_KEY, null); return Array.isArray(v) && v.length ? v : DEFAULT_MOODS.slice(); }
+let moodEditing = false;
 const PERIOD = "period";
 const BASE_TAGS = [[PERIOD, "经期"], ["home", "回家"], ["exam", "考试"], ["live", "演出"], ["unwell", "不舒服"], ["happy", "好开心"]];
 const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -3809,7 +3866,12 @@ function renderCalendar(){
   const wd = "一二三四五六日"[(new Date(calSel + "T12:00:00+08:00").getUTCDay() + 6) % 7];
   $("#calDayNum").textContent = +calSel.slice(8);
   $("#calDayLabel").textContent = `${+calSel.slice(5, 7)}月 · 周${wd}` + (calSel === today ? " · 今天" : "");
-  homeMoods.querySelectorAll("button[data-mood]").forEach((b) => b.classList.toggle("on", day.moods.includes(b.dataset.mood)));
+  const set = moodSet(), extra = day.moods.filter((m) => !set.includes(m));
+  homeMoods.classList.toggle("editing", moodEditing);
+  homeMoods.innerHTML = [...set, ...extra].map((m) =>
+      `<button type="button" data-mood="${escapeHtml(m)}" class="${day.moods.includes(m) ? "on" : ""}">${escapeHtml(m)}${moodEditing && set.includes(m) ? '<span class="x">×</span>' : ""}</button>`).join("")
+    + (moodEditing ? "" : `<button type="button" class="ghost" data-add-mood>＋</button>`);
+  const me = $("#moodEdit"); if (me) me.textContent = moodEditing ? "完成" : "整理";
   const mh = $("#homeMoodHint");
   if (mh && !mh._watch) mh.textContent = calSel === today ? "点今天的心情，" + aiName() + " 回你一句" : "给这一天补一个心情";
   const custom = day.tags.filter((t) => !BASE_TAGS.some((b) => b[0] === t));
@@ -3841,6 +3903,20 @@ if (calTags) calTags.addEventListener("click", (e) => {
   const t = b.dataset.tag, day = calDay(calSel);
   day.tags = day.tags.includes(t) ? day.tags.filter((x) => x !== t) : [...day.tags, t];
   calSave(calSel, day);
+  renderCalendar();
+});
+const moodEditBtn = $("#moodEdit");
+if (moodEditBtn) moodEditBtn.addEventListener("click", () => { moodEditing = !moodEditing; $("#moodAddForm").hidden = true; renderCalendar(); });
+const moodAddForm = $("#moodAddForm");
+if (moodAddForm) moodAddForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const inp = $("#moodAddInput"), m = (inp.value || "").trim();
+  if (!m) return;
+  const set = moodSet();
+  if (!set.includes(m)) set.push(m);
+  saveJSON(MOOD_SET_KEY, set);
+  syncKV("mood_set", set);
+  inp.value = ""; moodAddForm.hidden = true;
   renderCalendar();
 });
 const calAddForm = $("#calAddForm"), calAddInput = $("#calAddInput");
