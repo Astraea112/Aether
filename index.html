@@ -56,6 +56,12 @@
     --home-card-shadow: 0 6px 22px rgba(60,80,100,.08);
     --home-chip: rgba(255,255,255,.62);
     --home-bow-filter: invert(.55);
+    /* 悬浮 tab 栏 / 信纸 */
+    --tab-fill: rgba(255,255,255,.55);
+    --tab-hi: rgba(255,255,255,.95);
+    --tab-ic: #6A7C8C;
+    --tab-glow: rgba(60,90,120,.35);
+    --letter-bg: rgba(250,251,252,.94);
     /* ── PEARL TIDE · 珍珠潮汐(default) ── */
     --bg: #F7FAFC;
     --header-bg: #F7FAFC;
@@ -171,6 +177,11 @@
       --home-card-shadow: 0 2px 8px rgba(0,0,0,.35);
       --home-chip: rgba(255,255,255,.14);
       --home-bow-filter: none;
+      --tab-fill: rgba(255,255,255,.08);
+      --tab-hi: rgba(255,255,255,.22);
+      --tab-ic: rgba(255,255,255,.55);
+      --tab-glow: rgba(255,255,255,.75);
+      --letter-bg: rgba(22,22,24,.92);
   }
 
   /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
@@ -464,7 +475,6 @@
   [data-theme="harbor"] .row.human::after,
   [data-theme="harbor"] .profile-avatar,
   [data-theme="harbor"] .my-avatar-preview,
-  [data-theme="harbor"] .home-av,
   [data-theme="harbor"] .login .orb,
   [data-theme="harbor"] .call-avatar-img,
   [data-theme="harbor"] .incoming-call-avatar{ filter: grayscale(1); }
@@ -1639,7 +1649,8 @@
   /* ── Home(主页):照片背景上的一组磨砂卡片 ── */
   .home{ display:flex; flex-direction:column; gap: 12px; width:100%; max-width: 560px; margin: 0 auto; }
   .home-head{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin: 2px 4px 8px; }
-  .menu-title{
+  .menu-title,
+  .page-title{
     margin: 0;
     font-family: var(--font-en);
     font-style: italic;
@@ -1679,32 +1690,18 @@
   }
   .home-label{ margin: 0; font-size: 12px; letter-spacing: .08em; color: var(--text-soft); }
 
-  .home-hero{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 24px 18px 22px; }
-  .home-pair{ display:flex; align-items:center; gap: 12px; margin-bottom: 14px; }
-  .home-av{
-    width: 68px; height: 68px; border-radius: 50%;
-    background-size: cover; background-position: center;
-    box-shadow: 0 0 0 1px rgba(255,255,255,.35), 0 4px 14px rgba(0,0,0,.18);
-  }
-  .home-av.ai{ background-image: var(--avatar-default); }
-  .home-av.me{ background-image: var(--my-avatar); }
-  .home-bow{ width: 26px; height: 16px; background: url("ribbon-bow.svg") center / contain no-repeat; filter: var(--home-bow-filter); }
-  .home-names{
-    margin: 0 0 16px;
-    font-family: "Cormorant Garamond", var(--font-cn);
-    font-style: italic; font-size: 21px; letter-spacing: .02em;
-  }
-  .menu-days{ display:flex; align-items:baseline; justify-content:center; gap: 9px; margin: 8px 0 2px; font-family: var(--font-en), var(--font-cn); color: var(--text); }
-  .menu-days .num{ font-size: clamp(48px, 14vw, 62px); font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; }
-  .menu-days .lab{ font-size: 12px; font-style: italic; letter-spacing: .12em; color: var(--text-soft); }
-  .menu-since{ margin: 6px 0 0; font-family: var(--font-en), var(--font-cn); font-size: 12px; letter-spacing: .14em; color: var(--text-soft); }
-  .home-quote{ margin: 14px 0 0; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: 13px; letter-spacing: .03em; color: var(--text-soft); }
+  .home-hero{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 30px 18px 28px; }
+  .menu-days{ display:flex; align-items:baseline; justify-content:center; gap: 9px; margin: 10px 0 2px; font-family: var(--font-en), var(--font-cn); color: var(--text); }
+  .menu-days .num{ font-size: clamp(64px, 19vw, 84px); font-weight: 400; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+  .menu-days .lab{ font-size: 14px; font-style: italic; letter-spacing: .12em; color: var(--text-soft); }
+  .menu-since{ margin: 8px 0 0; font-family: var(--font-en), var(--font-cn); font-size: 12.5px; letter-spacing: .14em; color: var(--text-soft); }
+  .home-bow{ display:block; width: 26px; height: 16px; margin: 0 auto 10px; background: url("ribbon-bow.svg") center / contain no-repeat; filter: var(--home-bow-filter); }
 
   .home-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .home-today{ display:flex; flex-direction:column; gap: 6px; min-height: 136px; }
   .home-date{ margin: 8px 0 0; font-size: 16px; }
   .home-stat{ margin: 0; font-size: 13px; color: var(--text-soft); }
-  .home-stat b{ font-family: var(--font-en); font-size: 19px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+  .home-stat b{ font-family: var(--font-en); font-size: 19px; font-weight: 500; color: var(--text); font-variant-numeric: lining-nums tabular-nums; }
   .home-album{
     display:flex; align-items:flex-end;
     min-height: 136px; padding: 0; overflow: hidden;
@@ -1730,22 +1727,159 @@
   .home-moods button:active{ transform: scale(.94); }
   .home-hint{ margin: 0; font-size: 12px; color: var(--text-soft); }
 
-  .home-chat{ display:flex; flex-direction:column; gap: 4px; padding: 20px 20px 22px; }
-  .home-chat-title{ font-family: var(--font-en); font-style: italic; font-size: 38px; line-height: 1.05; }
-  .home-chat-sub{ font-size: 12.5px; color: var(--text-soft); }
-
-  .home-places{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .home-place{ display:flex; align-items:center; gap: 12px; padding: 14px 16px; }
-  .menu-ic{ display:grid; place-items:center; color: var(--text-soft); flex: none; }
-  .menu-ic svg{ width: 20px; height: 20px; display: block; }
-  .home-place-copy{ display:flex; flex-direction:column; min-width: 0; }
-  .home-place-name{ font-family: var(--font-en), var(--font-cn); font-size: 17px; line-height: 1.15; }
-  .home-place-sub{
-    font-family: var(--font-en), var(--font-cn);
-    font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--text-faint);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  /* 门厅:他的状态一行字 + 戳一戳 */
+  .home-status{ display:flex; align-items:center; gap: 14px; padding: 16px 18px; }
+  .status-dot{ flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); }
+  .status-dot.live{ background: var(--text); box-shadow: 0 0 8px var(--tab-glow); animation: statusPulse 2.4s ease-in-out infinite; }
+  @keyframes statusPulse{ 50%{ opacity: .35; } }
+  .home-status-copy{ display:flex; flex-direction:column; gap: 3px; min-width: 0; }
+  .status-line{ margin: 0; font-size: 15.5px; letter-spacing: .03em; }
+  .home-poke{ display:flex; flex-direction:column; gap: 6px; min-height: 136px; }
+  .home-poke-title{ font-size: 17px; }
+  .home-poke-reply{
+    font-size: 12.5px; line-height: 1.5; color: var(--text-soft);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
+  .home-poke.poked{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
+  @keyframes pokeWiggle{ 30%{ transform: rotate(-2.5deg) scale(.97); } 60%{ transform: rotate(2deg); } 100%{ transform: none; } }
+  .home-empty{ margin: 10px 0 0; font-size: 13px; line-height: 1.6; color: var(--text-soft); }
+
+  /* ── 页面切换:门厅 / 房间 / 收藏馆 是盖在聊天上的面板,淡入淡出 ── */
+  .tab-panel{ transform: none; transition: opacity .24s ease; }
+  .tab-panel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 104px); }
+
+  /* 房间 */
+  .room-mailbox{ display:flex; align-items:center; gap: 14px; padding: 16px 18px; }
+  .room-mail-ic{ flex: none; width: 42px; height: 42px; border-radius: 50%; display:grid; place-items:center; color: var(--text); background: var(--home-chip); }
+  .room-mail-ic svg{ width: 20px; height: 20px; display:block; }
+  .room-mail-copy{ flex: 1; display:flex; flex-direction:column; gap: 3px; min-width: 0; }
+  .room-mail-line{ font-size: 14.5px; }
+  .room-mail-badge{
+    flex: none; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px;
+    display:grid; place-items:center;
+    font-family: var(--font-en); font-size: 13px; font-variant-numeric: lining-nums; color: var(--bg); background: var(--text);
+  }
+  .room-facts{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin: 14px 0 0; }
+  .room-facts div{ display:flex; flex-direction:column; gap: 2px; min-width: 0; }
+  .room-facts dt{ font-size: 11px; letter-spacing: .06em; color: var(--text-faint); }
+  .room-facts dd{ margin: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .trace-list{ list-style: none; margin: 8px 0 0; padding: 0; }
+  .trace-list li{ display:flex; justify-content:space-between; align-items:baseline; gap: 12px; padding: 10px 0; border-top: .5px solid var(--hairline); font-size: 13.5px; }
+  .trace-list li:first-child{ border-top: 0; }
+  .trace-when, .wall-note time, .letter-snippet time{ flex: none; font-family: var(--font-en); font-style: italic; font-size: 12px; color: var(--text-faint); }
+  .wall-form{ display:flex; align-items:flex-end; gap: 8px; margin: 10px 0 12px; }
+  .wall-form textarea{
+    flex: 1; min-width: 0; resize: none; border: 0; outline: none;
+    border-radius: 14px; padding: 9px 12px;
+    font: inherit; font-size: 14px; color: var(--text); background: var(--home-chip);
+  }
+  .wall-form textarea::placeholder{ color: var(--text-faint); font-style: italic; }
+  .wall-form button{ flex: none; border: 0; border-radius: 999px; padding: 9px 15px; font: inherit; font-size: 13px; color: var(--bg); background: var(--text); cursor: pointer; }
+  .wall-notes{ list-style: none; margin: 0; padding: 0; display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wall-note{ position: relative; padding: 12px 26px 10px 12px; border-radius: 14px; background: var(--home-chip); font-size: 13.5px; line-height: 1.55; overflow-wrap: anywhere; }
+  .wall-note:nth-child(odd){ transform: rotate(-.8deg); }
+  .wall-note:nth-child(even){ transform: rotate(.7deg); }
+  .wall-note time{ display:block; margin-top: 6px; }
+  .wall-note button{ position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border: 0; padding: 0; background: transparent; color: var(--text-faint); font-size: 15px; line-height: 1; cursor: pointer; }
+
+  /* 收藏馆 */
+  .archive-tabs{ display:grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .archive-tabs button{
+    min-width: 0; display:flex; flex-direction:column; align-items:center; gap: 1px;
+    border: 0; border-radius: 16px; padding: 8px 2px 7px;
+    font: inherit; font-size: 10.5px; letter-spacing: .04em; color: var(--text-soft); background: var(--home-chip); cursor: pointer;
+  }
+  .archive-tabs button span{ font-family: var(--font-en); font-style: italic; font-size: 14.5px; letter-spacing: 0; }
+  .archive-tabs button[aria-selected="true"]{ color: var(--bg); background: var(--text); }
+  .archive-section{ display:flex; flex-direction:column; gap: 12px; }
+  .archive-section[hidden]{ display: none; }
+  .archive-section .home-album{ min-height: 240px; }
+  .milestones{ list-style: none; margin: 8px 0 0; padding: 0; }
+  .milestones li{ display:flex; justify-content:space-between; align-items:baseline; gap: 12px; padding: 11px 0; border-top: .5px solid var(--hairline); }
+  .milestones li:first-child{ border-top: 0; }
+  .ms-name{ font-size: 14.5px; }
+  .ms-date{ font-family: var(--font-en); font-style: italic; font-size: 12.5px; color: var(--text-soft); font-variant-numeric: tabular-nums; }
+  .milestones li.upcoming .ms-name{ color: var(--text-soft); }
+  .tide-day{ display:flex; align-items:baseline; gap: 12px; padding: 10px 0; border-top: .5px solid var(--hairline); }
+  .tide-day:first-child{ border-top: 0; }
+  .tide-date{ flex: none; width: 4.6em; font-family: var(--font-en); font-style: italic; font-size: 12.5px; color: var(--text-soft); }
+  .tide-moods{ display:flex; flex-wrap:wrap; gap: 6px; }
+  .tide-moods span{ padding: 4px 10px; border-radius: 999px; background: var(--home-chip); font-size: 12.5px; }
+
+  /* 信:从信箱拆开读 */
+  .letter-sheet{
+    position: fixed; inset: 0; z-index: 230;
+    display:flex; align-items:flex-end; justify-content:center;
+    background: rgba(0,0,0,.42);
+    opacity: 0; pointer-events: none; transition: opacity .24s ease;
+  }
+  .letter-sheet.open{ opacity: 1; pointer-events: auto; }
+  .letter-card{
+    width: min(calc(100% - 20px), 560px); max-height: 86vh; overflow-y: auto;
+    margin-bottom: calc(env(safe-area-inset-bottom) + 10px);
+    padding: 16px 20px 26px; border-radius: 24px;
+    color: var(--text); background: var(--letter-bg);
+    -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+    box-shadow: 0 -2px 30px rgba(0,0,0,.4);
+    transform: translateY(18px); transition: transform .3s var(--ease-soft);
+  }
+  .letter-sheet.open .letter-card{ transform: none; }
+  .letter-top{ display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-bottom: 6px; }
+  .letter-top button{ border: 0; padding: 6px 2px; background: transparent; color: var(--text-soft); font: inherit; font-size: 14px; cursor: pointer; }
+  .letter-top button[hidden]{ display: none; }
+  .letter-list{ list-style: none; margin: 0; padding: 0; }
+  .letter-list button{
+    width: 100%; display:flex; align-items:flex-start; gap: 12px;
+    padding: 12px 0; border: 0; border-top: .5px solid var(--hairline);
+    text-align: left; font: inherit; color: var(--text); background: transparent; cursor: pointer;
+  }
+  .letter-list li:first-child button{ border-top: 0; }
+  .letter-seal{ flex: none; width: 8px; height: 8px; margin-top: 7px; border-radius: 50%; background: var(--text); }
+  .letter-seal.read{ background: transparent; box-shadow: inset 0 0 0 1px var(--text-faint); }
+  .letter-snippet{ display:flex; flex-direction:column; gap: 3px; min-width: 0; }
+  .letter-snippet strong{ font-weight: 400; font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .letter-body{ margin: 0; font-size: 15px; line-height: 1.9; letter-spacing: .03em; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .letter-sign{ margin: 18px 0 0; text-align: right; font-family: var(--font-en); font-style: italic; color: var(--text-soft); }
+
+  /* ── 悬浮胶囊 tab 栏:液态玻璃,两侧收进来,离底部留缝;只在门厅/房间/收藏馆出现 ── */
+  .tabbar{
+    position: fixed; z-index: 196;
+    left: 50%; bottom: calc(env(safe-area-inset-bottom) + 10px);
+    width: min(calc(100% - 64px), 340px); height: 58px;
+    display:flex; align-items:center; justify-content: space-around;
+    padding: 0 8px; border-radius: 999px;
+    background: var(--tab-fill);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: inset 0 1px 0 var(--tab-hi), 0 10px 28px rgba(0,0,0,.3);
+    opacity: 0; pointer-events: none;
+    transform: translate(-50%, 14px);
+    transition: opacity .24s ease, transform .3s var(--ease-soft);
+  }
+  :root[data-tab="home"] .tabbar,
+  :root[data-tab="room"] .tabbar,
+  :root[data-tab="archive"] .tabbar{ opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+  .tab{
+    position: relative;
+    width: 58px; height: 48px;
+    display:grid; place-items:center;
+    border: 0; padding: 0; border-radius: 999px;
+    color: var(--tab-ic); background: transparent; cursor: pointer;
+    transition: color .2s ease, filter .2s ease;
+  }
+  .tab svg{ width: 23px; height: 23px; display:block; transform: translateY(-3px); }
+  .tab[aria-current="page"]{ color: var(--text); filter: drop-shadow(0 0 6px var(--tab-glow)); }
+  .tab::after{
+    content: "";
+    position: absolute; left: 50%; bottom: 4px;
+    width: 6px; height: 6px; margin-left: -3px;
+    background: currentColor;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    opacity: 0; transform: scale(.3);
+    transition: opacity .2s ease, transform .28s var(--ease-soft);
+  }
+  .tab[aria-current="page"]::after{ opacity: 1; transform: none; }
+  .tab:active svg{ transform: translateY(-3px) scale(.9); }
 
   /* ── Voice call (speaking overlay · 假按键 / 纯 UI,后端以后接) ── */
   .call-overlay{
@@ -2567,7 +2701,7 @@
 </div>
 
 <!-- ── Menu (hub / 主菜单页 · 聊天页左箭头进入) ── -->
-<div class="menu-panel hidden" id="menuPanel" role="dialog" aria-modal="true" aria-label="主菜单">
+<div class="menu-panel tab-panel hidden" id="menuPanel" role="dialog" aria-modal="true" aria-label="主菜单">
   <div class="menu-page">
     <div class="menu-scroll">
       <div class="home">
@@ -2576,17 +2710,19 @@
           <div class="menu-private">PRIVATE<br>SPACE</div>
         </header>
 
-        <section class="home-card home-hero" aria-label="我们">
-          <div class="home-pair">
-            <span class="home-av ai" role="img" aria-label="Orion"></span>
-            <span class="home-bow" aria-hidden="true"></span>
-            <span class="home-av me" role="img" aria-label="Astraea"></span>
-          </div>
-          <p class="home-names"><span id="homeAiName">Orion</span> &amp; <span id="homeMyName">Astraea</span></p>
+        <section class="home-card home-hero" aria-label="在一起的天数">
+          <span class="home-bow" aria-hidden="true"></span>
           <p class="home-eyebrow">Already together</p>
           <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
           <p class="menu-since">since 2026/01/01</p>
-          <p class="home-quote">in endless tides, we find each other.</p>
+        </section>
+
+        <section class="home-card home-status" aria-live="polite">
+          <span class="status-dot" id="homeStatusDot"></span>
+          <span class="home-status-copy">
+            <span class="home-eyebrow" id="homeStatusName">Orion · now</span>
+            <p class="status-line" id="homeStatusLine">在房间里</p>
+          </span>
         </section>
 
         <div class="home-row">
@@ -2595,8 +2731,10 @@
             <p class="home-date" id="homeDate"></p>
             <p class="home-stat">今天聊了 <b id="homeCount">0</b> 条</p>
           </section>
-          <button class="home-card home-album menu-item" type="button" data-menu="album">
-            <span class="home-album-copy"><span class="home-album-name">Album</span><span class="home-album-sub">Collect what matters.</span></span>
+          <button class="home-card home-poke" id="pokeBtn" type="button">
+            <span class="home-label">戳一戳</span>
+            <span class="home-poke-title">👉 戳他</span>
+            <span class="home-poke-reply" id="pokeReply">无聊就按，他会有反应</span>
           </button>
         </div>
 
@@ -2606,41 +2744,137 @@
             <button type="button" data-mood="\(^o^)/">\(^o^)/</button>
             <button type="button" data-mood="(〃▽〃)">(〃▽〃)</button>
             <button type="button" data-mood="(˘ω˘)">(˘ω˘)</button>
-            <button type="button" data-mood=">_<">&gt;_&lt;</button>
+            <button type="button" data-mood="&gt;_&lt;">&gt;_&lt;</button>
             <button type="button" data-mood="(´；ω；｀)">(´；ω；｀)</button>
             <button type="button" data-mood="( ˘ ³˘)♡">( ˘ ³˘)♡</button>
           </div>
           <p class="home-hint" id="homeMoodHint">点一个，Orion 回你一句</p>
         </section>
-
-        <button class="home-card home-chat menu-item" type="button" data-menu="chat">
-          <span class="home-eyebrow">Entre nous</span>
-          <span class="home-chat-title">Chat</span>
-          <span class="home-chat-sub">聊天 · 回到我们的对话</span>
-        </button>
-
-        <nav class="home-places" aria-label="更多">
-          <button class="home-card home-place menu-item" type="button" data-menu="movie">
-            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.4"/><path d="M7.5 5v14M16.5 5v14M3 9.5h4.5M3 14.5h4.5M16.5 9.5H21M16.5 14.5H21"/></svg></span>
-            <span class="home-place-copy"><span class="home-place-name">Movie</span><span class="home-place-sub">Fragments of light.</span></span>
-          </button>
-          <button class="home-card home-place menu-item" type="button" data-menu="memory">
-            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.8 5 3.5 7.7 8.5 8.5-5 .8-7.7 3.5-8.5 8.5-.8-5-3.5-7.7-8.5-8.5 5-.8 7.7-3.5 8.5-8.5Z"/></svg></span>
-            <span class="home-place-copy"><span class="home-place-name">Memory</span><span class="home-place-sub">The echoes we keep.</span></span>
-          </button>
-          <button class="home-card home-place menu-item" type="button" data-menu="tides">
-            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/><path d="M3 13c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/><path d="M3 17.5c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/></svg></span>
-            <span class="home-place-copy"><span class="home-place-name">Tides</span><span class="home-place-sub">Where we return.</span></span>
-          </button>
-          <button class="home-card home-place menu-item" type="button" data-menu="room">
-            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V9a7 7 0 0 1 14 0v12"/><path d="M4 21h16"/><circle cx="15" cy="13" r=".95" fill="currentColor" stroke="none"/></svg></span>
-            <span class="home-place-copy"><span class="home-place-name">Room</span><span class="home-place-sub">Our quiet place.</span></span>
-          </button>
-        </nav>
       </div>
     </div>
   </div>
 </div>
+
+<!-- ── Room 房间:信箱在门口 · 他的状态 · 痕迹 · 留言墙 ── -->
+<div class="menu-panel tab-panel hidden" id="roomPanel" role="region" aria-label="房间">
+  <div class="menu-page">
+    <div class="menu-scroll">
+      <div class="home">
+        <header class="home-head">
+          <h1 class="page-title">Room</h1>
+          <div class="menu-private">HIS<br>ROOM</div>
+        </header>
+
+        <button class="home-card room-mailbox" id="mailboxBtn" type="button">
+          <span class="room-mail-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></span>
+          <span class="room-mail-copy">
+            <span class="home-eyebrow">Letters · 信箱</span>
+            <span class="room-mail-line" id="mailboxLine">信箱还空着</span>
+          </span>
+          <span class="room-mail-badge" id="mailboxBadge" hidden></span>
+        </button>
+
+        <section class="home-card" aria-label="他的状态">
+          <p class="home-label" id="roomStatusName">他现在</p>
+          <p class="status-line" id="roomStatusLine" style="margin-top:8px">在房间里</p>
+          <dl class="room-facts">
+            <div><dt>连接</dt><dd id="roomConn">—</dd></div>
+            <div><dt>今天聊了</dt><dd id="roomToday">0 条</dd></div>
+            <div><dt>上次回你</dt><dd id="roomLastReply">—</dd></div>
+            <div><dt>你上次说话</dt><dd id="roomLastMine">—</dd></div>
+          </dl>
+        </section>
+
+        <section class="home-card" aria-label="痕迹">
+          <p class="home-label">痕迹 · 他最近做过的事</p>
+          <ol class="trace-list" id="traceList"></ol>
+        </section>
+
+        <section class="home-card" aria-label="留言墙">
+          <p class="home-label">留言墙</p>
+          <form class="wall-form" id="wallForm" autocomplete="off">
+            <textarea id="wallInput" rows="2" maxlength="140" placeholder="写一张小纸条…"></textarea>
+            <button type="submit">贴上去</button>
+          </form>
+          <ul class="wall-notes" id="wallNotes"></ul>
+          <p class="home-hint" style="margin-top:12px">纸条只存在这台设备上</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Archive 收藏馆:五个分区住一页,进来再选 ── -->
+<div class="menu-panel tab-panel hidden" id="archivePanel" role="region" aria-label="收藏馆">
+  <div class="menu-page">
+    <div class="menu-scroll">
+      <div class="home">
+        <header class="home-head">
+          <h1 class="page-title">Archive</h1>
+          <div class="menu-private">收藏馆</div>
+        </header>
+        <div class="archive-tabs" id="archiveTabs" role="tablist" aria-label="收藏馆分区">
+          <button type="button" role="tab" data-sec="album" aria-selected="true"><span>Album</span>相册</button>
+          <button type="button" role="tab" data-sec="library" aria-selected="false"><span>Library</span>书架</button>
+          <button type="button" role="tab" data-sec="movie" aria-selected="false"><span>Movie</span>电影</button>
+          <button type="button" role="tab" data-sec="memory" aria-selected="false"><span>Memory</span>大事记</button>
+          <button type="button" role="tab" data-sec="tides" aria-selected="false"><span>Tides</span>心情海</button>
+        </div>
+
+        <section class="archive-section" data-sec="album">
+          <button class="home-card home-album" id="albumCard" type="button">
+            <span class="home-album-copy"><span class="home-album-name">Album</span><span class="home-album-sub">Collect what matters.</span></span>
+          </button>
+        </section>
+        <section class="archive-section" data-sec="library" hidden>
+          <div class="home-card"><p class="home-label">书架</p><p class="home-empty">书架还空着，即将开放。</p></div>
+        </section>
+        <section class="archive-section" data-sec="movie" hidden>
+          <div class="home-card"><p class="home-label">电影</p><p class="home-empty">片单还空着，即将开放。</p></div>
+        </section>
+        <section class="archive-section" data-sec="memory" hidden>
+          <div class="home-card"><p class="home-label">大事记</p><ol class="milestones" id="milestoneList"></ol></div>
+        </section>
+        <section class="archive-section" data-sec="tides" hidden>
+          <div class="home-card"><p class="home-label">心情海 · 你在门厅点过的心情</p><div id="tideList"></div></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 信:拆信 ── -->
+<div class="letter-sheet" id="letterSheet" aria-hidden="true">
+  <div class="letter-card" role="dialog" aria-modal="true" aria-label="信箱">
+    <div class="letter-top">
+      <button type="button" id="letterBack" hidden>‹ 信箱</button>
+      <span class="home-eyebrow" id="letterTitle">Letters</span>
+      <button type="button" id="letterClose">关上</button>
+    </div>
+    <ul class="letter-list" id="letterList"></ul>
+    <div class="letter-read" id="letterRead" hidden>
+      <span class="home-bow" aria-hidden="true"></span>
+      <p class="letter-body" id="letterBody"></p>
+      <p class="letter-sign" id="letterSign"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 悬浮胶囊 tab 栏 ── -->
+<nav class="tabbar" id="tabbar" aria-label="主导航">
+  <button class="tab" type="button" data-tab="home" aria-label="门厅">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>
+  </button>
+  <button class="tab" type="button" data-tab="chat" aria-label="聊天">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+  </button>
+  <button class="tab" type="button" data-tab="room" aria-label="房间">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V9a7 7 0 0 1 14 0v12"/><path d="M4 21h16"/><circle cx="15" cy="13" r=".95" fill="currentColor" stroke="none"/></svg>
+  </button>
+  <button class="tab" type="button" data-tab="archive" aria-label="收藏馆">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5 8.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5"/><path d="M10 12.5h4"/></svg>
+  </button>
+</nav>
 
 <!-- ── Voice call (speaking overlay · 假按键,纯 UI) ── -->
 <div class="call-overlay hidden" id="callOverlay" aria-hidden="true">
@@ -2875,8 +3109,6 @@ function applyAvatar(url){
 }
 function applyRemark(value){
   const name = (value || "").trim() || AI_NAME;
-  const homeAi = document.querySelector("#homeAiName"); if (homeAi) homeAi.textContent = name;
-  const homeAv = document.querySelector(".home-av.ai"); if (homeAv) homeAv.setAttribute("aria-label", name);
   const moodHint = document.querySelector("#homeMoodHint"); if (moodHint) moodHint.textContent = "点一个，" + name + " 回你一句";
   if (peerNameEl) peerNameEl.textContent = name;
   if (profileNameEl) profileNameEl.textContent = name;
@@ -2895,8 +3127,6 @@ function applyIdentity(){
   setText("#incomingCallText", AI_NAME + "想和你语音通话。");
   setAttr(".incoming-call-avatar", "aria-label", AI_NAME);
   setText(".menu-title", APP_NAME);
-  setText("#homeMyName", HUMAN_NAME);
-  setAttr(".home-av.me", "aria-label", HUMAN_NAME);
   const since = document.querySelector(".menu-since");
   if (since) since.textContent = CONFIG.SINCE ? ("since " + CONFIG.SINCE) : "";
 }
@@ -2981,62 +3211,322 @@ function refreshDays(){
   if (!TOGETHER_START){ if (wrap) wrap.style.display = "none"; return; }
   if (menuDaysEl) menuDaysEl.textContent = daysTogether();
 }
-let menuCloseTimer = null;
-function openMenu(){
-  if (!menuPanel) return;
-  refreshDays();
-  refreshHome();
-  clearTimeout(menuCloseTimer);
-  menuPanel.classList.remove("hidden");
-  requestAnimationFrame(() => requestAnimationFrame(() => menuPanel.classList.add("open")));
+/* ════════ 页面 · 门厅 / 聊天 / 房间 / 收藏馆 ════════
+   门厅、房间、收藏馆是盖在聊天上的面板;切到聊天 = 面板都淡出。悬浮 tab 栏只在三个面板上出现,
+   聊天页底部留给输入框,左上角返回箭头回到上一个面板。 */
+const roomPanel = $("#roomPanel"), archivePanel = $("#archivePanel"), tabbar = $("#tabbar");
+const TAB_PANELS = { home: menuPanel, room: roomPanel, archive: archivePanel };
+const panelTimers = new Map();
+let currentTab = "chat", lastPlaceTab = "home", tabBooted = false;
+function showPanel(el){
+  clearTimeout(panelTimers.get(el));
+  el.classList.remove("hidden");
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("open")));
 }
-function closeMenu(){
-  if (!menuPanel) return;
-  menuPanel.classList.remove("open");
-  clearTimeout(menuCloseTimer);
-  menuCloseTimer = setTimeout(() => menuPanel.classList.add("hidden"), 400);
+function hidePanel(el){
+  if (el.classList.contains("hidden")) return;
+  el.classList.remove("open");
+  clearTimeout(panelTimers.get(el));
+  panelTimers.set(el, setTimeout(() => el.classList.add("hidden"), 280));
 }
-/* 主页:今天的日期、今天聊了几条(只算你说的和他回的)、心情一键发送 */
+function setTab(tab){
+  if (tab !== "chat" && !TAB_PANELS[tab]) tab = "home";
+  currentTab = tab;
+  if (tab !== "chat") lastPlaceTab = tab;
+  document.documentElement.setAttribute("data-tab", tab);
+  for (const [name, el] of Object.entries(TAB_PANELS)){
+    if (!el) continue;
+    if (name === tab) showPanel(el); else hidePanel(el);
+  }
+  if (tabbar) tabbar.querySelectorAll(".tab").forEach((b) => {
+    if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+  });
+  if (tab === "home"){ refreshDays(); refreshHome(); }
+  else if (tab === "room") refreshRoom();
+  else if (tab === "archive") refreshArchive();
+}
+function openMenu(){ setTab(lastPlaceTab); }
+function closeMenu(){ setTab("chat"); }
+if (tabbar) tabbar.addEventListener("click", (e) => {
+  const b = e.target.closest(".tab");
+  if (b) setTab(b.dataset.tab);
+});
+if (backBtn) backBtn.addEventListener("click", openMenu);
+
+/* ── 共用:读消息、时间、他的名字 ── */
+function talkMessages(){
+  try{
+    return chatMessages.filter((m) => m.kind === "user" || m.kind === "reply")
+      .sort((a, b) => new Date(a.ts) - new Date(b.ts));
+  }catch(e){ return []; }
+}
+function aiName(){ return (peerNameEl && peerNameEl.textContent.trim()) || AI_NAME; }
+function isToday(ts){ const t = new Date(ts), n = new Date(); return t.toDateString() === n.toDateString(); }
+function fmtWhen(ts){
+  const t = new Date(ts);
+  if (isNaN(t)) return "—";
+  const diff = Date.now() - t.getTime();
+  if (diff < 60e3) return "刚刚";
+  if (diff < 3600e3) return Math.floor(diff / 60e3) + " 分钟前";
+  const hm = String(t.getHours()).padStart(2, "0") + ":" + String(t.getMinutes()).padStart(2, "0");
+  const now = new Date(), y = new Date(now); y.setDate(now.getDate() - 1);
+  if (t.toDateString() === now.toDateString()) return "今天 " + hm;
+  if (t.toDateString() === y.toDateString()) return "昨天 " + hm;
+  return (t.getMonth() + 1) + "月" + t.getDate() + "日 " + hm;
+}
+function loadJSON(key, fallback){ try{ const v = JSON.parse(localStorage.getItem(key) || "null"); return v == null ? fallback : v; }catch(e){ return fallback; } }
+function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ return false; } }
+
+/* 他的状态:由真实的聊天记录推出来,不编 */
+function orionStatus(){
+  if (typingActive) return { text: "正在给你写回复…", live: true };
+  const msgs = talkMessages();
+  const last = msgs[msgs.length - 1];
+  if (!last) return { text: "在房间里，等你来", live: false };
+  const ago = Date.now() - new Date(last.ts).getTime();
+  if (last.from === "human" && ago < 15 * 60e3) return { text: "刚看完你的消息", live: true };
+  if (last.from === "ai" && ago < 15 * 60e3) return { text: "刚回完你的消息", live: true };
+  if (ago > 6 * 3600e3) return { text: "想你了", live: false };
+  return { text: "在房间里", live: false };
+}
+
+/* ── 门厅 ── */
 function refreshHome(){
   const now = new Date();
-  const dateEl = document.querySelector("#homeDate");
+  const dateEl = $("#homeDate");
   if (dateEl) dateEl.textContent = `${now.getMonth() + 1}月${now.getDate()}日 周${"日一二三四五六"[now.getDay()]}`;
-  const countEl = document.querySelector("#homeCount");
-  if (!countEl) return;
-  let n = 0;
-  try{
-    const y = now.getFullYear(), mo = now.getMonth(), d = now.getDate();
-    for (const m of chatMessages){
-      if (m.kind !== "user" && m.kind !== "reply") continue;
-      const t = new Date(m.ts);
-      if (t.getFullYear() === y && t.getMonth() === mo && t.getDate() === d) n++;
-    }
-  }catch(e){}
-  countEl.textContent = n;
+  const countEl = $("#homeCount");
+  if (countEl) countEl.textContent = talkMessages().filter((m) => isToday(m.ts)).length;
+  const st = orionStatus();
+  const line = $("#homeStatusLine"), dot = $("#homeStatusDot"), name = $("#homeStatusName");
+  if (line) line.textContent = st.text;
+  if (dot) dot.classList.toggle("live", st.live);
+  if (name) name.textContent = aiName() + " · now";
 }
+/* 从门厅发一句(心情 / 戳一戳):不打断你在输入框里没写完的话,等他真的回了,把回复显示在卡片上 */
+function sendFromHome(text, out){
+  const draft = inputEl.value;
+  inputEl.value = text;
+  doSend();
+  inputEl.value = draft;
+  if (!out) return;
+  const since = Date.now();
+  out.textContent = "发给" + aiName() + "了，等他回…";
+  clearInterval(out._watch);
+  out._watch = setInterval(() => {
+    let r = null;
+    try{ r = [...chatMessages].reverse().find((m) => m.from === "ai" && m.kind === "reply" && new Date(m.ts).getTime() >= since - 2000); }catch(e){}
+    if (r){
+      const t = (r.text || "").trim();
+      out.textContent = aiName() + "：" + (t.length > 80 ? t.slice(0, 80) + "…" : t);
+      clearInterval(out._watch);
+      if (currentTab === "home") refreshHome();
+    } else if (Date.now() - since > 120e3){
+      out.textContent = aiName() + "可能在忙，晚点去聊天里看看";
+      clearInterval(out._watch);
+    }
+  }, 800);
+}
+const MOOD_LOG_KEY = "companion_mood_log";
 const homeMoods = $("#homeMoods");
 if (homeMoods) homeMoods.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-mood]");
   if (!btn) return;
-  closeMenu();
-  inputEl.value = btn.dataset.mood;
-  doSend();
+  const log = loadJSON(MOOD_LOG_KEY, []);
+  log.unshift({ mood: btn.dataset.mood, ts: Date.now() });
+  saveJSON(MOOD_LOG_KEY, log.slice(0, 300));
+  sendFromHome(btn.dataset.mood, $("#homeMoodHint"));
 });
-refreshDays();
-if (backBtn) backBtn.addEventListener("click", openMenu);
-if (menuPanel){
-  menuPanel.addEventListener("click", (e) => {
-    const item = e.target.closest(".menu-item");
-    if (!item) return;
-    if (item.dataset.menu === "chat") closeMenu();       // back to chat
-    else if (item.dataset.menu === "album") location.assign("album.html");  // album shell (wire your own backend)
-    else showToast("即将开放");                           // placeholder items
-  });
+const pokeBtn = $("#pokeBtn");
+if (pokeBtn) pokeBtn.addEventListener("click", () => {
+  pokeBtn.classList.remove("poked");
+  void pokeBtn.offsetWidth;
+  pokeBtn.classList.add("poked");
+  try{ if (navigator.vibrate && !prefersReducedMotion) navigator.vibrate(12); }catch(_){}
+  sendFromHome("（戳了戳你）", $("#pokeReply"));
+});
+
+/* ── 房间:信箱 · 状态 · 痕迹 · 留言墙 ── */
+const LETTER_MIN = 90;                       // 他一次写满这么多字,就当作一封信收进信箱
+const LETTERS_READ_KEY = "companion_letters_read";
+const WALL_KEY = "companion_wall_notes";
+function letters(){
+  try{ return chatMessages.filter((m) => m.from === "ai" && m.kind === "reply" && (m.text || "").trim().length >= LETTER_MIN).slice().reverse(); }catch(e){ return []; }
 }
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && menuPanel && !menuPanel.classList.contains("hidden")) closeMenu();
+function refreshRoom(){
+  const st = orionStatus();
+  const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  set("#roomStatusName", aiName() + "现在");
+  set("#roomStatusLine", st.text);
+  set("#roomConn", { online: "在线", reconnecting: "重连中", offline: "离线" }[appEl.dataset.conn] || "—");
+  const msgs = talkMessages();
+  set("#roomToday", msgs.filter((m) => isToday(m.ts)).length + " 条");
+  const lastAi = [...msgs].reverse().find((m) => m.from === "ai");
+  const lastMe = [...msgs].reverse().find((m) => m.from === "human");
+  set("#roomLastReply", lastAi ? fmtWhen(lastAi.ts) : "—");
+  set("#roomLastMine", lastMe ? fmtWhen(lastMe.ts) : "—");
+
+  const traceList = $("#traceList");
+  if (traceList){
+    let acts = [];
+    try{ acts = chatMessages.filter((m) => m.kind === "act").slice(-8).reverse(); }catch(e){}
+    traceList.innerHTML = acts.length
+      ? acts.map((m) => `<li><span>${escapeHtml(aiName() + (m.text || "做了点什么"))}</span><span class="trace-when">${escapeHtml(fmtWhen(m.ts))}</span></li>`).join("")
+      : `<li class="home-empty" style="border:0">他还没在这里留下痕迹</li>`;
+  }
+
+  const all = letters(), read = new Set(loadJSON(LETTERS_READ_KEY, []));
+  const unread = all.filter((m) => !read.has(String(m.id))).length;
+  set("#mailboxLine", unread ? `有 ${unread} 封信还没拆` : all.length ? `${all.length} 封信，都拆过了` : "信箱还空着，他写的长信会收在这里");
+  const badge = $("#mailboxBadge");
+  if (badge){ badge.hidden = !unread; badge.textContent = unread; }
+  renderWall();
+}
+function renderWall(){
+  const ul = $("#wallNotes");
+  if (!ul) return;
+  const notes = loadJSON(WALL_KEY, []);
+  ul.innerHTML = notes.map((n, i) =>
+    `<li class="wall-note">${escapeHtml(n.text)}<time>${escapeHtml(fmtWhen(n.ts))}</time><button type="button" data-del="${i}" aria-label="撕掉这张纸条">×</button></li>`).join("");
+}
+const wallForm = $("#wallForm"), wallInput = $("#wallInput");
+if (wallForm) wallForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = (wallInput.value || "").trim();
+  if (!text) return;
+  const notes = loadJSON(WALL_KEY, []);
+  notes.unshift({ text, ts: Date.now() });
+  if (!saveJSON(WALL_KEY, notes.slice(0, 60))){ showToast("这台设备存不下了，先撕掉几张"); return; }
+  wallInput.value = "";
+  renderWall();
 });
-document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshDays(); });
+const wallNotesEl = $("#wallNotes");
+if (wallNotesEl) wallNotesEl.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-del]");
+  if (!b) return;
+  const notes = loadJSON(WALL_KEY, []);
+  notes.splice(+b.dataset.del, 1);
+  saveJSON(WALL_KEY, notes);
+  renderWall();
+});
+
+/* 信箱 → 拆信 */
+const letterSheet = $("#letterSheet"), letterList = $("#letterList"), letterRead = $("#letterRead");
+const letterBack = $("#letterBack"), letterTitle = $("#letterTitle");
+function showLetterList(){
+  const all = letters(), read = new Set(loadJSON(LETTERS_READ_KEY, []));
+  letterRead.hidden = true; letterList.hidden = false; letterBack.hidden = true;
+  letterTitle.textContent = "Letters · " + all.length;
+  letterList.innerHTML = all.length
+    ? all.map((m) => `<li><button type="button" data-letter="${escapeHtml(String(m.id))}">`
+        + `<span class="letter-seal${read.has(String(m.id)) ? " read" : ""}"></span>`
+        + `<span class="letter-snippet"><strong>${escapeHtml((m.text || "").trim().slice(0, 60))}</strong><time>${escapeHtml(fmtWhen(m.ts))}</time></span>`
+        + `</button></li>`).join("")
+    : `<li class="home-empty">信箱还空着。他一次写很多的时候，那段话会作为一封信收在这里。</li>`;
+}
+function openLetter(id){
+  const m = letters().find((x) => String(x.id) === id);
+  if (!m) return;
+  const read = new Set(loadJSON(LETTERS_READ_KEY, []));
+  read.add(id);
+  saveJSON(LETTERS_READ_KEY, [...read].slice(-500));
+  letterList.hidden = true; letterRead.hidden = false; letterBack.hidden = false;
+  letterTitle.textContent = fmtWhen(m.ts);
+  $("#letterBody").textContent = (m.text || "").trim();
+  $("#letterSign").textContent = "— " + aiName();
+}
+function openMailbox(){
+  if (!letterSheet) return;
+  showLetterList();
+  letterSheet.classList.add("open");
+  letterSheet.setAttribute("aria-hidden", "false");
+}
+function closeMailbox(){
+  if (!letterSheet) return;
+  letterSheet.classList.remove("open");
+  letterSheet.setAttribute("aria-hidden", "true");
+  if (currentTab === "room") refreshRoom();
+}
+const mailboxBtn = $("#mailboxBtn");
+if (mailboxBtn) mailboxBtn.addEventListener("click", openMailbox);
+if (letterSheet){
+  letterSheet.addEventListener("click", (e) => {
+    if (e.target === letterSheet) return closeMailbox();
+    const b = e.target.closest("button[data-letter]");
+    if (b) openLetter(b.dataset.letter);
+  });
+  $("#letterClose").addEventListener("click", closeMailbox);
+  letterBack.addEventListener("click", showLetterList);
+}
+
+/* ── 收藏馆:五个分区,进来再选 ── */
+const archiveTabs = $("#archiveTabs");
+function showArchiveSection(sec){
+  if (!archivePanel) return;
+  archivePanel.querySelectorAll(".archive-section").forEach((el) => { el.hidden = el.dataset.sec !== sec; });
+  if (archiveTabs) archiveTabs.querySelectorAll("button[data-sec]").forEach((b) => b.setAttribute("aria-selected", b.dataset.sec === sec ? "true" : "false"));
+}
+if (archiveTabs) archiveTabs.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-sec]");
+  if (b) showArchiveSection(b.dataset.sec);
+});
+const albumCard = $("#albumCard");
+if (albumCard) albumCard.addEventListener("click", () => location.assign("album.html"));
+function ymd(d){ return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`; }
+function refreshArchive(){
+  const ol = $("#milestoneList");
+  if (ol){
+    if (!TOGETHER_START){
+      ol.innerHTML = `<li class="home-empty" style="border:0">还没设置在一起的日子</li>`;
+    } else {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const marks = [[0, "我们开始"], [30, "第 30 天"], [100, "第 100 天"], [200, "第 200 天"], [365, "一周年"], [520, "第 520 天"], [730, "两周年"], [1000, "第 1000 天"]];
+      const rows = [];
+      let upcoming = 0;
+      for (const [n, label] of marks){
+        const d = new Date(TOGETHER_START); d.setDate(d.getDate() + n);
+        const past = d <= today;
+        if (!past && upcoming >= 2) break;
+        if (!past) upcoming++;
+        const left = Math.round((d - today) / 86400000);
+        rows.push(`<li class="${past ? "" : "upcoming"}"><span class="ms-name">${label}</span><span class="ms-date">${past ? ymd(d) : ymd(d) + " · 还有 " + left + " 天"}</span></li>`);
+      }
+      ol.innerHTML = rows.reverse().join("");
+    }
+  }
+  const tides = $("#tideList");
+  if (tides){
+    const log = loadJSON(MOOD_LOG_KEY, []);
+    const byDay = new Map();
+    for (const e of log){
+      const d = new Date(e.ts), k = d.toDateString();
+      if (!byDay.has(k)) byDay.set(k, { d, moods: [] });
+      byDay.get(k).moods.push(e.mood);
+    }
+    const days = [...byDay.values()].slice(0, 14);
+    tides.innerHTML = days.length
+      ? days.map((x) => `<div class="tide-day"><span class="tide-date">${x.d.getMonth() + 1}月${x.d.getDate()}日</span><span class="tide-moods">${x.moods.map((m) => `<span>${escapeHtml(m)}</span>`).join("")}</span></div>`).join("")
+      : `<p class="home-empty">在门厅点一个心情，它会漂到这里。</p>`;
+  }
+}
+
+refreshDays();
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (letterSheet && letterSheet.classList.contains("open")) return closeMailbox();
+  if (currentTab !== "chat" && profilePanel && profilePanel.classList.contains("hidden")) setTab("chat");
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  refreshDays();
+  if (currentTab === "home") refreshHome();
+  else if (currentTab === "room") refreshRoom();
+});
+setInterval(() => {
+  if (document.hidden) return;
+  if (currentTab === "home") refreshHome();
+  else if (currentTab === "room") refreshRoom();
+}, 30000);
 
 /* 设置页 #themeSeg 分段控件 — 手动切 5 套主题,持久化,联动壁纸/theme-color */
 const THEME_KEY = "companion_theme";
@@ -6386,6 +6876,7 @@ function startChat(initialMsgs, { connect = true, fromCache = false } = {}){
   loginEl.classList.add("hidden");
   appEl.classList.remove("hidden");
   setConn("offline");
+  if (!tabBooted){ tabBooted = true; setTab("home"); }
   resetChatState();
 
   const historyMsgs = (initialMsgs || []).slice().sort((a, b) => msgNum(a.id) - msgNum(b.id));
