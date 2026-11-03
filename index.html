@@ -7,7 +7,7 @@
 
 <!-- PWA / iOS -->
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preload" href="chat-light.webp" as="image" fetchpriority="high">
+<link rel="preload" href="chat-orion.webp" as="image" fetchpriority="high">
 <link rel="preload" href="avatar-sea.png" as="image">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@5/400.min.css" rel="stylesheet">
@@ -15,7 +15,7 @@
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/400.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/500.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/pinyon-script@5/400.min.css" rel="stylesheet">
-<meta name="theme-color" content="#0C0F1A">
+<meta name="theme-color" content="#000000">
 <!-- iOS launch mode is manifest-only; legacy Apple fullscreen meta breaks bottom viewport. -->
 
 <meta name="apple-mobile-web-app-title" content="Aether">
@@ -44,10 +44,10 @@
     --font-en: "Cormorant Garamond", Georgia, serif;
     --font-cn: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
     --wall-light: url("chat-light.webp");
-    --wall-harbor: url("chat-harbor.webp");
+    --wall-harbor: url("chat-orion.webp");
     --wall-default: var(--wall-light);
     --menu-wall-light: url("menu-light.webp");
-    --menu-wall-harbor: url("menu-harbor.webp");
+    --menu-wall-harbor: url("menu-orion.webp");
     --menu-wall-default: var(--menu-wall-light);
     --avatar-default: url("avatar-sea.png");
     /* ── PEARL TIDE · 珍珠潮汐(default) ── */
@@ -111,54 +111,142 @@
     --call-hangup-bg: #cf8d92;
     --call-hangup-shadow: rgba(176,96,104,.34);
   }
-  /* ── AETHER · 以太(深色星空主题) ── */
+  /* ── ORION · 星图(纯黑白杂志皮肤:黑底 · 灰白衬线 · 细线边框 · 星点) ── */
   :root[data-theme="harbor"]{
       --wall-default: var(--wall-harbor);
       --menu-wall-default: var(--menu-wall-harbor);
-      --bg: #0C0F1A;
-      --header-bg: rgba(12,15,26,.85);
-      --hairline: rgba(139,148,195,.18);
-      --text: #E2E4ED;
-      --text-soft: #A8ADCB;
-      --text-faint: #6B7099;
-      --bubble-ai-bg: rgba(30,33,58,.88);
-      --bubble-ai-fg: #E2E4ED;
-      --bubble-human-bg: rgba(88,72,139,.45);
-      --bubble-human-fg: #E8E4F2;
-      --accent: #9B7DD4;
-      --send-bg: #7B5FB8;
-      --tick: #7E83AB;
-      --accent-fg: #ffffff;
-      --think-flourish: rgba(139,115,200,.48);
-      --think-label: #9B8DC8;
-      --think-body: #B4A6D8;
-      --composer-bg: rgba(16,19,35,.92);
-      --field-bg: rgba(22,26,48,.92);
-      --field-line: rgba(139,148,195,.14);
-      --shadow: 0 18px 46px rgba(0,0,0,.35);
-      --soft-shadow: 0 14px 34px rgba(0,0,0,.25);
-      --scrim: linear-gradient(180deg, rgba(12,15,26,0.5), rgba(12,15,26,0.15) 30%, rgba(12,15,26,0.05) 68%, rgba(12,15,26,0.35));
-      --slider-thumb: #9B7DD4;
-      --status-dot: #7DD4A8;
-      --card-bg: rgba(22,26,48,.65);
-      --card-line: rgba(139,148,195,.10);
-      --card-shadow: 0 10px 28px rgba(0,0,0,.20);
-      --seg-track: rgba(139,148,195,.12);
-      --seg-thumb: rgba(88,72,139,.55);
-      --seg-thumb-shadow: 0 2px 8px rgba(0,0,0,.25);
-      --row-press: rgba(139,148,195,.08);
-      --slider-track: rgba(139,148,195,.22);
-      --call-glass-top: rgba(88,72,139,.40);
-      --call-glass-bot: rgba(88,72,139,.18);
-      --call-glass-edge: rgba(155,125,212,.45);
-      --call-glass-hi: rgba(155,125,212,.60);
-      --call-glass-glow: rgba(88,72,139,.25);
-      --call-glass-shadow: 0 20px 50px rgba(0,0,0,.35);
-      --call-scrim: rgba(12,15,26,.25);
-      --call-hangup-bg: #cf6b78;
-      --call-hangup-shadow: rgba(176,72,88,.40);
-      --info-ring: rgba(155,125,212,.30);
+      --bg: #000000;
+      --header-bg: rgba(0,0,0,.85);
+      --hairline: rgba(255,255,255,.16);
+      --text: #E8E8E6;
+      --text-soft: #A9A9A6;
+      --text-faint: #6F6F6C;
+      --bubble-ai-bg: rgba(255,255,255,.035);
+      --bubble-ai-fg: #E8E8E6;
+      --bubble-ai-line: rgba(255,255,255,.20);
+      --bubble-human-bg: rgba(255,255,255,.10);
+      --bubble-human-fg: #F0F0EE;
+      --bubble-human-line: rgba(255,255,255,.26);
+      --accent: #E8E8E6;
+      --send-bg: #E8E8E6;
+      --tick: #8A8A87;
+      --accent-fg: #000000;
+      --think-flourish: rgba(255,255,255,.42);
+      --think-label: #9C9C99;
+      --think-body: #B9B9B6;
+      --composer-bg: rgba(6,6,6,.92);
+      --field-bg: rgba(8,8,8,.88);
+      --field-line: rgba(255,255,255,.20);
+      --shadow: none;
+      --soft-shadow: none;
+      --scrim: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.10) 30%, rgba(0,0,0,.04) 68%, rgba(0,0,0,.30));
+      --slider-thumb: #E8E8E6;
+      --status-dot: #CFCFCC;
+      --card-bg: rgba(255,255,255,.03);
+      --card-line: rgba(255,255,255,.14);
+      --card-shadow: none;
+      --seg-track: rgba(255,255,255,.07);
+      --seg-thumb: rgba(255,255,255,.16);
+      --seg-thumb-shadow: none;
+      --row-press: rgba(255,255,255,.07);
+      --slider-track: rgba(255,255,255,.18);
+      --call-glass-top: rgba(255,255,255,.08);
+      --call-glass-bot: rgba(255,255,255,.03);
+      --call-glass-edge: rgba(255,255,255,.26);
+      --call-glass-hi: rgba(255,255,255,.16);
+      --call-glass-glow: rgba(255,255,255,.08);
+      --call-glass-shadow: none;
+      --call-scrim: rgba(0,0,0,.30);
+      --call-hangup-bg: rgba(255,255,255,.06);
+      --call-hangup-shadow: rgba(0,0,0,0);
+      --info-ring: rgba(255,255,255,.26);
+      --bubble-radius: 10px;
   }
+
+  /* ── ORION 杂志化结构覆盖:细线边框 · 斜体衬线小字 · 去彩色/去投影(仅深色主题作用域) ── */
+  [data-theme="harbor"] .row.ai .bubble{ border: 1px solid var(--bubble-ai-line); box-shadow: none; }
+  [data-theme="harbor"] .row.human .bubble{ border: 1px solid var(--bubble-human-line); box-shadow: none; }
+  [data-theme="harbor"] .meta{
+    font-family: var(--font-en);
+    font-style: italic;
+    font-size: clamp(10px, 1.15vw, 12px);
+    letter-spacing: .03em;
+  }
+  [data-theme="harbor"] .day,
+  [data-theme="harbor"] .new-divider,
+  [data-theme="harbor"] .session-meta,
+  [data-theme="harbor"] .menu-since,
+  [data-theme="harbor"] .peerpill .status,
+  [data-theme="harbor"] .think-caption,
+  [data-theme="harbor"] .call-status,
+  [data-theme="harbor"] .call-caption,
+  [data-theme="harbor"] .call-transcript-label{ font-style: italic; }
+  [data-theme="harbor"] .peerpill .name{ text-shadow: none; }
+  [data-theme="harbor"] .peerpill .status.typing{ color: var(--text); font-weight: 400; text-shadow: none; }
+  [data-theme="harbor"] .app[data-conn="reconnecting"] .peerpill .status{ color: var(--text-faint); }
+  [data-theme="harbor"] .menu-title{
+    font-family: var(--font-en);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: .015em;
+    text-shadow: none;
+  }
+  [data-theme="harbor"] .avatar,
+  [data-theme="harbor"] .row.ai::before,
+  [data-theme="harbor"] .profile-avatar,
+  [data-theme="harbor"] .login .orb{ box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
+  /* 杂志黑白:头像照片走灰度,与星图同一个墨色世界 */
+  [data-theme="harbor"] .avatar,
+  [data-theme="harbor"] .row.ai::before,
+  [data-theme="harbor"] .profile-avatar,
+  [data-theme="harbor"] .login .orb,
+  [data-theme="harbor"] .call-avatar-img,
+  [data-theme="harbor"] .incoming-call-avatar{ filter: grayscale(1); }
+  [data-theme="harbor"] .floatbtn.send{ color: #000; box-shadow: none; }
+  [data-theme="harbor"] .floatbtn.send:hover{ color: #000; }
+  [data-theme="harbor"] .newmsg-pill{
+    background: rgba(0,0,0,.55);
+    border: 1px solid var(--hairline);
+    box-shadow: none;
+  }
+  [data-theme="harbor"] .toast{
+    background: rgba(8,8,8,.92);
+    color: var(--text);
+    border: 1px solid var(--hairline);
+    box-shadow: none;
+  }
+  [data-theme="harbor"] .bubble .txt code,
+  [data-theme="harbor"] .think-copy code{ background: rgba(255,255,255,.10); }
+  [data-theme="harbor"] .reaction{ box-shadow: none; }
+  [data-theme="harbor"] .msg-menu-scrim{ background: rgba(0,0,0,.45); }
+  [data-theme="harbor"] .msg-menu-clone{ box-shadow: none; border: 1px solid var(--hairline); }
+  [data-theme="harbor"] .msg-menu-actions{ box-shadow: none; }
+  [data-theme="harbor"] .session-pop{ box-shadow: none; }
+  [data-theme="harbor"] .incoming-call-btn.accept{ background: #E8E8E6; color: #000; box-shadow: none; }
+  [data-theme="harbor"] .incoming-call-btn.decline{
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.35);
+    color: var(--text);
+    box-shadow: none;
+  }
+  [data-theme="harbor"] .call-hangup{
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.35);
+    color: var(--text);
+    box-shadow: none;
+  }
+  [data-theme="harbor"] .call-ctrl-btn > svg{ box-shadow: none; }
+  [data-theme="harbor"] .context-slider::-webkit-slider-thumb{ border-color: #000; box-shadow: none; }
+  [data-theme="harbor"] .context-slider::-moz-range-thumb{ border-color: #000; box-shadow: none; }
+  [data-theme="harbor"] .meta .fail{ color: #d9d9d6; text-decoration: underline; }
+  [data-theme="harbor"] .msg-act.danger{ color: #d9d9d6; text-decoration: underline; text-underline-offset: 3px; }
+  [data-theme="harbor"] .login .err{ color: #d9d9d6; font-style: italic; }
+  [data-theme="harbor"] .att-failed{ outline-color: rgba(255,255,255,.5); }
+  [data-theme="harbor"] .mcp-dot{ background: rgba(255,255,255,.25); }
+  [data-theme="harbor"] .mcp-dot.online{ background: #fff; }
+  [data-theme="harbor"] .mcp-dot.connecting{ background: rgba(255,255,255,.55); }
+  [data-theme="harbor"] .mcp-dot.error{ background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.8); }
+  [data-theme="harbor"] .loop-btn.danger{ color: #d9d9d6; text-decoration: underline; text-underline-offset: 3px; }
 
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body{ margin:0; padding:0; height:100%; overflow:hidden; overscroll-behavior:none; }
@@ -2010,7 +2098,7 @@
         <div class="settings-label">主题</div>
         <div class="segmented" id="themeSeg" role="group" aria-label="主题切换">
           <button type="button" data-val="light">珍珠</button>
-          <button type="button" data-val="harbor">海港</button>
+          <button type="button" data-val="harbor">星图</button>
         </div>
       </section>
 
@@ -2393,7 +2481,7 @@ const brainSeg = $("#brainSeg"), brainHint = $("#brainHint");
 
 /* ════════ 固定聊天背景 + 本地头像 ════════ */
 const THEMES = ["light","harbor"];
-const WALLS = { light: "chat-light.webp", harbor: "chat-harbor.webp" };
+const WALLS = { light: "chat-light.webp", harbor: "chat-orion.webp" };
 const AVATAR_KEY = "companion_avatar";
 const REMARK_KEY = "companion_profile_remark";
 const SESSION_PICK_KEY = "companion_api_session_pick";
