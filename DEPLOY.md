@@ -139,3 +139,9 @@ const CACHE = "companion-v1";   // ← 每次改前端都要 bump（v1 → v2 �
 | 痕迹 | `kind: "act"` 的消息 |
 | 留言墙、心情海、我的头像 | 只存本机 localStorage（`companion_wall_notes` / `companion_mood_log` / `companion_my_avatar`），不上传 |
 
+
+## 10. 自言自语 / 日历 的服务器同步(待后端补)
+
+Room 页的「自言自语」和 Archive 的「Tides 日历」(心情、标签、经期)现在先存在手机本机(localStorage)。
+前端每次改动都会顺手发一次 `PUT /relay/app/kv/<name>`(`murmurs` / `calendar`,body 为整份 JSON,带同一把 Bearer 密钥)。
+relay 还没有这个接口时请求会 404,前端静默忽略、不影响使用。后端补上一个简单的 KV 存储后,Orion 就能在服务器上读到这两份数据。

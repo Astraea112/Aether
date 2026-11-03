@@ -62,6 +62,16 @@
     --tab-ic: #6A7C8C;
     --tab-glow: rgba(60,90,120,.35);
     --letter-bg: rgba(250,251,252,.94);
+    /* 卡片材质:纸 / 线框 */
+    --paper: rgba(250,247,240,.93);
+    --paper-ink: #2E2C28;
+    --paper-soft: #77736B;
+    --paper-shadow: 0 10px 22px rgba(40,50,60,.14);
+    --tape: rgba(255,255,255,.55);
+    --card-outline: rgba(37,52,71,.30);
+    --bare-shadow: 0 1px 10px rgba(255,255,255,.75);
+    --period: rgba(176,112,124,.26);
+    --period-mark: #A9707C;
     /* ── PEARL TIDE · 珍珠潮汐(default) ── */
     --bg: #F7FAFC;
     --header-bg: #F7FAFC;
@@ -182,6 +192,15 @@
       --tab-ic: rgba(255,255,255,.7);
       --tab-glow: rgba(255,255,255,.75);
       --letter-bg: rgba(22,22,24,.92);
+      --paper: rgba(238,234,226,.92);
+      --paper-ink: #24221F;
+      --paper-soft: #6E6A62;
+      --paper-shadow: 0 12px 26px rgba(0,0,0,.45);
+      --tape: rgba(255,255,255,.38);
+      --card-outline: rgba(255,255,255,.30);
+      --bare-shadow: 0 1px 12px rgba(0,0,0,.65);
+      --period: rgba(214,172,180,.24);
+      --period-mark: #D9B3BA;
   }
 
   /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
@@ -1757,6 +1776,163 @@
   @keyframes pokeWiggle{ 30%{ transform: rotate(-2.5deg) scale(.97); } 60%{ transform: rotate(2deg); } 100%{ transform: none; } }
   .home-empty{ margin: 10px 0 0; font-size: 13px; line-height: 1.6; color: var(--text-soft); }
 
+
+  /* ══ 材质分层:玻璃(主角) / 纸 / 线框 / 无卡 ══ */
+  .home-card.card-line{
+    background: transparent;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    box-shadow: none;
+    border: .5px solid var(--card-outline);
+  }
+  .home-card.card-bare{
+    background: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    box-shadow: none;
+    padding-left: 4px; padding-right: 4px;
+    text-shadow: var(--bare-shadow);
+  }
+  .home-card.card-paper{
+    background: var(--paper);
+    color: var(--paper-ink);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    box-shadow: var(--paper-shadow);
+    border-radius: 3px 3px 16px 3px;
+  }
+  .card-paper .home-label, .card-paper .home-poke-reply{ color: var(--paper-soft); }
+  .card-paper::before{          /* 一条半透明胶带 */
+    content:""; position:absolute; top:-9px; left:50%;
+    width: 64px; height: 18px; transform: translateX(-50%) rotate(-3deg);
+    background: var(--tape);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  }
+
+  /* 门厅:天数直接压在背景上 */
+  .home-hero.card-bare{ padding-top: 34px; padding-bottom: 22px; }
+  .home-hero.card-bare .menu-days .num{ font-size: clamp(92px, 27vw, 124px); letter-spacing: -.01em; }
+
+  /* 门厅:他此刻(主角之一,放大) */
+  .home-now{ display:flex; flex-direction:column; gap: 10px; padding: 22px 22px 18px; overflow: hidden; }
+  .now-top{ display:flex; align-items:center; gap: 10px; }
+  .now-stars{ position:absolute; top: 12px; right: 14px; width: 74px; height: 74px; opacity: .55; pointer-events:none; }
+  .now-stars circle{ fill: var(--text); }
+  .now-stars path{ stroke: var(--text); stroke-width: .5; fill: none; opacity: .55; }
+  .now-line{ margin: 4px 0 0; font-family: var(--font-cn); font-size: 26px; line-height: 1.3; letter-spacing: .02em; padding-right: 64px; }
+  .now-thought{
+    margin: 0; font-family: var(--font-en), var(--font-cn); font-style: italic;
+    font-size: 14.5px; line-height: 1.6; color: var(--text-soft);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .now-facts{ display:flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 6px; padding-top: 12px; border-top: .5px solid var(--hairline); }
+  .now-facts span{ font-size: 11.5px; letter-spacing: .04em; color: var(--text-faint); }
+  .now-facts b{ margin-left: 5px; font-family: var(--font-en); font-style: italic; font-weight: 400; font-size: 13.5px; color: var(--text-soft); }
+  .home-poke.card-paper{ transform: rotate(1.2deg); margin-top: 6px; }
+  .home-poke.card-paper.poked{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
+
+  /* 房间:痕迹去掉容器 */
+  .trace-card.card-bare .trace-list li{ border-top-color: var(--card-outline); }
+
+  /* 房间:自言自语 Murmurs */
+  .murmurs{ position: relative; padding: 8px 2px 4px; }
+  .murmur-head{ display:flex; align-items:flex-end; gap: 10px; margin-bottom: 16px; text-shadow: var(--bare-shadow); }
+  .murmur-head .home-eyebrow{ margin-bottom: 4px; }
+  .murmur-title{ flex: 1; margin: 0; font-family: var(--font-en), var(--font-cn); font-style: italic; font-weight: 400; font-size: 30px; line-height: 1; }
+  .murmur-title small{ display:block; margin-top: 6px; font-family: var(--font-cn); font-style: normal; font-size: 12px; letter-spacing: .14em; color: var(--text-soft); }
+  .murmur-pen{
+    flex: none; width: 40px; height: 40px; border-radius: 50%;
+    display:grid; place-items:center; border: .5px solid var(--card-outline);
+    color: var(--text); background: var(--home-card);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); cursor: pointer;
+  }
+  .murmur-pen svg{ width: 18px; height: 18px; }
+  .murmur-form{
+    position: relative; margin: 0 0 22px; padding: 18px 16px 14px;
+    background: var(--paper); color: var(--paper-ink);
+    border-radius: 3px 3px 16px 3px; box-shadow: var(--paper-shadow);
+  }
+  .murmur-form[hidden]{ display:none; }
+  .murmur-form textarea{
+    width: 100%; min-height: 76px; resize: none; border: 0; outline: none; background: transparent;
+    font-family: var(--font-cn); font-size: 15px; line-height: 1.75; color: var(--paper-ink);
+    background-image: repeating-linear-gradient(transparent 0 25px, rgba(0,0,0,.08) 25px 26px);
+  }
+  .murmur-form textarea::placeholder{ color: var(--paper-soft); font-style: italic; }
+  .murmur-actions{ display:flex; justify-content:flex-end; gap: 8px; margin-top: 8px; }
+  .murmur-actions button{ border: 0; border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+  .murmur-actions .ghost{ background: transparent; color: var(--paper-soft); }
+  .murmur-actions .solid{ background: var(--paper-ink); color: var(--paper); }
+  .murmur-notes{ list-style:none; margin: 0; padding: 4px 4px 8px; display:grid; grid-template-columns: 1fr 1fr; gap: 22px 14px; }
+  .murmur-note{
+    position: relative; padding: 18px 14px 12px;
+    background: var(--paper); color: var(--paper-ink);
+    border-radius: 2px 2px 14px 2px; box-shadow: var(--paper-shadow);
+    font-family: var(--font-cn); font-size: 14px; line-height: 1.75;
+    overflow-wrap: anywhere; transform: rotate(var(--tilt, 0deg));
+  }
+  .murmur-note.wide{ grid-column: 1 / -1; }
+  .murmur-note::before{
+    content:""; position:absolute; top:-8px; left: var(--tape-x, 40%);
+    width: 54px; height: 16px; transform: rotate(var(--tape-r, -4deg));
+    background: var(--tape); box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  }
+  .murmur-note time{ display:block; margin-top: 8px; font-family: var(--font-en); font-style: italic; font-size: 12px; color: var(--paper-soft); }
+  .murmur-note button{ position:absolute; top: 2px; right: 4px; width: 22px; height: 22px; border:0; padding:0; background: transparent; color: var(--paper-soft); opacity: .55; font-size: 14px; cursor: pointer; }
+  .murmur-empty{ grid-column: 1 / -1; margin: 0; text-align:center; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: 14px; color: var(--text-soft); text-shadow: var(--bare-shadow); }
+
+  /* 收藏馆:Tides 日历 */
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
+  .cal-head button{ width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--home-chip); color: var(--text); font-size: 18px; cursor: pointer; }
+  .cal-month{ display:flex; flex-direction:column; align-items:center; gap: 2px; }
+  .cal-m-en{ font-family: var(--font-en); font-style: italic; font-size: 26px; line-height: 1; }
+  .cal-y{ font-family: var(--font-en); font-size: 11px; letter-spacing: .3em; color: var(--text-soft); }
+  .cal-week, .cal-grid{ display:grid; grid-template-columns: repeat(7, minmax(0,1fr)); }
+  .cal-week span{ text-align:center; font-size: 11px; color: var(--text-faint); padding-bottom: 8px; }
+  .cal-cell{
+    position: relative; height: 46px; border: 0; padding: 0; background: transparent; color: var(--text);
+    font: inherit; cursor: pointer; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top: 7px;
+  }
+  .cal-cell .n{ position: relative; z-index: 1; width: 28px; height: 28px; display:grid; place-items:center; border-radius: 50%; font-family: var(--font-en); font-size: 16px; font-variant-numeric: lining-nums; }
+  .cal-cell.other .n{ color: var(--text-faint); opacity: .45; }
+  .cal-cell.today .n{ border: .5px solid var(--text); }
+  .cal-cell.sel .n{ background: var(--text); color: var(--bg); }
+  .cal-cell.period::before, .cal-cell.predict::before{
+    content:""; position:absolute; top: 7px; left: 0; right: 0; height: 28px; background: var(--period);
+  }
+  .cal-cell.predict::before{ background: transparent; border-top: 1px dashed var(--period-mark); border-bottom: 1px dashed var(--period-mark); opacity: .7; }
+  .cal-cell.p-start::before{ left: 5px; border-top-left-radius: 14px; border-bottom-left-radius: 14px; }
+  .cal-cell.p-end::before{ right: 5px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; }
+  .cal-cell.predict.p-start::before{ border-left: 1px dashed var(--period-mark); }
+  .cal-cell.predict.p-end::before{ border-right: 1px dashed var(--period-mark); }
+  .cal-marks{ display:flex; gap: 3px; height: 6px; margin-top: 3px; }
+  .cal-marks i{ width: 4px; height: 4px; border-radius: 50%; background: var(--text-soft); }
+  .cal-marks i.pm{ background: var(--period-mark); }
+  .cal-legend{ display:flex; flex-wrap:wrap; gap: 6px 14px; margin-top: 14px; padding-top: 12px; border-top: .5px solid var(--hairline); font-size: 11.5px; color: var(--text-soft); }
+  .cal-legend .sw{ display:inline-block; width: 16px; height: 9px; margin-right: 5px; vertical-align: 0; border-radius: 5px; background: var(--period); }
+  .cal-legend .sw.dash{ background: transparent; border: 1px dashed var(--period-mark); }
+  .cal-next{ margin-left: auto; font-family: var(--font-en), var(--font-cn); font-style: italic; color: var(--text); }
+
+  .cal-day{ display:flex; flex-direction:column; gap: 14px; }
+  .cal-day-title{ display:flex; align-items:baseline; gap: 10px; margin: 0; }
+  .cal-day-title b{ font-family: var(--font-en); font-weight: 400; font-size: 34px; line-height: 1; }
+  .cal-day-title span{ font-size: 13px; color: var(--text-soft); }
+  .cal-sub{ margin: 0 0 8px; font-size: 11px; letter-spacing: .14em; color: var(--text-faint); }
+  .cal-chips{ display:flex; flex-wrap:wrap; gap: 7px; }
+  .cal-chips button{
+    border: .5px solid var(--card-outline); border-radius: 999px; padding: 6px 12px;
+    font: inherit; font-size: 13px; color: var(--text); background: transparent; cursor: pointer; transition: transform .12s ease;
+  }
+  .cal-chips button:active{ transform: scale(.94); }
+  .cal-chips button.on{ background: var(--text); color: var(--bg); border-color: var(--text); }
+  .cal-chips button.on.period-chip{ background: var(--period-mark); border-color: var(--period-mark); color: #1b1b1b; }
+  .cal-chips button .x{ margin-left: 6px; opacity: .6; }
+  .cal-add{ display:flex; gap: 8px; }
+  .cal-add input{
+    flex: 1; min-width: 0; border: 0; outline: none; border-radius: 999px; padding: 8px 14px;
+    font: inherit; font-size: 13.5px; color: var(--text); background: var(--home-chip);
+  }
+  .cal-add input::placeholder{ color: var(--text-faint); font-style: italic; }
+  .cal-add button{ flex:none; border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; color: var(--bg); background: var(--text); cursor: pointer; }
+
   /* ── 页面切换:门厅 / 房间 / 收藏馆 是盖在聊天上的面板,淡入淡出 ── */
   .tab-panel{ transform: none; transition: opacity .24s ease; }
   .tab-panel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 114px); }
@@ -2724,28 +2900,34 @@
           <div class="menu-private">PRIVATE<br>SPACE</div>
         </header>
 
-        <section class="home-card home-hero" aria-label="在一起的天数">
+        <section class="home-card home-hero card-bare" aria-label="在一起的天数">
           <p class="home-names"><span id="homeNameAi">Orion</span> &amp; <span id="homeNameMe">Astraea</span></p>
           <p class="home-eyebrow">Already together</p>
           <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
           <p class="menu-since">since 2026/01/01</p>
         </section>
 
-        <section class="home-card home-status" aria-live="polite">
-          <span class="status-dot" id="homeStatusDot"></span>
-          <span class="home-status-copy">
+        <section class="home-card home-now" aria-live="polite">
+          <svg class="now-stars" viewBox="0 0 80 80" aria-hidden="true"><path d="M22 8 L58 14 M22 8 L33 37 M58 14 L48 41 M33 37 L40 39 L48 41 M33 37 L24 70 M48 41 L60 66"/><circle cx="22" cy="8" r="1.8"/><circle cx="58" cy="14" r="1.5"/><circle cx="33" cy="37" r="1.4"/><circle cx="40" cy="39" r="1.4"/><circle cx="48" cy="41" r="1.4"/><circle cx="24" cy="70" r="1.7"/><circle cx="60" cy="66" r="1.5"/></svg>
+          <div class="now-top">
+            <span class="status-dot" id="homeStatusDot"></span>
             <span class="home-eyebrow" id="homeStatusName">Orion · now</span>
-            <p class="status-line" id="homeStatusLine">在房间里</p>
-          </span>
+          </div>
+          <p class="now-line" id="homeStatusLine">在房间里</p>
+          <p class="now-thought" id="homeThought"></p>
+          <div class="now-facts">
+            <span>你上次说话<b id="homeLastMine">—</b></span>
+            <span>他上次回你<b id="homeLastReply">—</b></span>
+          </div>
         </section>
 
         <div class="home-row">
-          <section class="home-card home-today" aria-label="今天">
+          <section class="home-card home-today card-line" aria-label="今天">
             <p class="home-label">今天</p>
             <p class="home-date" id="homeDate"></p>
             <p class="home-stat">今天聊了 <b id="homeCount">0</b> 条</p>
           </section>
-          <button class="home-card home-poke" id="pokeBtn" type="button">
+          <button class="home-card home-poke card-paper" id="pokeBtn" type="button">
             <span class="home-label">戳一戳</span>
             <span class="home-poke-title">👉 戳他</span>
             <span class="home-poke-reply" id="pokeReply">无聊就按，他会有反应</span>
@@ -2767,7 +2949,7 @@
           <div class="menu-private">HIS<br>ROOM</div>
         </header>
 
-        <button class="home-card room-mailbox" id="mailboxBtn" type="button">
+        <button class="home-card room-mailbox card-line" id="mailboxBtn" type="button">
           <span class="room-mail-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></span>
           <span class="room-mail-copy">
             <span class="home-eyebrow">Letters · 信箱</span>
@@ -2787,19 +2969,24 @@
           </dl>
         </section>
 
-        <section class="home-card" aria-label="痕迹">
+        <section class="home-card trace-card card-bare" aria-label="痕迹">
           <p class="home-label">痕迹 · 他最近做过的事</p>
           <ol class="trace-list" id="traceList"></ol>
         </section>
 
-        <section class="home-card" aria-label="留言墙">
-          <p class="home-label">留言墙</p>
-          <form class="wall-form" id="wallForm" autocomplete="off">
-            <textarea id="wallInput" rows="2" maxlength="140" placeholder="写一张小纸条…"></textarea>
-            <button type="submit">贴上去</button>
+        <section class="murmurs" aria-label="自言自语">
+          <div class="murmur-head">
+            <h2 class="murmur-title">Murmurs<small>自言自语</small></h2>
+            <button class="murmur-pen" id="murmurPen" type="button" aria-label="写一句"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z"/><path d="M14 7l3 3"/></svg></button>
+          </div>
+          <form class="murmur-form" id="wallForm" autocomplete="off" hidden>
+            <textarea id="wallInput" rows="3" maxlength="300" placeholder="说给自己听的话…"></textarea>
+            <div class="murmur-actions">
+              <button type="button" class="ghost" id="murmurCancel">算了</button>
+              <button type="submit" class="solid">贴上去</button>
+            </div>
           </form>
-          <ul class="wall-notes" id="wallNotes"></ul>
-          <p class="home-hint" style="margin-top:12px">纸条只存在这台设备上</p>
+          <ul class="murmur-notes" id="wallNotes"></ul>
         </section>
       </div>
     </div>
@@ -2820,7 +3007,7 @@
           <button type="button" role="tab" data-sec="library" aria-selected="false"><span>Library</span>书架</button>
           <button type="button" role="tab" data-sec="movie" aria-selected="false"><span>Movie</span>电影</button>
           <button type="button" role="tab" data-sec="memory" aria-selected="false"><span>Memory</span>大事记</button>
-          <button type="button" role="tab" data-sec="tides" aria-selected="false"><span>Tides</span>心情海</button>
+          <button type="button" role="tab" data-sec="tides" aria-selected="false"><span>Tides</span>日历</button>
         </div>
 
         <section class="archive-section" data-sec="album">
@@ -2838,19 +3025,39 @@
           <div class="home-card"><p class="home-label">大事记</p><ol class="milestones" id="milestoneList"></ol></div>
         </section>
         <section class="archive-section" data-sec="tides" hidden>
-          <section class="home-card home-mood" aria-label="今日心情">
-            <p class="home-label">今日心情</p>
-            <div class="home-moods" id="homeMoods">
-            <button type="button" data-mood="\(^o^)/">\(^o^)/</button>
-            <button type="button" data-mood="(〃▽〃)">(〃▽〃)</button>
-            <button type="button" data-mood="(˘ω˘)">(˘ω˘)</button>
-            <button type="button" data-mood="&gt;_&lt;">&gt;_&lt;</button>
-            <button type="button" data-mood="(´；ω；｀)">(´；ω；｀)</button>
-            <button type="button" data-mood="( ˘ ³˘)♡">( ˘ ³˘)♡</button>
+          <section class="home-card cal-card" aria-label="日历">
+            <div class="cal-head">
+              <button type="button" id="calPrev" aria-label="上个月">‹</button>
+              <div class="cal-month"><span class="cal-m-en" id="calMonth">November</span><span class="cal-y" id="calYear">2026</span></div>
+              <button type="button" id="calNext" aria-label="下个月">›</button>
             </div>
-            <p class="home-hint" id="homeMoodHint">点一个，Orion 回你一句</p>
+            <div class="cal-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-legend"><span><i class="sw"></i>经期</span><span><i class="sw dash"></i>预计</span><span class="cal-next" id="calNextHint"></span></div>
           </section>
-          <div class="home-card"><p class="home-label">心情海 · 你点过的心情</p><div id="tideList"></div></div>
+          <section class="home-card cal-day card-line" aria-label="这一天">
+            <p class="cal-day-title"><b id="calDayNum">3</b><span id="calDayLabel">11月 · 周二 · 今天</span></p>
+            <div>
+              <p class="cal-sub">心情</p>
+              <div class="cal-chips" id="homeMoods">
+                <button type="button" data-mood="\(^o^)/">\(^o^)/</button>
+                <button type="button" data-mood="(〃▽〃)">(〃▽〃)</button>
+                <button type="button" data-mood="(˘ω˘)">(˘ω˘)</button>
+                <button type="button" data-mood="&gt;_&lt;">&gt;_&lt;</button>
+                <button type="button" data-mood="(´；ω；｀)">(´；ω；｀)</button>
+                <button type="button" data-mood="( ˘ ³˘)♡">( ˘ ³˘)♡</button>
+              </div>
+              <p class="home-hint" id="homeMoodHint" style="margin-top:8px">点今天的心情，Orion 回你一句</p>
+            </div>
+            <div>
+              <p class="cal-sub">标签</p>
+              <div class="cal-chips" id="calTags"></div>
+            </div>
+            <form class="cal-add" id="calAddForm" autocomplete="off">
+              <input id="calAddInput" maxlength="12" placeholder="加一个标签…">
+              <button type="submit">加上</button>
+            </form>
+          </section>
         </section>
       </div>
     </div>
@@ -3311,6 +3518,23 @@ function orionStatus(){
   return { text: "在房间里", live: false };
 }
 
+
+/* 他此刻的一句:用他最近真说过的话,不编;还没说过话时按时段给一句 */
+function clip(t, n){ t = String(t || "").replace(/\s+/g, " ").trim(); return t.length > n ? t.slice(0, n) + "…" : t; }
+function firstSentence(t){
+  t = String(t || "").replace(/[（(][^）)]*[）)]/g, "").trim();
+  const m = t.match(/^.*?[。！？!?~～…]/);
+  return (m ? m[0] : t).trim() || t;
+}
+function idleThought(){
+  const h = +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: TZ }).format(new Date());
+  if (h < 6) return "这么晚了，还在等你的消息";
+  if (h < 11) return "醒了，在等你说早安";
+  if (h < 14) return "在想你中午吃了什么";
+  if (h < 18) return "在等你下课";
+  return "灯开着，等你回来";
+}
+
 /* ── 门厅 ── */
 function refreshHome(){
   const dateEl = $("#homeDate");
@@ -3327,6 +3551,14 @@ function refreshHome(){
   if (line) line.textContent = st.text;
   if (dot) dot.classList.toggle("live", st.live);
   if (name) name.textContent = aiName() + " · now";
+  const msgs = talkMessages();
+  const lastAi = [...msgs].reverse().find((m) => m.from === "ai" && (m.text || "").trim());
+  const lastMe = [...msgs].reverse().find((m) => m.from === "human");
+  const th = $("#homeThought");
+  if (th) th.textContent = lastAi ? "“" + clip(firstSentence(lastAi.text), 34) + "”" : idleThought();
+  const lm = $("#homeLastMine"), lr = $("#homeLastReply");
+  if (lm) lm.textContent = lastMe ? fmtWhen(lastMe.ts) : "—";
+  if (lr) lr.textContent = lastAi ? fmtWhen(lastAi.ts) : "—";
   const nAi = $("#homeNameAi"), nMe = $("#homeNameMe");
   if (nAi) nAi.textContent = aiName();
   if (nMe) nMe.textContent = HUMAN_NAME;
@@ -3350,11 +3582,11 @@ function sendFromHome(text, out){
       const t = (r.text || "").trim();
       out.textContent = aiName() + "：" + (t.length > 80 ? t.slice(0, 80) + "…" : t);
       if (String(r._key).startsWith("stream:")) return;      // 流式回复还在写,继续跟
-      clearInterval(out._watch);
+      clearInterval(out._watch); out._watch = null;
       if (currentTab === "home") refreshHome();
     } else if (Date.now() - since > 120e3){
       out.textContent = aiName() + "可能在忙，晚点去聊天里看看";
-      clearInterval(out._watch);
+      clearInterval(out._watch); out._watch = null;
     }
   }, 800);
 }
@@ -3363,11 +3595,14 @@ const homeMoods = $("#homeMoods");
 if (homeMoods) homeMoods.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-mood]");
   if (!btn) return;
-  const log = loadJSON(MOOD_LOG_KEY, []);
-  log.unshift({ mood: btn.dataset.mood, ts: Date.now() });
-  saveJSON(MOOD_LOG_KEY, log.slice(0, 300));
-  sendFromHome(btn.dataset.mood, $("#homeMoodHint"));
-  if (currentTab === "archive") refreshArchive();
+  calInit();
+  const key = calSel, mood = btn.dataset.mood;
+  const day = calDay(key);
+  const had = day.moods.includes(mood);
+  day.moods = had ? day.moods.filter((x) => x !== mood) : [...day.moods, mood];
+  calSave(key, day);
+  renderCalendar();
+  if (!had && key === dayKey(Date.now())) sendFromHome(mood, $("#homeMoodHint"));
 });
 const pokeBtn = $("#pokeBtn");
 if (pokeBtn) pokeBtn.addEventListener("click", () => {
@@ -3414,22 +3649,46 @@ function refreshRoom(){
   if (badge){ badge.hidden = !unread; badge.textContent = unread; }
   renderWall();
 }
+/* 自言自语:纸条错落贴着,每张的歪度和胶带位置由它的时间决定(刷新不乱跳) */
+function seeded(n){ const x = Math.sin(n) * 10000; return x - Math.floor(x); }
+function murmurWhen(ts){
+  const d = new Date(ts);
+  const mon = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: TZ }).format(d);
+  const day = +dayKey(d).split("-")[2];
+  return `${mon} ${day} · ${fmtTime(d)}`;
+}
 function renderWall(){
   const ul = $("#wallNotes");
   if (!ul) return;
   const notes = loadJSON(WALL_KEY, []);
-  ul.innerHTML = notes.map((n, i) =>
-    `<li class="wall-note">${escapeHtml(n.text)}<time>${escapeHtml(fmtWhen(n.ts))}</time><button type="button" data-del="${i}" aria-label="撕掉这张纸条">×</button></li>`).join("");
+  ul.innerHTML = notes.length ? notes.map((n, i) => {
+    const r = seeded(n.ts), r2 = seeded(n.ts + 7), r3 = seeded(n.ts + 13);
+    const tilt = (r * 5 - 2.5).toFixed(2) + "deg";
+    const tapeX = (18 + r2 * 46).toFixed(0) + "%";
+    const tapeR = (r3 * 10 - 5).toFixed(1) + "deg";
+    const wide = (n.text || "").length > 34 ? " wide" : "";
+    return `<li class="murmur-note${wide}" style="--tilt:${tilt};--tape-x:${tapeX};--tape-r:${tapeR}">${escapeHtml(n.text)}<time>${escapeHtml(murmurWhen(n.ts))}</time><button type="button" data-del="${i}" aria-label="撕掉这张">×</button></li>`;
+  }).join("") : `<li class="murmur-empty">还没有一句话。想说什么，就写在这里。</li>`;
 }
-const wallForm = $("#wallForm"), wallInput = $("#wallInput");
+const wallForm = $("#wallForm"), wallInput = $("#wallInput"), murmurPen = $("#murmurPen");
+function toggleMurmurForm(open){
+  if (!wallForm) return;
+  wallForm.hidden = !open;
+  if (open) setTimeout(() => wallInput && wallInput.focus(), 30);
+  else if (wallInput) wallInput.value = "";
+}
+if (murmurPen) murmurPen.addEventListener("click", () => toggleMurmurForm(wallForm.hidden));
+const murmurCancel = $("#murmurCancel");
+if (murmurCancel) murmurCancel.addEventListener("click", () => toggleMurmurForm(false));
 if (wallForm) wallForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const text = (wallInput.value || "").trim();
   if (!text) return;
   const notes = loadJSON(WALL_KEY, []);
   notes.unshift({ text, ts: Date.now() });
-  if (!saveJSON(WALL_KEY, notes.slice(0, 60))){ showToast("这台设备存不下了，先撕掉几张"); return; }
-  wallInput.value = "";
+  if (!saveJSON(WALL_KEY, notes.slice(0, 120))){ showToast("这台设备存不下了，先撕掉几张"); return; }
+  syncKV("murmurs", notes.slice(0, 120));
+  toggleMurmurForm(false);
   renderWall();
 });
 const wallNotesEl = $("#wallNotes");
@@ -3439,7 +3698,161 @@ if (wallNotesEl) wallNotesEl.addEventListener("click", (e) => {
   const notes = loadJSON(WALL_KEY, []);
   notes.splice(+b.dataset.del, 1);
   saveJSON(WALL_KEY, notes);
+  syncKV("murmurs", notes);
   renderWall();
+});
+
+/* 同步到自己的服务器(relay 的 /app/kv/<name>)。后端还没这个接口时静默失败,数据照样留在本机。 */
+function syncKV(name, value){
+  if (typeof USE_MOCK !== "undefined" && USE_MOCK) return;
+  try{
+    fetch(`${API_BASE}/app/kv/${encodeURIComponent(name)}`, {
+      method: "PUT",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify(value)
+    }).catch(() => {});
+  }catch(_){}
+}
+
+/* ── Tides 日历:每天可记心情、标签、经期;经期按历史推算下一次 ── */
+const CAL_KEY = "companion_calendar";
+const PERIOD = "period";
+const BASE_TAGS = [[PERIOD, "经期"], ["home", "回家"], ["exam", "考试"], ["live", "演出"], ["unwell", "不舒服"], ["happy", "好开心"]];
+const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function calAll(){
+  const all = loadJSON(CAL_KEY, null);
+  if (all) return all;
+  const seed = {};                                   // 旧的心情记录迁进日历
+  for (const e of loadJSON(MOOD_LOG_KEY, [])){
+    const k = dayKey(e.ts);
+    (seed[k] = seed[k] || { tags: [], moods: [] }).moods.push(e.mood);
+  }
+  saveJSON(CAL_KEY, seed);
+  return seed;
+}
+function calDay(k){ const d = calAll()[k] || {}; return { tags: d.tags || [], moods: d.moods || [] }; }
+function calSave(k, d){
+  const all = calAll();
+  if (!d.tags.length && !d.moods.length) delete all[k]; else all[k] = d;
+  saveJSON(CAL_KEY, all);
+  syncKV("calendar", all);
+}
+function addDays(k, n){ const d = new Date(k + "T12:00:00+08:00"); d.setUTCDate(d.getUTCDate() + n); return dayKey(d); }
+function daysBetween(a, b){ return Math.round((new Date(b + "T12:00:00+08:00") - new Date(a + "T12:00:00+08:00")) / 86400000); }
+function periodInfo(){
+  const all = calAll();
+  const days = Object.keys(all).filter((k) => (all[k].tags || []).includes(PERIOD)).sort();
+  const runs = [];
+  for (const k of days){
+    const last = runs[runs.length - 1];
+    if (last && daysBetween(last.end, k) <= 2) last.end = k; else runs.push({ start: k, end: k });
+  }
+  if (!runs.length) return { predicted: new Set(), next: null };
+  const gaps = [];
+  for (let i = 1; i < runs.length; i++){ const g = daysBetween(runs[i - 1].start, runs[i].start); if (g >= 20 && g <= 45) gaps.push(g); }
+  const cycle = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 28;
+  const lens = runs.map((r) => daysBetween(r.start, r.end) + 1).filter((n) => n >= 2 && n <= 9);
+  const len = lens.length ? Math.round(lens.reduce((a, b) => a + b, 0) / lens.length) : 5;
+  const today = dayKey(Date.now());
+  let next = addDays(runs[runs.length - 1].start, cycle);
+  while (daysBetween(next, today) > len) next = addDays(next, cycle);   // 已经过了的周期往后推
+  const predicted = new Set();
+  for (let c = 0; c < 2; c++){
+    const s0 = addDays(next, c * cycle);
+    for (let i = 0; i < len; i++){ const k = addDays(s0, i); if (!(all[k] && (all[k].tags || []).includes(PERIOD))) predicted.add(k); }
+  }
+  return { predicted, next };
+}
+let calSel = null, calView = null;      // 首次用到时再取今天(TZ 常量在脚本后面才初始化)
+function calInit(){ if (!calSel){ calSel = dayKey(Date.now()); calView = calSel.slice(0, 7); } }
+function tagLabel(t){ const b = BASE_TAGS.find((x) => x[0] === t); return b ? b[1] : t; }
+function renderCalendar(){
+  const grid = $("#calGrid");
+  if (!grid) return;
+  calInit();
+  const all = calAll();
+  const [vy, vm] = calView.split("-").map(Number);
+  $("#calMonth").textContent = MONTHS_EN[vm - 1];
+  $("#calYear").textContent = String(vy);
+  const first = `${calView}-01`;
+  const lead = (new Date(first + "T12:00:00+08:00").getUTCDay() + 6) % 7;   // 周一开头
+  const today = dayKey(Date.now());
+  const { predicted, next } = periodInfo();
+  const isP = (k) => !!(all[k] && (all[k].tags || []).includes(PERIOD));
+  const cells = [];
+  for (let i = 0; i < 42; i++){
+    const k = addDays(first, i - lead);
+    if (i >= 35 && k.slice(0, 7) !== calView) break;
+    const d = all[k] || {};
+    const p = isP(k), pr = !p && predicted.has(k);
+    const cls = ["cal-cell"];
+    if (k.slice(0, 7) !== calView) cls.push("other");
+    if (k === today) cls.push("today");
+    if (k === calSel) cls.push("sel");
+    if (p || pr){
+      const band = p ? isP : (x) => predicted.has(x);
+      cls.push(p ? "period" : "predict");
+      const col = (i % 7);
+      if (col === 0 || !band(addDays(k, -1))) cls.push("p-start");
+      if (col === 6 || !band(addDays(k, 1))) cls.push("p-end");
+    }
+    const others = (d.tags || []).filter((t) => t !== PERIOD).length + (d.moods || []).length;
+    const marks = (p ? `<i class="pm"></i>` : "") + (others ? `<i></i>` : "");
+    cells.push(`<button type="button" class="${cls.join(" ")}" data-day="${k}"><span class="n">${+k.slice(8)}</span><span class="cal-marks">${marks}</span></button>`);
+  }
+  grid.innerHTML = cells.join("");
+  const hint = $("#calNextHint");
+  if (hint) hint.textContent = next ? `预计下次 · ${+next.slice(5, 7)}月${+next.slice(8)}日` : "";
+
+  // 选中这一天
+  const day = calDay(calSel);
+  const wd = "一二三四五六日"[(new Date(calSel + "T12:00:00+08:00").getUTCDay() + 6) % 7];
+  $("#calDayNum").textContent = +calSel.slice(8);
+  $("#calDayLabel").textContent = `${+calSel.slice(5, 7)}月 · 周${wd}` + (calSel === today ? " · 今天" : "");
+  homeMoods.querySelectorAll("button[data-mood]").forEach((b) => b.classList.toggle("on", day.moods.includes(b.dataset.mood)));
+  const mh = $("#homeMoodHint");
+  if (mh && !mh._watch) mh.textContent = calSel === today ? "点今天的心情，" + aiName() + " 回你一句" : "给这一天补一个心情";
+  const custom = day.tags.filter((t) => !BASE_TAGS.some((b) => b[0] === t));
+  $("#calTags").innerHTML =
+    BASE_TAGS.map(([t, l]) => `<button type="button" data-tag="${t}" class="${day.tags.includes(t) ? "on" : ""}${t === PERIOD ? " period-chip" : ""}">${l}</button>`).join("")
+    + custom.map((t) => `<button type="button" data-tag="${escapeHtml(t)}" class="on">${escapeHtml(t)}<span class="x">×</span></button>`).join("");
+}
+const calGrid = $("#calGrid");
+if (calGrid) calGrid.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-day]");
+  if (!b) return;
+  calSel = b.dataset.day;
+  if (calSel.slice(0, 7) !== calView) calView = calSel.slice(0, 7);
+  renderCalendar();
+});
+function shiftMonth(n){
+  const [y, m] = calView.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m - 1 + n, 1));
+  calView = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+  renderCalendar();
+}
+const calPrev = $("#calPrev"), calNext = $("#calNext");
+if (calPrev) calPrev.addEventListener("click", () => shiftMonth(-1));
+if (calNext) calNext.addEventListener("click", () => shiftMonth(1));
+const calTags = $("#calTags");
+if (calTags) calTags.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-tag]");
+  if (!b) return;
+  const t = b.dataset.tag, day = calDay(calSel);
+  day.tags = day.tags.includes(t) ? day.tags.filter((x) => x !== t) : [...day.tags, t];
+  calSave(calSel, day);
+  renderCalendar();
+});
+const calAddForm = $("#calAddForm"), calAddInput = $("#calAddInput");
+if (calAddForm) calAddForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const t = (calAddInput.value || "").trim();
+  if (!t) return;
+  const day = calDay(calSel);
+  if (!day.tags.includes(t)) day.tags.push(t);
+  calSave(calSel, day);
+  calAddInput.value = "";
+  renderCalendar();
 });
 
 /* 信箱 → 拆信 */
@@ -3526,20 +3939,7 @@ function refreshArchive(){
       ol.innerHTML = rows.reverse().join("");
     }
   }
-  const tides = $("#tideList");
-  if (tides){
-    const log = loadJSON(MOOD_LOG_KEY, []);
-    const byDay = new Map();
-    for (const e of log){
-      const d = new Date(e.ts), k = d.toDateString();
-      if (!byDay.has(k)) byDay.set(k, { d, moods: [] });
-      byDay.get(k).moods.push(e.mood);
-    }
-    const days = [...byDay.values()].slice(0, 14);
-    tides.innerHTML = days.length
-      ? days.map((x) => `<div class="tide-day"><span class="tide-date">${x.d.getMonth() + 1}月${x.d.getDate()}日</span><span class="tide-moods">${x.moods.map((m) => `<span>${escapeHtml(m)}</span>`).join("")}</span></div>`).join("")
-      : `<p class="home-empty">在上面点一个心情，它会漂到这里。</p>`;
-  }
+  renderCalendar();
 }
 
 refreshDays();
