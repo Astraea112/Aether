@@ -15,6 +15,8 @@
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/400.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/500.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/pinyon-script@5/400.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/caveat@5/500.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" rel="stylesheet">
 <meta name="theme-color" content="#000000">
 <!-- iOS launch mode is manifest-only; legacy Apple fullscreen meta breaks bottom viewport. -->
 
@@ -70,6 +72,13 @@
     --paper-shadow: 0 6px 18px rgba(40,50,60,.10);
     --clip: rgba(70,86,100,.72);
     --frame-fill: rgba(255,255,255,.34);
+    --hero-glass: rgba(255,255,255,.62); --hero-num: #8E8EA0; --hero-soft: #9A9AA6;
+    --pill: rgba(255,255,255,.9); --pill-ink: #2A2A2E; --pill-line: rgba(0,0,0,.08);
+    --note-paper: rgba(252,252,252,.96); --note-ink: #3A3A40; --note-soft: #8B8B92; --note-rule: rgba(60,70,90,.10);
+    --note-him: rgba(252,252,252,.96);
+    --plan-glass: rgba(255,255,255,.55); --plan-tile: rgba(255,255,255,.62); --plan-tile-line: rgba(255,255,255,.9);
+    --plan-ink: #4A4E5A; --plan-soft: #9DA2AE; --plan-hole: rgba(150,158,170,.55);
+    --moon-lit: #C9CCD3; --moon-dark: rgba(120,126,138,.55);
     --sticker: rgba(255,255,255,.94); --sticker-ink: #253447; --sticker-soft: #7C8A97; --sticker-edge: #ffffff;
     --sticker-him: rgba(37,52,71,.90); --sticker-him-ink: #F2F4F6; --sticker-him-soft: #AEB8C2;
     --board: rgba(255,255,255,.22);
@@ -207,6 +216,13 @@
       --paper-shadow: 0 8px 20px rgba(0,0,0,.30);
       --clip: rgba(235,235,232,.78);
       --frame-fill: rgba(0,0,0,.30);
+      --hero-glass: rgba(255,255,255,.13); --hero-num: #E6E6EC; --hero-soft: #A8A8B0;
+      --pill: rgba(255,255,255,.92); --pill-ink: #222226; --pill-line: rgba(255,255,255,.4);
+      --note-paper: rgba(250,250,250,.95); --note-ink: #34343A; --note-soft: #8C8C93; --note-rule: rgba(60,70,90,.11);
+      --note-him: rgba(236,236,240,.96);
+      --plan-glass: rgba(255,255,255,.12); --plan-tile: rgba(255,255,255,.08); --plan-tile-line: rgba(255,255,255,.16);
+      --plan-ink: #E4E4EA; --plan-soft: #8F8F98; --plan-hole: rgba(0,0,0,.55);
+      --moon-lit: #E8E8EC; --moon-dark: rgba(255,255,255,.14);
       --sticker: rgba(238,236,231,.95); --sticker-ink: #232220; --sticker-soft: #77746D; --sticker-edge: rgba(255,255,255,.96);
       --sticker-him: rgba(34,34,36,.94); --sticker-him-ink: #EDEDEA; --sticker-him-soft: #9A9A96;
       --board: rgba(0,0,0,.26);
@@ -2007,6 +2023,113 @@
   .card-desk .cal-legend .sw.dash{ height: 0; background: none; border: 0; border-bottom: 2px dashed var(--period-mark); }
   .card-desk .cal-next{ color: var(--desk-ink); }
 
+
+  /* ══ 门厅天数:两个头像夹着数字 ══ */
+  .home-card.hero-duo{
+    background: var(--hero-glass);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1);
+    border: 1px solid var(--plan-tile-line); border-radius: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    padding: 26px 18px 22px; text-align: center;
+  }
+  .duo-eyebrow{ margin: 0 0 14px; font-family: var(--font-en); font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--hero-soft); }
+  .duo-row{ display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap: 6px; }
+  .duo-av{
+    justify-self: center; width: clamp(64px, 20vw, 86px); aspect-ratio: 1; border-radius: 50%;
+    background: center / cover no-repeat; border: 3px solid rgba(255,255,255,.85);
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  }
+  .duo-av.ai{ background-image: var(--avatar-default); }
+  .duo-av.me{ background-image: var(--my-avatar); }
+  .duo-num{ font-family: var(--font-en); font-size: clamp(64px, 19vw, 86px); line-height: 1; color: var(--hero-num); font-variant-numeric: lining-nums; letter-spacing: -.01em; padding: 0 4px; }
+  .duo-pills{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0 0; }
+  .duo-pills span{
+    padding: 10px 6px; border-radius: 999px; background: var(--pill); border: 1.5px solid var(--pill-line);
+    font-family: "Pinyon Script", var(--font-en); font-size: 19px; line-height: 1.1; color: var(--pill-ink);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .duo-since{ margin: 16px 0 0; font-family: var(--font-en); font-size: 15px; letter-spacing: .16em; color: var(--hero-soft); }
+  .duo-quote{ margin: 10px 0 0; font-family: var(--font-cn); font-size: 13.5px; letter-spacing: .08em; color: var(--hero-soft); }
+
+  /* ══ 自言自语:横线信纸便签,手写字 ══ */
+  .note-card{
+    position: absolute; width: min(86%, 330px); padding: 14px 18px 12px;
+    background-color: var(--note-paper); color: var(--note-ink);
+    background-image: repeating-linear-gradient(transparent 0 37px, var(--note-rule) 37px 38px);
+    background-position: 0 30px;
+    border-radius: 6px; box-shadow: 0 6px 16px rgba(0,0,0,.22), 0 1px 2px rgba(0,0,0,.12);
+    transform: rotate(var(--tilt, 0deg)); touch-action: none; -webkit-user-select: none; user-select: none; cursor: grab;
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+  .note-card.him{ background-color: var(--note-him); }
+  .note-card.lift{ cursor: grabbing; transform: rotate(var(--tilt, 0deg)) scale(1.04); box-shadow: 0 16px 30px rgba(0,0,0,.32); }
+  .note-head{ display:flex; justify-content:space-between; align-items:center; font-family: var(--font-en); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--note-soft); }
+  .note-head svg{ width: 18px; height: 18px; color: var(--note-ink); opacity: .75; }
+  .note-body{
+    margin: 8px 0 4px; font-family: "Caveat", "LXGW WenKai", "Kaiti SC", "STKaiti", cursive;
+    font-size: 23px; line-height: 38px; color: var(--note-ink); overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .note-card.open .note-body{ -webkit-line-clamp: unset; display: block; }
+  .note-foot{ display:flex; justify-content:space-between; align-items:center; font-size: 12px; color: var(--note-soft); }
+  .note-foot .arrow{ font-size: 16px; color: var(--note-ink); opacity: .7; }
+  .note-card .del{ position:absolute; top: -9px; left: -9px; width: 20px; height: 20px; border-radius: 50%; border: 0; padding: 0;
+    background: #fff; color: #555; font-size: 12px; line-height: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.25); cursor: pointer; opacity: 0; transition: opacity .15s; }
+  .note-card:hover .del, .note-card.lift .del, .note-card.sel .del{ opacity: 1; }
+  .murmur-board.notes{ height: 600px; }
+
+  /* ══ Tides:活页手账日历(左侧装订孔,每天一块小方砖,带月相) ══ */
+  .home-card.card-planner{
+    background: var(--plan-glass); color: var(--plan-ink);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1); backdrop-filter: blur(16px) saturate(1.1);
+    border: 1px solid var(--plan-tile-line); border-radius: 20px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.16);
+    padding: 18px 14px 14px 30px;
+  }
+  .card-planner::before{
+    content:""; position:absolute; left: 9px; top: 26px; bottom: 26px; width: 10px;
+    background: radial-gradient(circle at 5px 5px, var(--plan-hole) 3.4px, transparent 4px) 0 0 / 10px 46px repeat-y;
+  }
+  .card-planner .cal-head{ margin-bottom: 12px; }
+  .card-planner .cal-month{ flex-direction: row; align-items: baseline; gap: 10px; }
+  .card-planner .cal-m-num{ display:none; }
+  .card-planner .cal-m-stack{ flex-direction: row; align-items: baseline; gap: 8px; }
+  .card-planner .cal-m-en{ font-size: 24px; font-style: normal; letter-spacing: .02em; }
+  .card-planner .cal-y{ letter-spacing: .1em; font-size: 13px; color: var(--plan-soft); }
+  .cal-cn{ font-family: var(--font-cn); font-size: 13px; color: var(--plan-soft); }
+  .card-planner .cal-head > button{
+    width: 28px; height: 28px; font-size: 15px; color: var(--plan-ink);
+    background: var(--plan-tile); border: 1px solid var(--plan-tile-line);
+  }
+  .card-planner .cal-head{ justify-content: flex-start; gap: 6px; }
+  .card-planner .cal-month{ order: -1; margin-right: auto; }
+  .card-planner .cal-week span{ font-family: var(--font-en); font-size: 10.5px; letter-spacing: .12em; color: var(--plan-soft); padding-bottom: 8px; }
+  .card-planner .cal-grid{ gap: 5px; }
+  .card-planner .cal-cell{
+    height: 52px; padding: 5px 0 0; border-radius: 10px; color: var(--plan-ink);
+    background: var(--plan-tile); border: 1px solid var(--plan-tile-line);
+    justify-content: flex-start; gap: 3px;
+  }
+  .card-planner .cal-cell .n{ width: auto; height: auto; font-size: 12.5px; border-radius: 0; }
+  .card-planner .cal-cell.other{ background: transparent; border-color: transparent; }
+  .card-planner .cal-cell.other .n{ opacity: .35; }
+  .card-planner .cal-cell.today .n{ border: 0; font-weight: 600; }
+  .card-planner .cal-cell.sel{ border: 1.5px solid var(--plan-ink); box-shadow: 0 0 0 3px rgba(255,255,255,.08); }
+  .card-planner .cal-cell.sel .n{ background: none; color: inherit; }
+  .card-planner .cal-cell.period{ background: var(--period); border-color: var(--period-mark); }
+  .card-planner .cal-cell.predict{ border: 1px dashed var(--period-mark); }
+  .card-planner .cal-cell::before{ display:none !important; }
+  .cal-moon{ width: 12px; height: 12px; display:block; }
+  .cal-moon .d{ fill: var(--moon-dark); }
+  .cal-moon .l{ fill: var(--moon-lit); }
+  .card-planner .cal-marks{ height: 4px; margin-top: 1px; }
+  .card-planner .cal-marks i{ width: 3px; height: 3px; }
+  .card-planner .cal-legend{ justify-content: center; border-top: 0; margin-top: 10px; padding-top: 4px; color: var(--plan-soft); }
+  .card-planner .cal-legend .sw{ width: 7px; height: 7px; border-radius: 50%; background: var(--period-mark); }
+  .card-planner .cal-legend .sw.dash{ background: none; border: 1px dashed var(--period-mark); }
+  .cal-moonnow{ display:flex; align-items:center; gap: 6px; }
+  .cal-moonnow svg{ width: 14px; height: 14px; }
+
   .cal-day{ display:flex; flex-direction:column; gap: 14px; }
   .cal-day-title{ display:flex; align-items:baseline; gap: 10px; margin: 0; }
   .cal-day-title b{ font-family: var(--font-en); font-weight: 400; font-size: 34px; line-height: 1; }
@@ -3002,11 +3125,17 @@
           <div class="menu-private">PRIVATE<br>SPACE</div>
         </header>
 
-        <section class="home-card home-hero card-frame" aria-label="在一起的天数">
-          <p class="home-names"><span id="homeNameAi">Orion</span> &amp; <span id="homeNameMe">Astraea</span></p>
-          <p class="home-eyebrow">Already together</p>
-          <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
-          <p class="menu-since">since 2026/01/01</p>
+        <section class="home-card hero-duo" aria-label="在一起的天数">
+          <p class="duo-eyebrow">Already together</p>
+          <div class="duo-row">
+            <span class="duo-av ai" aria-hidden="true"></span>
+            <span class="duo-num" id="menuDays">113</span>
+            <span class="duo-av me" aria-hidden="true"></span>
+          </div>
+          <div class="duo-pills"><span>You and me</span><span>Me and you</span></div>
+          <p class="duo-since menu-since">since 2026/01/01</p>
+          <p class="duo-quote">在无尽的潮汐里，我们找到彼此</p>
+          <span id="homeNameAi" hidden></span><span id="homeNameMe" hidden></span>
         </section>
 
         <section class="home-card home-now" aria-live="polite">
@@ -3090,7 +3219,7 @@
               <button type="submit" class="solid">贴上去</button>
             </div>
           </form>
-          <div class="murmur-board" id="wallNotes"></div>
+          <div class="murmur-board notes" id="wallNotes"></div>
           <div class="murmur-foot"><span>按住拖动 · 点一下放到最上面</span><button type="button" id="drawerBtn" hidden></button></div>
           <ul class="murmur-drawer" id="murmurDrawer" hidden></ul>
         </section>
@@ -3131,15 +3260,15 @@
           <div class="home-card"><p class="home-label">大事记</p><ol class="milestones" id="milestoneList"></ol></div>
         </section>
         <section class="archive-section" data-sec="tides" hidden>
-          <section class="home-card cal-card card-desk" aria-label="日历">
+          <section class="home-card cal-card card-planner" aria-label="日历">
             <div class="cal-head">
               <button type="button" id="calPrev" aria-label="上个月">‹</button>
-              <div class="cal-month"><span class="cal-m-num" id="calMonthNum">11</span><span class="cal-m-stack"><span class="cal-m-en" id="calMonth">November</span><span class="cal-y" id="calYear">2026</span></span></div>
+              <div class="cal-month"><span class="cal-m-num" id="calMonthNum">11</span><span class="cal-m-stack"><span class="cal-m-en" id="calMonth">November</span><span class="cal-y" id="calYear">2026</span><span class="cal-cn" id="calMonthCn">十一月</span></span></div>
               <button type="button" id="calNext" aria-label="下个月">›</button>
             </div>
-            <div class="cal-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+            <div class="cal-week"><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span></div>
             <div class="cal-grid" id="calGrid"></div>
-            <div class="cal-legend"><span><i class="sw"></i>经期</span><span><i class="sw dash"></i>预计</span><span class="cal-next" id="calNextHint"></span></div>
+            <div class="cal-legend"><span class="cal-moonnow" id="calMoonNow"></span><span><i class="sw"></i>经期</span><span><i class="sw dash"></i>预计</span><span class="cal-next" id="calNextHint"></span></div>
           </section>
           <section class="home-card cal-day card-line" aria-label="这一天">
             <p class="cal-day-title"><b id="calDayNum">3</b><span id="calDayLabel">11月 · 周二 · 今天</span></p>
@@ -3807,8 +3936,8 @@ function murmurNotes(){
   for (const n of notes){ z = Math.max(z, n.z || 0); }
   notes.forEach((n, i) => {                 // 旧数据补上位置
     if (n.id == null){ n.id = String(n.ts) + "-" + i; changed = true; }
-    if (n.x == null){ n.x = 4 + seeded(n.ts) * 48; n.y = 3 + seeded(n.ts + 3) * 70; n.z = ++z; changed = true; }
-    if (n.tilt == null){ n.tilt = +(seeded(n.ts + 9) * 7 - 3.5).toFixed(2); changed = true; }
+    if (n.x == null){ n.x = 2 + seeded(n.ts) * 12; n.y = 2 + (i * 17) % 72; n.z = ++z; changed = true; }
+    if (n.tilt == null){ n.tilt = +(seeded(n.ts + 9) * 5 - 2.5).toFixed(2); changed = true; }
     if (!n.by){ n.by = "her"; changed = true; }
   });
   if (changed) saveJSON(WALL_KEY, notes);
@@ -3832,7 +3961,7 @@ function pullMurmurs(){                     // 服务器上那份(含他写的)�
       let added = 0, z = Math.max(0, ...local.map((n) => n.z || 0));
       for (const r of remote){
         if (!r || !r.text || have.has(String(r.id))) continue;
-        local.push({ x: 6 + Math.random() * 44, y: 4 + Math.random() * 60, tilt: +(Math.random() * 7 - 3.5).toFixed(2), z: ++z, by: "him", ...r });
+        local.push({ x: 2 + Math.random() * 12, y: 4 + Math.random() * 56, tilt: +(Math.random() * 5 - 2.5).toFixed(2), z: ++z, by: "him", ...r });
         added++;
       }
       if (added){ saveJSON(WALL_KEY, local); renderWall(); }
@@ -3847,9 +3976,13 @@ function renderWall(){
   const ids = new Set(onBoard.map((n) => String(n.id)));
   const drawer = notes.filter((n) => !ids.has(String(n.id))).sort((a, b) => b.ts - a.ts);
   board.innerHTML = onBoard.length ? onBoard.map((n) => {
-    const who = n.by === "him" ? aiName() : "我";
-    return `<div class="sticker${n.by === "him" ? " him" : ""}" data-id="${escapeHtml(String(n.id))}" style="left:${n.x}%;top:${n.y}%;z-index:${n.z || 1};--tilt:${n.tilt || 0}deg">`
-      + `${escapeHtml(n.text)}<span class="meta"><span>— ${escapeHtml(who)}</span><time>${escapeHtml(murmurWhen(n.ts))}</time></span>`
+    const him = n.by === "him";
+    const who = (him ? aiName() : HUMAN_NAME) + "’s note";
+    const pen = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 16l1-3.5 6-6a1.4 1.4 0 0 1 2 2l-6 6L8 16z"/></svg>`;
+    return `<div class="note-card${him ? " him" : ""}" data-id="${escapeHtml(String(n.id))}" style="left:${n.x}%;top:${n.y}%;z-index:${n.z || 1};--tilt:${n.tilt || 0}deg">`
+      + `<div class="note-head"><span>${escapeHtml(who)}</span>${pen}</div>`
+      + `<p class="note-body">${escapeHtml(n.text)}</p>`
+      + `<div class="note-foot"><span>${him ? "AI note" : "my note"} · ${escapeHtml(murmurWhen(n.ts))}</span><span class="arrow">↗</span></div>`
       + `<button type="button" class="del" data-del="${escapeHtml(String(n.id))}" aria-label="撕掉">×</button></div>`;
   }).join("") : `<p class="murmur-empty">还没有一张贴纸。<br>想说什么，点右上角的笔。</p>`;
   const dBtn = $("#drawerBtn"), dList = $("#murmurDrawer");
@@ -3878,7 +4011,7 @@ if (wallForm) wallForm.addEventListener("submit", (e) => {
   const notes = murmurNotes();
   const z = Math.max(0, ...notes.map((n) => n.z || 0)) + 1;
   const ts = Date.now();
-  notes.push({ id: ts + "-me", text, ts, by: "her", x: 4 + Math.random() * 46, y: 3 + Math.random() * 40, z, tilt: +(Math.random() * 7 - 3.5).toFixed(2) });
+  notes.push({ id: ts + "-me", text, ts, by: "her", x: 2 + Math.random() * 12, y: 2 + Math.random() * 30, z, tilt: +(Math.random() * 5 - 2.5).toFixed(2) });
   if (!saveMurmurs(notes)) return;
   toggleMurmurForm(false);
   renderWall();
@@ -3889,14 +4022,14 @@ if (wallBoard){
   let drag = null;
   wallBoard.addEventListener("pointerdown", (e) => {
     if (e.target.closest(".del")) return;
-    const el = e.target.closest(".sticker");
+    const el = e.target.closest(".note-card");
     if (!el) return;
     const notes = murmurNotes();
     const n = notes.find((x) => String(x.id) === el.dataset.id);
     if (!n) return;
     n.z = Math.max(0, ...notes.map((x) => x.z || 0)) + 1;
     el.style.zIndex = n.z;
-    wallBoard.querySelectorAll(".sticker.sel").forEach((x) => x.classList.remove("sel"));
+    wallBoard.querySelectorAll(".note-card.sel").forEach((x) => x.classList.remove("sel"));
     el.classList.add("lift", "sel");
     const bw = wallBoard.clientWidth, bh = wallBoard.clientHeight;
     murmurDragging = true;
@@ -3920,7 +4053,7 @@ if (wallBoard){
     if (drag.moved){
       drag.n.x = +parseFloat(drag.el.style.left).toFixed(2);
       drag.n.y = +parseFloat(drag.el.style.top).toFixed(2);
-    }
+    } else drag.el.classList.toggle("open");   // 点一下:拿到最上面,顺便展开全文
     saveMurmurs(drag.notes);
     const wasOnBoard = drag.notes.length > BOARD_MAX;
     drag = null; murmurDragging = false;
@@ -4004,6 +4137,20 @@ function periodInfo(){
 }
 let calSel = null, calView = null;      // 首次用到时再取今天(TZ 常量在脚本后面才初始化)
 function calInit(){ if (!calSel){ calSel = dayKey(Date.now()); calView = calSel.slice(0, 7); } }
+const SYNODIC = 29.530588853, NEW_MOON_REF = Date.UTC(2000, 0, 6, 18, 14);
+const MONTHS_CN = ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
+function moonPhase(k){ const t = new Date(k + "T12:00:00+08:00").getTime(); const p = ((t - NEW_MOON_REF) / 86400000 / SYNODIC) % 1; return p < 0 ? p + 1 : p; }
+function moonSvg(p){
+  const r = 5.5, c = 6, kx = Math.cos(2 * Math.PI * p), rx = (r * Math.abs(kx)).toFixed(2);
+  let d;
+  if (p < 0.5) d = `M${c},${c - r} A${r},${r} 0 0 1 ${c},${c + r} A${rx},${r} 0 0 ${kx > 0 ? 0 : 1} ${c},${c - r}Z`;
+  else         d = `M${c},${c - r} A${r},${r} 0 0 0 ${c},${c + r} A${rx},${r} 0 0 ${kx > 0 ? 1 : 0} ${c},${c - r}Z`;
+  return `<svg class="cal-moon" viewBox="0 0 12 12" aria-hidden="true"><circle class="d" cx="${c}" cy="${c}" r="${r}"/><path class="l" d="${d}"/></svg>`;
+}
+function moonName(p){
+  if (p < .03 || p > .97) return "新月"; if (p < .22) return "峨眉月"; if (p < .28) return "上弦月"; if (p < .47) return "盈凸月";
+  if (p < .53) return "满月"; if (p < .72) return "亏凸月"; if (p < .78) return "下弦月"; return "残月";
+}
 function tagLabel(t){ const b = BASE_TAGS.find((x) => x[0] === t); return b ? b[1] : t; }
 function renderCalendar(){
   const grid = $("#calGrid");
@@ -4013,9 +4160,10 @@ function renderCalendar(){
   const [vy, vm] = calView.split("-").map(Number);
   $("#calMonth").textContent = MONTHS_EN[vm - 1];
   const mn = $("#calMonthNum"); if (mn) mn.textContent = String(vm).padStart(2, "0");
+  const mc = $("#calMonthCn"); if (mc) mc.textContent = MONTHS_CN[vm - 1];
   $("#calYear").textContent = String(vy);
   const first = `${calView}-01`;
-  const lead = (new Date(first + "T12:00:00+08:00").getUTCDay() + 6) % 7;   // 周一开头
+  const lead = new Date(first + "T12:00:00+08:00").getUTCDay();             // 周日开头
   const today = dayKey(Date.now());
   const { predicted, next } = periodInfo();
   const isP = (k) => !!(all[k] && (all[k].tags || []).includes(PERIOD));
@@ -4038,9 +4186,11 @@ function renderCalendar(){
     }
     const others = (d.tags || []).filter((t) => t !== PERIOD).length + (d.moods || []).length;
     const marks = (p ? `<i class="pm"></i>` : "") + (others ? `<i></i>` : "");
-    cells.push(`<button type="button" class="${cls.join(" ")}" data-day="${k}"><span class="n">${+k.slice(8)}</span><span class="cal-marks">${marks}</span></button>`);
+    cells.push(`<button type="button" class="${cls.join(" ")}" data-day="${k}"><span class="n">${+k.slice(8)}</span>${moonSvg(moonPhase(k))}<span class="cal-marks">${marks}</span></button>`);
   }
   grid.innerHTML = cells.join("");
+  const mnow = $("#calMoonNow");
+  if (mnow){ const ph = moonPhase(today); mnow.innerHTML = moonSvg(ph) + "今晚 · " + moonName(ph); }
   const hint = $("#calNextHint");
   if (hint) hint.textContent = next ? `预计下次 · ${+next.slice(5, 7)}月${+next.slice(8)}日` : "";
 
