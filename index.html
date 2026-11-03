@@ -159,7 +159,8 @@
       --call-hangup-bg: rgba(255,255,255,.06);
       --call-hangup-shadow: rgba(0,0,0,0);
       --info-ring: rgba(255,255,255,.26);
-      --bubble-radius: 20px;
+      --bubble-radius: 18px;
+      --bubble-nook: 7px;
   }
 
   /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
@@ -179,20 +180,23 @@
     -webkit-backdrop-filter: var(--glass-blur);
             backdrop-filter: var(--glass-blur);
     box-shadow: 0 2px 8px rgba(0,0,0,.35);
-    padding: 10px 14px;
+    padding: 7px 12px 8px;
     max-width: min(74vw, 520px);
     font-family: var(--font-cn);
-    font-size: 14.5px;
-    line-height: 1.56;
-    letter-spacing: .04em;
+    font-size: 13.5px;
+    line-height: 1.5;
+    letter-spacing: .03em;
     text-shadow: 0 0 6px rgba(0,0,0,.28);
   }
-  [data-theme="harbor"] .row.ai.tail .bubble,
-  [data-theme="harbor"] .row.human.tail .bubble{ border-radius: var(--bubble-radius); }
+  /* 不对称圆角:说话人那一侧的下角收小,像话从那边说出来;连发时相邻一侧也收小,让一串泡连着往下流 */
+  :root[data-theme="harbor"] .row.human .bubble{ border-radius: var(--bubble-radius) var(--bubble-radius) var(--bubble-nook) var(--bubble-radius); }
+  :root[data-theme="harbor"] .row.ai .bubble{ border-radius: var(--bubble-radius) var(--bubble-radius) var(--bubble-radius) var(--bubble-nook); }
+  :root[data-theme="harbor"] .row.human.grouped .bubble{ border-top-right-radius: var(--bubble-nook); }
+  :root[data-theme="harbor"] .row.ai.grouped .bubble{ border-top-left-radius: var(--bubble-nook); }
   :root[data-theme="harbor"] .row .bubble.att-only{ box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
   /* 连续消息各自成泡,间距 5px */
-  :root[data-theme="harbor"] .scroll .row.grouped{ margin-top: 5px; }
+  :root[data-theme="harbor"] .scroll .row.grouped{ margin-top: 4px; }
   :root[data-theme="harbor"] .scroll .row.ai.grouped::before{ visibility: hidden; }
 
   /* ── 时间戳:贴在泡泡里的侧边,和最后一行底对齐,不占竖向空间。
@@ -200,17 +204,17 @@
   :root[data-theme="harbor"] .row .bubble:not(.has-att){
     display: flex;
     align-items: flex-end;
-    gap: 10px;
+    gap: 8px;
   }
   :root[data-theme="harbor"] .row.human .bubble:not(.has-att){ flex-direction: row-reverse; }
   :root[data-theme="harbor"] .row .bubble:not(.has-att) .txt{ min-width: 0; }
   :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{
     position: static;
     flex: none;
-    margin: 0 0 3px;
+    margin: 0 0 2px;
     font-family: var(--font-en);
     font-style: italic;
-    font-size: 10.5px;
+    font-size: 10px;
     line-height: 1;
     letter-spacing: .03em;
     color: rgba(255,255,255,.58);
