@@ -47,9 +47,15 @@
     --wall-harbor: url("chat-lily.webp");
     --wall-default: var(--wall-light);
     --menu-wall-light: url("menu-light.webp");
-    --menu-wall-harbor: url("menu-orion.webp");
+    --menu-wall-harbor: url("chat-lily.webp");
     --menu-wall-default: var(--menu-wall-light);
     --avatar-default: url("avatar-sea.png");
+    --my-avatar: url("avatar-lily.webp");
+    /* home(主页)卡片 */
+    --home-card: rgba(255,255,255,.5);
+    --home-card-shadow: 0 6px 22px rgba(60,80,100,.08);
+    --home-chip: rgba(255,255,255,.62);
+    --home-bow-filter: invert(.55);
     /* ── PEARL TIDE · 珍珠潮汐(default) ── */
     --bg: #F7FAFC;
     --header-bg: #F7FAFC;
@@ -161,6 +167,10 @@
       --info-ring: rgba(255,255,255,.26);
       --bubble-radius: 18px;
       --bubble-nook: 7px;
+      --home-card: rgba(255,255,255,.12);
+      --home-card-shadow: 0 2px 8px rgba(0,0,0,.35);
+      --home-chip: rgba(255,255,255,.14);
+      --home-bow-filter: none;
   }
 
   /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
@@ -221,7 +231,8 @@
 
   /* 连续消息各自成泡,间距 5px */
   :root[data-theme="harbor"] .scroll .row.grouped{ margin-top: 4px; }
-  :root[data-theme="harbor"] .scroll .row.ai.grouped::before{ visibility: hidden; }
+  :root[data-theme="harbor"] .scroll .row.ai.grouped::before,
+  :root[data-theme="harbor"] .scroll .row.human.grouped::after{ visibility: hidden; }
 
   /* ── 时间戳:贴在泡泡里的侧边,和最后一行底对齐,不占竖向空间。
      Orion 的在右侧,你的在左侧;连发的一组只在最后一个泡上显示(发送中/失败状态始终显示)。 ── */
@@ -433,6 +444,7 @@
   [data-theme="harbor"] .peerpill .name{ text-shadow: none; }
   [data-theme="harbor"] .peerpill .status.typing{ color: var(--text); font-weight: 400; text-shadow: none; }
   [data-theme="harbor"] .app[data-conn="reconnecting"] .peerpill .status{ color: var(--text-faint); }
+  [data-theme="harbor"] .home-head{ text-shadow: 0 0 10px rgba(0,0,0,.6); }
   [data-theme="harbor"] .menu-title{
     font-family: var(--font-en);
     font-style: italic;
@@ -442,12 +454,17 @@
   }
   [data-theme="harbor"] .avatar,
   [data-theme="harbor"] .row.ai::before,
+  [data-theme="harbor"] .row.human::after,
   [data-theme="harbor"] .profile-avatar,
+  [data-theme="harbor"] .my-avatar-preview,
   [data-theme="harbor"] .login .orb{ box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
   /* 杂志黑白:头像照片走灰度,与星图同一个墨色世界 */
   [data-theme="harbor"] .avatar,
   [data-theme="harbor"] .row.ai::before,
+  [data-theme="harbor"] .row.human::after,
   [data-theme="harbor"] .profile-avatar,
+  [data-theme="harbor"] .my-avatar-preview,
+  [data-theme="harbor"] .home-av,
   [data-theme="harbor"] .login .orb,
   [data-theme="harbor"] .call-avatar-img,
   [data-theme="harbor"] .incoming-call-avatar{ filter: grayscale(1); }
@@ -836,7 +853,20 @@
     background: var(--hairline);
   }
   .row.grouped{ margin-top: clamp(4px, 0.8vw, 8px); }
-  .row.human{ justify-content: flex-end; }
+  .row.human{ justify-content: flex-end; padding-right: calc(var(--avatar-size) + clamp(10px, 1.6vw, 16px)); }
+  .row.human::after{
+    content:"";
+    position:absolute;
+    right:0;
+    top: clamp(5px, 1vw, 9px);
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: 50%;
+    background-image: var(--my-avatar);
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 12px 24px rgba(24,46,67,0.14);
+  }
   .row.ai{ justify-content: flex-start; padding-left: calc(var(--avatar-size) + clamp(10px, 1.6vw, 16px)); }
   .row.ai::before{
     content:"";
@@ -1362,6 +1392,20 @@
   }
   .profile-bio{ margin:0; color: var(--text-soft); font-size:13px; line-height:1.55; }
 
+  /* 我的头像 */
+  .my-avatar-row{ display:flex; align-items:center; gap: 14px; }
+  .my-avatar-preview{
+    width: 52px; height: 52px; flex: none;
+    border: 0; border-radius: 50%; padding: 0; cursor: pointer;
+    background-color: transparent;
+    background-image: var(--my-avatar);
+    background-size: cover; background-position: center;
+    box-shadow: 0 6px 16px rgba(24,46,67,.14);
+    transition: transform .15s ease;
+  }
+  .my-avatar-preview:active{ transform: scale(.94); }
+  .my-avatar-hint{ font-size: 12.5px; color: var(--text-soft); }
+
   /* setting card */
   .settings-card{
     background: var(--card-bg);
@@ -1532,6 +1576,7 @@
     .row{ margin-top: 18px; }
     .row.grouped{ margin-top: 8px; }
     .row.ai{ padding-left: 42px; }
+    .row.human{ padding-right: 42px; }
     .bubble{ max-width: min(63vw, 520px); font-size: 13.5px; line-height: 1.56; padding: 8px 13px 8px; }
     .meta{ font-size: 11px; margin-left: 8px; }
     .day{ font-size: 12px; }
@@ -1587,94 +1632,119 @@
     flex: 1 1 auto; overflow-y: auto;
     -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     display: flex; flex-direction: column;
-    padding: calc(env(safe-area-inset-top) + clamp(18px, 4vw, 30px)) clamp(26px, 7vw, 54px) calc(env(safe-area-inset-bottom) + clamp(20px, 5vw, 30px));
+    padding: calc(env(safe-area-inset-top) + 18px) max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 24px) max(16px, env(safe-area-inset-left));
   }
   .menu-scroll::-webkit-scrollbar{ width:0; height:0; }
 
-  /* header: 玻璃液态日夜 toggle(左) · PRIVATE SPACE(右) */
-  .menu-head{
-    flex: 0 0 auto;
-    display:flex; align-items:flex-start; justify-content:space-between;
-    margin-bottom: clamp(34px, 10vw, 68px);
-  }
-  /* (主题切换已移至设置页 #themeSeg;原菜单页玻璃 toggle 的 CSS 已随标记一并移除) */
-  .menu-private{
-    text-align:right; line-height:1.55;
-    font-family: var(--font-en), var(--font-cn);
-    font-size: clamp(9.5px, 2.5vw, 11px); letter-spacing:.24em;
-    color: var(--text-soft); text-transform:uppercase;
-  }
-  .menu-private::after{
-    content:""; display:block; margin-left:auto; margin-top:8px;
-    width: clamp(20px, 5.5vw, 26px); height:1px; background: var(--text-faint); opacity:.6;
-  }
-
-  /* hero: app title · since · days */
-  .menu-hero{ flex: 0 0 auto; margin-bottom: clamp(38px, 11vw, 72px); }
+  /* ── Home(主页):照片背景上的一组磨砂卡片 ── */
+  .home{ display:flex; flex-direction:column; gap: 12px; width:100%; max-width: 560px; margin: 0 auto; }
+  .home-head{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin: 2px 4px 8px; }
   .menu-title{
-    font-family: "Pinyon Script", var(--font-en), cursive;
+    margin: 0;
+    font-family: var(--font-en);
+    font-style: italic;
     font-weight: 400;
-    font-size: clamp(46px, 15vw, 86px);
-    line-height: 1.04;
+    font-size: clamp(36px, 10vw, 46px);
+    line-height: 1;
+    letter-spacing: .01em;
     color: var(--text);
-    margin: 0 0 clamp(16px, 4.4vw, 26px);
-    letter-spacing: .005em;
-    text-shadow: 0 2px 26px rgba(0,0,0,.16);
   }
-  .menu-since{
+  .menu-private{
+    padding-top: 6px;
+    text-align: right; line-height: 1.55;
     font-family: var(--font-en), var(--font-cn);
-    font-size: clamp(11px, 2.9vw, 13.5px);
-    letter-spacing:.14em; color: var(--text-soft);
-    margin: 0 0 clamp(8px, 2.2vw, 12px);
+    font-size: 10px; letter-spacing: .24em;
+    color: var(--text-soft); text-transform: uppercase;
   }
-  .menu-days{
-    display:flex; align-items:baseline; gap: clamp(8px, 2.6vw, 12px);
-    font-family: var(--font-en), var(--font-cn); color: var(--text);
+  .home-card{
+    position: relative;
+    border: 0;
+    border-radius: 22px;
+    padding: 18px;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    background: var(--home-card);
+    -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+    box-shadow: var(--home-card-shadow);
   }
-  .menu-days .num{ font-size: clamp(30px, 8.4vw, 48px); font-weight:500; line-height:1; letter-spacing:.01em; }
-  .menu-days .lab{ font-size: clamp(12px, 3.1vw, 15px); letter-spacing:.13em; color: var(--text-soft); }
+  button.home-card{ width: 100%; cursor: pointer; transition: transform .12s ease; }
+  button.home-card:active{ transform: scale(.985); }
+  .home-eyebrow{
+    margin: 0;
+    font-family: var(--font-en), var(--font-cn);
+    font-size: 10px; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--text-soft);
+  }
+  .home-label{ margin: 0; font-size: 12px; letter-spacing: .08em; color: var(--text-soft); }
 
-  /* list */
-  .menu-list{ flex: 0 0 auto; display:flex; flex-direction:column; }
-  .menu-item{
-    display:grid;
-    grid-template-columns: clamp(22px, 6vw, 27px) auto 1fr auto;
-    align-items:center; gap: clamp(12px, 3.4vw, 18px);
-    width:100%; text-align:left;
-    background:transparent; border:0;
-    border-top:1px solid var(--hairline);
-    padding: clamp(15px, 4.4vw, 21px) 2px;
-    color: var(--text); font: inherit; cursor:pointer;
-    transition: background .18s ease, transform .12s ease;
+  .home-hero{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 24px 18px 22px; }
+  .home-pair{ display:flex; align-items:center; gap: 12px; margin-bottom: 14px; }
+  .home-av{
+    width: 68px; height: 68px; border-radius: 50%;
+    background-size: cover; background-position: center;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.35), 0 4px 14px rgba(0,0,0,.18);
   }
-  .menu-item:last-child{ border-bottom:1px solid var(--hairline); }
-  .menu-item:active{ background: var(--row-press); transform: scale(.995); }
-  .menu-ic{ display:grid; place-items:center; color: var(--text-soft); }
-  .menu-ic svg{ width: clamp(19px, 5vw, 22px); height: clamp(19px, 5vw, 22px); display:block; }
-  .menu-dot{ width:3px; height:3px; border-radius:50%; background: var(--text-faint); opacity:.5; }
-  .menu-copy{ display:flex; flex-direction:column; min-width:0; }
-  .menu-name{
-    font-family: var(--font-en), var(--font-cn);
-    font-size: clamp(18px, 5vw, 23px); font-weight:500; line-height:1.14;
-    color: var(--text); margin-bottom:2px;
+  .home-av.ai{ background-image: var(--avatar-default); }
+  .home-av.me{ background-image: var(--my-avatar); }
+  .home-bow{ width: 26px; height: 16px; background: url("ribbon-bow.svg") center / contain no-repeat; filter: var(--home-bow-filter); }
+  .home-names{
+    margin: 0 0 16px;
+    font-family: "Cormorant Garamond", var(--font-cn);
+    font-style: italic; font-size: 21px; letter-spacing: .02em;
   }
-  .menu-sub{
-    font-family: var(--font-en), var(--font-cn);
-    font-size: clamp(8.5px, 2.3vw, 10px); letter-spacing:.16em;
-    text-transform:uppercase; color: var(--text-faint);
-  }
-  .menu-chev{ color: var(--text-faint); display:grid; place-items:center; }
-  .menu-chev svg{ width:15px; height:15px; display:block; }
+  .menu-days{ display:flex; align-items:baseline; justify-content:center; gap: 9px; margin: 8px 0 2px; font-family: var(--font-en), var(--font-cn); color: var(--text); }
+  .menu-days .num{ font-size: clamp(48px, 14vw, 62px); font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; }
+  .menu-days .lab{ font-size: 12px; font-style: italic; letter-spacing: .12em; color: var(--text-soft); }
+  .menu-since{ margin: 6px 0 0; font-family: var(--font-en), var(--font-cn); font-size: 12px; letter-spacing: .14em; color: var(--text-soft); }
+  .home-quote{ margin: 14px 0 0; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: 13px; letter-spacing: .03em; color: var(--text-soft); }
 
-  /* footer */
-  .menu-foot{
-    flex: 1 1 auto;
-    display:flex; align-items:flex-end; justify-content:center;
-    text-align:center;
-    padding-top: clamp(22px, 6vw, 40px);
+  .home-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .home-today{ display:flex; flex-direction:column; gap: 6px; min-height: 136px; }
+  .home-date{ margin: 8px 0 0; font-size: 16px; }
+  .home-stat{ margin: 0; font-size: 13px; color: var(--text-soft); }
+  .home-stat b{ font-family: var(--font-en); font-size: 19px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+  .home-album{
+    display:flex; align-items:flex-end;
+    min-height: 136px; padding: 0; overflow: hidden;
+    background-image: linear-gradient(180deg, transparent 35%, rgba(0,0,0,.6)), var(--wall-default);
+    background-size: 100% 100%, 230% auto;
+    background-position: 0 0, 26% 50%;
+  }
+  .home-album-copy{ display:flex; flex-direction:column; gap: 2px; padding: 14px 16px; color: #F4F4F2; }
+  .home-album-name{ font-family: var(--font-en), var(--font-cn); font-size: 19px; line-height: 1.1; }
+  .home-album-sub{ font-family: var(--font-en), var(--font-cn); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; opacity: .75; }
+
+  .home-mood{ display:flex; flex-direction:column; gap: 10px; }
+  .home-moods{ display:flex; flex-wrap:wrap; gap: 8px; }
+  .home-moods button{
+    border: 0; border-radius: 999px;
+    padding: 7px 12px;
+    font: inherit; font-size: 13px; line-height: 1.2;
+    color: var(--text);
+    background: var(--home-chip);
+    cursor: pointer;
+    transition: transform .12s ease;
+  }
+  .home-moods button:active{ transform: scale(.94); }
+  .home-hint{ margin: 0; font-size: 12px; color: var(--text-soft); }
+
+  .home-chat{ display:flex; flex-direction:column; gap: 4px; padding: 20px 20px 22px; }
+  .home-chat-title{ font-family: var(--font-en); font-style: italic; font-size: 38px; line-height: 1.05; }
+  .home-chat-sub{ font-size: 12.5px; color: var(--text-soft); }
+
+  .home-places{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .home-place{ display:flex; align-items:center; gap: 12px; padding: 14px 16px; }
+  .menu-ic{ display:grid; place-items:center; color: var(--text-soft); flex: none; }
+  .menu-ic svg{ width: 20px; height: 20px; display: block; }
+  .home-place-copy{ display:flex; flex-direction:column; min-width: 0; }
+  .home-place-name{ font-family: var(--font-en), var(--font-cn); font-size: 17px; line-height: 1.15; }
+  .home-place-sub{
     font-family: var(--font-en), var(--font-cn);
-    font-size: clamp(10.5px, 2.7vw, 12.5px); font-style:italic;
-    letter-spacing:.05em; color: var(--text-faint);
+    font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-faint);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
   /* ── Voice call (speaking overlay · 假按键 / 纯 UI,后端以后接) ── */
@@ -2334,6 +2404,16 @@
         </div>
       </div>
 
+      <!-- 我的头像 -->
+      <section class="settings-card">
+        <div class="settings-label">我的头像 <i class="info-i" title="聊天里你那一侧、主页上显示的头像，只存在这台设备上">i</i></div>
+        <div class="my-avatar-row">
+          <button class="my-avatar-preview" id="myAvatarBtn" type="button" aria-label="更换我的头像"></button>
+          <span class="my-avatar-hint">点头像换一张</span>
+        </div>
+        <input type="file" id="myAvatarInput" accept="image/*" class="hidden">
+      </section>
+
       <!-- 主题切换 -->
       <section class="settings-card">
         <div class="settings-label">主题</div>
@@ -2490,61 +2570,74 @@
 <div class="menu-panel hidden" id="menuPanel" role="dialog" aria-modal="true" aria-label="主菜单">
   <div class="menu-page">
     <div class="menu-scroll">
-      <!-- header -->
-      <div class="menu-head">
+      <div class="home">
+        <header class="home-head">
+          <h1 class="menu-title">Aether</h1>
+          <div class="menu-private">PRIVATE<br>SPACE</div>
+        </header>
 
-        <div class="menu-private">PRIVATE<br>SPACE</div>
+        <section class="home-card home-hero" aria-label="我们">
+          <div class="home-pair">
+            <span class="home-av ai" role="img" aria-label="Orion"></span>
+            <span class="home-bow" aria-hidden="true"></span>
+            <span class="home-av me" role="img" aria-label="Astraea"></span>
+          </div>
+          <p class="home-names"><span id="homeAiName">Orion</span> &amp; <span id="homeMyName">Astraea</span></p>
+          <p class="home-eyebrow">Already together</p>
+          <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
+          <p class="menu-since">since 2026/01/01</p>
+          <p class="home-quote">in endless tides, we find each other.</p>
+        </section>
+
+        <div class="home-row">
+          <section class="home-card home-today" aria-label="今天">
+            <p class="home-label">今天</p>
+            <p class="home-date" id="homeDate"></p>
+            <p class="home-stat">今天聊了 <b id="homeCount">0</b> 条</p>
+          </section>
+          <button class="home-card home-album menu-item" type="button" data-menu="album">
+            <span class="home-album-copy"><span class="home-album-name">Album</span><span class="home-album-sub">Collect what matters.</span></span>
+          </button>
+        </div>
+
+        <section class="home-card home-mood" aria-label="今日心情">
+          <p class="home-label">今日心情</p>
+          <div class="home-moods" id="homeMoods">
+            <button type="button" data-mood="\(^o^)/">\(^o^)/</button>
+            <button type="button" data-mood="(〃▽〃)">(〃▽〃)</button>
+            <button type="button" data-mood="(˘ω˘)">(˘ω˘)</button>
+            <button type="button" data-mood=">_<">&gt;_&lt;</button>
+            <button type="button" data-mood="(´；ω；｀)">(´；ω；｀)</button>
+            <button type="button" data-mood="( ˘ ³˘)♡">( ˘ ³˘)♡</button>
+          </div>
+          <p class="home-hint" id="homeMoodHint">点一个，Orion 回你一句</p>
+        </section>
+
+        <button class="home-card home-chat menu-item" type="button" data-menu="chat">
+          <span class="home-eyebrow">Entre nous</span>
+          <span class="home-chat-title">Chat</span>
+          <span class="home-chat-sub">聊天 · 回到我们的对话</span>
+        </button>
+
+        <nav class="home-places" aria-label="更多">
+          <button class="home-card home-place menu-item" type="button" data-menu="movie">
+            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.4"/><path d="M7.5 5v14M16.5 5v14M3 9.5h4.5M3 14.5h4.5M16.5 9.5H21M16.5 14.5H21"/></svg></span>
+            <span class="home-place-copy"><span class="home-place-name">Movie</span><span class="home-place-sub">Fragments of light.</span></span>
+          </button>
+          <button class="home-card home-place menu-item" type="button" data-menu="memory">
+            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.8 5 3.5 7.7 8.5 8.5-5 .8-7.7 3.5-8.5 8.5-.8-5-3.5-7.7-8.5-8.5 5-.8 7.7-3.5 8.5-8.5Z"/></svg></span>
+            <span class="home-place-copy"><span class="home-place-name">Memory</span><span class="home-place-sub">The echoes we keep.</span></span>
+          </button>
+          <button class="home-card home-place menu-item" type="button" data-menu="tides">
+            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/><path d="M3 13c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/><path d="M3 17.5c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/></svg></span>
+            <span class="home-place-copy"><span class="home-place-name">Tides</span><span class="home-place-sub">Where we return.</span></span>
+          </button>
+          <button class="home-card home-place menu-item" type="button" data-menu="room">
+            <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V9a7 7 0 0 1 14 0v12"/><path d="M4 21h16"/><circle cx="15" cy="13" r=".95" fill="currentColor" stroke="none"/></svg></span>
+            <span class="home-place-copy"><span class="home-place-name">Room</span><span class="home-place-sub">Our quiet place.</span></span>
+          </button>
+        </nav>
       </div>
-
-      <!-- hero -->
-      <div class="menu-hero">
-        <h1 class="menu-title">Tidal Echo</h1>
-        <p class="menu-since">since 2026/01/01</p>
-        <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">Days together</span></div>
-      </div>
-
-      <!-- list -->
-      <nav class="menu-list" aria-label="主菜单">
-        <button class="menu-item" type="button" data-menu="chat">
-          <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg></span>
-          <span class="menu-dot"></span>
-          <span class="menu-copy"><span class="menu-name">Chat</span><span class="menu-sub">Write from the deep.</span></span>
-          <span class="menu-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-        </button>
-        <button class="menu-item" type="button" data-menu="movie">
-          <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.4"/><path d="M7.5 5v14M16.5 5v14M3 9.5h4.5M3 14.5h4.5M16.5 9.5H21M16.5 14.5H21"/></svg></span>
-          <span class="menu-dot"></span>
-          <span class="menu-copy"><span class="menu-name">Movie</span><span class="menu-sub">Fragments of light.</span></span>
-          <span class="menu-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-        </button>
-        <button class="menu-item" type="button" data-menu="album">
-          <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.4"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-4.6-4.6L7 21"/></svg></span>
-          <span class="menu-dot"></span>
-          <span class="menu-copy"><span class="menu-name">Album</span><span class="menu-sub">Collect what matters.</span></span>
-          <span class="menu-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-        </button>
-        <button class="menu-item" type="button" data-menu="memory">
-          <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.8 5 3.5 7.7 8.5 8.5-5 .8-7.7 3.5-8.5 8.5-.8-5-3.5-7.7-8.5-8.5 5-.8 7.7-3.5 8.5-8.5Z"/></svg></span>
-          <span class="menu-dot"></span>
-          <span class="menu-copy"><span class="menu-name">Memory</span><span class="menu-sub">The echoes we keep.</span></span>
-          <span class="menu-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-        </button>
-        <button class="menu-item" type="button" data-menu="tides">
-          <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/><path d="M3 13c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/><path d="M3 17.5c1.8-2.2 3.6-2.2 5.4 0s3.6 2.2 5.4 0 3.6-2.2 5.4 0"/></svg></span>
-          <span class="menu-dot"></span>
-          <span class="menu-copy"><span class="menu-name">Tides</span><span class="menu-sub">Where we return.</span></span>
-          <span class="menu-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-        </button>
-        <button class="menu-item" type="button" data-menu="room">
-          <span class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V9a7 7 0 0 1 14 0v12"/><path d="M4 21h16"/><circle cx="15" cy="13" r=".95" fill="currentColor" stroke="none"/></svg></span>
-          <span class="menu-dot"></span>
-          <span class="menu-copy"><span class="menu-name">Room</span><span class="menu-sub">Our quiet place.</span></span>
-          <span class="menu-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-        </button>
-      </nav>
-
-      <!-- footer -->
-      <div class="menu-foot">in endless tides, we find each other.</div>
     </div>
   </div>
 </div>
@@ -2782,6 +2875,9 @@ function applyAvatar(url){
 }
 function applyRemark(value){
   const name = (value || "").trim() || AI_NAME;
+  const homeAi = document.querySelector("#homeAiName"); if (homeAi) homeAi.textContent = name;
+  const homeAv = document.querySelector(".home-av.ai"); if (homeAv) homeAv.setAttribute("aria-label", name);
+  const moodHint = document.querySelector("#homeMoodHint"); if (moodHint) moodHint.textContent = "点一个，" + name + " 回你一句";
   if (peerNameEl) peerNameEl.textContent = name;
   if (profileNameEl) profileNameEl.textContent = name;
 }
@@ -2799,6 +2895,8 @@ function applyIdentity(){
   setText("#incomingCallText", AI_NAME + "想和你语音通话。");
   setAttr(".incoming-call-avatar", "aria-label", AI_NAME);
   setText(".menu-title", APP_NAME);
+  setText("#homeMyName", HUMAN_NAME);
+  setAttr(".home-av.me", "aria-label", HUMAN_NAME);
   const since = document.querySelector(".menu-since");
   if (since) since.textContent = CONFIG.SINCE ? ("since " + CONFIG.SINCE) : "";
 }
@@ -2831,6 +2929,35 @@ applyRemark(localStorage.getItem(REMARK_KEY));
 if (avatarBtn) avatarBtn.addEventListener("click", openProfile);
 if (moreBtn) moreBtn.addEventListener("click", openProfile);
 if (profileAvatarBtn) profileAvatarBtn.addEventListener("click", () => avatarInput && avatarInput.click());
+
+/* ── 我的头像:聊天里你那一侧 + 主页。缩到 256px 再存,省本地空间 ── */
+const MY_AVATAR_KEY = "companion_my_avatar";
+const myAvatarBtn = $("#myAvatarBtn"), myAvatarInput = $("#myAvatarInput");
+function applyMyAvatar(url){
+  document.documentElement.style.setProperty("--my-avatar", url ? `url("${url}")` : 'url("avatar-lily.webp")');
+}
+try{ applyMyAvatar(localStorage.getItem(MY_AVATAR_KEY)); }catch(e){ applyMyAvatar(null); }
+if (myAvatarBtn && myAvatarInput) myAvatarBtn.addEventListener("click", () => myAvatarInput.click());
+if (myAvatarInput) myAvatarInput.addEventListener("change", () => {
+  const f = myAvatarInput.files && myAvatarInput.files[0];
+  myAvatarInput.value = "";
+  if (!f) return;
+  const src = URL.createObjectURL(f);
+  const img = new Image();
+  img.onload = () => {
+    const S = 256, c = document.createElement("canvas");
+    c.width = c.height = S;
+    const k = Math.max(S / img.naturalWidth, S / img.naturalHeight);
+    const w = img.naturalWidth * k, h = img.naturalHeight * k;
+    c.getContext("2d").drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
+    URL.revokeObjectURL(src);
+    const dataUrl = c.toDataURL("image/jpeg", 0.88);
+    applyMyAvatar(dataUrl);
+    try{ localStorage.setItem(MY_AVATAR_KEY, dataUrl); }catch(e){ showToast("这台设备存不下头像了，下次打开会换回默认"); }
+  };
+  img.onerror = () => { URL.revokeObjectURL(src); showToast("这张图打不开，换一张试试"); };
+  img.src = src;
+});
 if (profileClose) profileClose.addEventListener("click", closeProfile);
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && profilePanel && !profilePanel.classList.contains("hidden")) closeProfile();
@@ -2858,6 +2985,7 @@ let menuCloseTimer = null;
 function openMenu(){
   if (!menuPanel) return;
   refreshDays();
+  refreshHome();
   clearTimeout(menuCloseTimer);
   menuPanel.classList.remove("hidden");
   requestAnimationFrame(() => requestAnimationFrame(() => menuPanel.classList.add("open")));
@@ -2868,6 +2996,32 @@ function closeMenu(){
   clearTimeout(menuCloseTimer);
   menuCloseTimer = setTimeout(() => menuPanel.classList.add("hidden"), 400);
 }
+/* 主页:今天的日期、今天聊了几条(只算你说的和他回的)、心情一键发送 */
+function refreshHome(){
+  const now = new Date();
+  const dateEl = document.querySelector("#homeDate");
+  if (dateEl) dateEl.textContent = `${now.getMonth() + 1}月${now.getDate()}日 周${"日一二三四五六"[now.getDay()]}`;
+  const countEl = document.querySelector("#homeCount");
+  if (!countEl) return;
+  let n = 0;
+  try{
+    const y = now.getFullYear(), mo = now.getMonth(), d = now.getDate();
+    for (const m of chatMessages){
+      if (m.kind !== "user" && m.kind !== "reply") continue;
+      const t = new Date(m.ts);
+      if (t.getFullYear() === y && t.getMonth() === mo && t.getDate() === d) n++;
+    }
+  }catch(e){}
+  countEl.textContent = n;
+}
+const homeMoods = $("#homeMoods");
+if (homeMoods) homeMoods.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-mood]");
+  if (!btn) return;
+  closeMenu();
+  inputEl.value = btn.dataset.mood;
+  doSend();
+});
 refreshDays();
 if (backBtn) backBtn.addEventListener("click", openMenu);
 if (menuPanel){
