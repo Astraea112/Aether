@@ -159,51 +159,83 @@
       --call-hangup-bg: rgba(255,255,255,.06);
       --call-hangup-shadow: rgba(0,0,0,0);
       --info-ring: rgba(255,255,255,.26);
-      --bubble-radius: 17px;
+      --bubble-radius: 20px;
   }
 
   /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
      原则:星空是世界,缎带只做相框——装饰只出现在包裹内容的边缘,不漂浮在空间里。 */
 
-  /* ── 磨砂玻璃:半透明白 + blur(10px),背景透过来一点但隔着雾;
-     边线最多 0.5px 8% 白,若有若无。你和 Orion 只靠填充透明度区分:你 .14 稍亮,Orion .08 稍暗。 ── */
+  /* ── 饱满磨砂:Orion .18 / 你 .24 的白,blur 10px;无边框,一层轻投影让泡泡微微浮起。
+     圆角 20px,单行短消息就是胶囊;内边距收紧、气泡贴着文字。只靠填充亮度区分双方。 ── */
   [data-theme="harbor"] .row.ai .bubble,
-  [data-theme="harbor"] .msg-menu-clone.clone-ai{ --g-fill: rgba(255,255,255,.08); }
+  [data-theme="harbor"] .msg-menu-clone.clone-ai{ --g-fill: rgba(255,255,255,.18); }
   [data-theme="harbor"] .row.human .bubble,
-  [data-theme="harbor"] .msg-menu-clone.clone-human{ --g-fill: rgba(255,255,255,.14); }
+  [data-theme="harbor"] .msg-menu-clone.clone-human{ --g-fill: rgba(255,255,255,.24); }
   :root[data-theme="harbor"] .row .bubble,
   :root[data-theme="harbor"] .msg-menu-clone{
     border: 0;
-    color: #F2F2F0 !important;
+    color: #F4F4F2 !important;
     background: var(--g-fill) !important;
     -webkit-backdrop-filter: var(--glass-blur);
             backdrop-filter: var(--glass-blur);
-    /* 0.5px 边线用 inset spread 画:border 在部分浏览器会被取整成 1px */
-    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08);
-    padding: 10px 15px 11px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    padding: 10px 14px;
+    max-width: min(74vw, 520px);
     font-family: var(--font-cn);
     font-size: 14.5px;
-    line-height: 1.82;
+    line-height: 1.56;
     letter-spacing: .04em;
+    text-shadow: 0 0 6px rgba(0,0,0,.28);
   }
   [data-theme="harbor"] .row.ai.tail .bubble,
   [data-theme="harbor"] .row.human.tail .bubble{ border-radius: var(--bubble-radius); }
-  :root[data-theme="harbor"] .row .bubble.att-only{ border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  :root[data-theme="harbor"] .row .bubble.att-only{ box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
-  /* 时间戳挪到气泡外侧:Orion 的在右、你的在左,底边对齐 */
-  [data-theme="harbor"] .bubble .meta{
+  /* 连续消息各自成泡,间距 5px */
+  :root[data-theme="harbor"] .scroll .row.grouped{ margin-top: 5px; }
+  :root[data-theme="harbor"] .scroll .row.ai.grouped::before{ visibility: hidden; }
+
+  /* ── 时间戳:贴在泡泡里的侧边,和最后一行底对齐,不占竖向空间。
+     Orion 的在右侧,你的在左侧;连发的一组只在最后一个泡上显示(发送中/失败状态始终显示)。 ── */
+  :root[data-theme="harbor"] .row .bubble:not(.has-att){
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  :root[data-theme="harbor"] .row.human .bubble:not(.has-att){ flex-direction: row-reverse; }
+  :root[data-theme="harbor"] .row .bubble:not(.has-att) .txt{ min-width: 0; }
+  :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{
+    position: static;
+    flex: none;
+    margin: 0 0 3px;
+    font-family: var(--font-en);
+    font-style: italic;
+    font-size: 10.5px;
+    line-height: 1;
+    letter-spacing: .03em;
+    color: rgba(255,255,255,.58);
+    text-shadow: none;
+  }
+  :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta .tick{ margin-left: 4px; }
+  :root[data-theme="harbor"] .row:not(.tail) .bubble .meta:not(:has(.fail, .state, .clock)){ display: none; }
+  [data-theme="harbor"] .msg-menu-clone .meta{ display: none; }
+
+  /* 带附件的气泡保持原排版,时间戳挂在气泡外侧 */
+  :root[data-theme="harbor"] .row .bubble.has-att .meta{
     position: absolute;
     bottom: 3px;
     margin: 0;
     font-family: var(--font-en);
     font-style: italic;
-    font-size: 11px;
+    font-size: 10.5px;
     line-height: 1;
-    letter-spacing: .04em;
-    color: var(--text-faint);
+    color: #B2B2AE;
   }
-  /* 直接落在照片上的小字(时间戳、分隔线、thinking、动作行):柔和暗晕托底,亮花瓣上也读得清 */
-  :root[data-theme="harbor"] .row .bubble .meta,
+  [data-theme="harbor"] .row.ai .bubble.has-att .meta{ left: calc(100% + 8px); }
+  [data-theme="harbor"] .row.human .bubble.has-att .meta{ right: calc(100% + 8px); }
+
+  /* 直接落在照片上的小字(分隔线、thinking、动作行、附件时间):柔和暗晕托底,亮花瓣上也读得清 */
+  :root[data-theme="harbor"] .row .bubble.has-att .meta,
   :root[data-theme="harbor"] .scroll .day,
   :root[data-theme="harbor"] .scroll .new-divider,
   :root[data-theme="harbor"] .think-caption,
@@ -216,25 +248,21 @@
   :root[data-theme="harbor"] .login .sub{
     text-shadow: 0 0 4px rgba(0,0,0,.95), 0 0 12px rgba(0,0,0,.75);
   }
-  :root[data-theme="harbor"] .row .bubble .meta,
   :root[data-theme="harbor"] .scroll .day,
   :root[data-theme="harbor"] .scroll .new-divider{ color: #B2B2AE; }
-  [data-theme="harbor"] .row.ai .bubble .meta{ left: calc(100% + 8px); }
-  [data-theme="harbor"] .row.human .bubble .meta{ right: calc(100% + 8px); }
-  [data-theme="harbor"] .msg-menu-clone .meta{ display: none; }
 
   /* 输入框 / 按钮:同款磨砂玻璃 */
   [data-theme="harbor"] .composer .field,
   [data-theme="harbor"] .login input{
     border: 0;
-    background: rgba(255,255,255,.10);
+    background: rgba(255,255,255,.18);
     -webkit-backdrop-filter: var(--glass-blur);
             backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
     border-radius: var(--bubble-radius);
   }
   [data-theme="harbor"] .login input:focus,
-  [data-theme="harbor"] .composer .field:focus-within{ background: rgba(255,255,255,.13); }
+  [data-theme="harbor"] .composer .field:focus-within{ background: rgba(255,255,255,.22); }
   [data-theme="harbor"] .composer textarea::placeholder,
   [data-theme="harbor"] .login input::placeholder{ font-style: italic; letter-spacing: .03em; color: #B9B9B5; }
   [data-theme="harbor"] .floatbtn.send,
@@ -242,10 +270,10 @@
   [data-theme="harbor"] .newmsg-pill{
     color: #F2F2F0;
     border: 0;
-    background: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.24);
     -webkit-backdrop-filter: var(--glass-blur);
             backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
   }
   [data-theme="harbor"] .floatbtn.send:hover{ color: #fff; }
   [data-theme="harbor"] .login button{ border-radius: var(--bubble-radius); font-weight: 500; letter-spacing: .3em; }
