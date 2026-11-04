@@ -160,7 +160,9 @@ if [ -n "$NEWPIN" ]; then
   [ -n "$got" ] && [ "$got" = "$want" ] && ok "用你刚设的数字密码换到了正确的密钥" || { echo "✗ 数字密码没换到密钥"; fail=1; }
   unset NEWPIN want got res
 fi
-curl -fsS "https://$DOMAIN/chat/" | grep -q 'id="pinPad"' && ok "网页已经是带数字键盘的版本" || { echo "✗ 网页还是旧版"; fail=1; }
+# 先整页存进变量再找：直接 curl | grep -q 会因为 grep 提前退出让 curl 报 (23)，在 pipefail 下误判成失败
+page=$(curl -fsS "https://$DOMAIN/chat/" || true)
+case "$page" in *'id="pinPad"'*) ok "网页已经是带数字键盘的版本" ;; *) echo "✗ 网页还是旧版"; fail=1 ;; esac
 
 [ "$fail" = 0 ] || die "有检查没通过，把上面的输出截图给我"
 printf '\n\033[32m全部完成。\033[0m 手机上把网页关掉再打开一次（第一次可能还是旧页面），退出登录后就是数字键盘。\n'
