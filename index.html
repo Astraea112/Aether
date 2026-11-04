@@ -2987,7 +2987,7 @@
   .card-planner .cal-grid{ gap: 3px; }
   /* 每天一个若有若无的小格子:很淡的磨砂,不描边 */
   .card-planner .cal-cell{
-    height: 58px; padding: 9px 0 0; border: 0; border-radius: 14px; background: rgba(255,255,255,.035);
+    height: 58px; padding: 9px 0 0; border: 0; border-radius: 14px; background: rgba(255,255,255,.02);
     gap: 6px; transition: background-color .18s ease, box-shadow .18s ease;
   }
   .card-planner .cal-cell .n{ font-size: 16px; font-family: var(--font-en); font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; line-height: 1; }
@@ -3017,6 +3017,15 @@
   .cal-ev-acts button{ font-size: 12px; color: var(--text-faint); letter-spacing: .04em; }
   .cal-period-link{ font-size: 13px; color: var(--text-faint); }
   .card-planner + .cal-day, .cal-day.card-line{ border-radius: 26px; }
+  /* 标签:选上的是实色的雾玫瑰(跟经期那抹粉同一个色系),加标签的输入框和按钮也实一点 */
+  .cal-tags-block .cal-chips button{ border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+  .cal-tags-block .cal-chips button.on{ background: #CDB2B6; border-color: #CDB2B6; color: #241E1F; }
+  .cal-tags-block .cal-chips button.on.period-chip{ background: #D9B3BA; border-color: #D9B3BA; color: #241E1F; }
+  .cal-tags-block .cal-chips button.ghost{ border-style: dashed; background: transparent; color: var(--text-soft); min-width: 44px; }
+  .cal-tags-block .tag-add{ margin-top: 10px; }
+  .cal-tags-block .tag-add[hidden]{ display:none; }
+  .cal-tags-block .tag-add input{ background: rgba(58,52,53,.82); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.14); }
+  .cal-tags-block .tag-add button{ background: #CDB2B6; color: #241E1F; }
 
   /* 顶栏多了一个额度按钮:手机上把按钮间距收紧一点,别压到名字 */
   @media (max-width: 600px){ .header-actions{ gap: 15px; } }
@@ -3488,7 +3497,8 @@
               <button type="submit">加上</button>
             </form>
             <button type="button" class="cal-period-link" id="calPeriodLink">经期从这天开始</button>
-            <div>
+            <!-- 心情这一块先收起来(换成了标签),元素留着给脚本用 -->
+            <div class="cal-mood-legacy" hidden>
               <div class="cal-sub-row"><p class="cal-sub">心情</p><button type="button" id="moodEdit">整理</button></div>
               <div class="cal-chips" id="homeMoods"></div>
               <form class="cal-add mood-add" id="moodAddForm" autocomplete="off" hidden>
@@ -3497,14 +3507,14 @@
               </form>
               <p class="home-hint" id="homeMoodHint" style="margin-top:8px">点今天的心情，Orion 回你一句</p>
             </div>
-            <div>
+            <div class="cal-tags-block">
               <p class="cal-sub">标签</p>
               <div class="cal-chips" id="calTags"></div>
+              <form class="cal-add tag-add" id="calAddForm" autocomplete="off" hidden>
+                <input id="calAddInput" maxlength="12" placeholder="加一个标签…">
+                <button type="submit">加上</button>
+              </form>
             </div>
-            <form class="cal-add" id="calAddForm" autocomplete="off">
-              <input id="calAddInput" maxlength="12" placeholder="加一个标签…">
-              <button type="submit">加上</button>
-            </form>
           </section>
         </section>
       </div>
@@ -4538,7 +4548,8 @@ function renderCalendar(){
   const custom = day.tags.filter((t) => !BASE_TAGS.some((b) => b[0] === t));
   $("#calTags").innerHTML =
     BASE_TAGS.map(([t, l]) => `<button type="button" data-tag="${t}" class="${day.tags.includes(t) ? "on" : ""}${t === PERIOD ? " period-chip" : ""}">${l}</button>`).join("")
-    + custom.map((t) => `<button type="button" data-tag="${escapeHtml(t)}" class="on">${escapeHtml(t)}<span class="x">×</span></button>`).join("");
+    + custom.map((t) => `<button type="button" data-tag="${escapeHtml(t)}" class="on">${escapeHtml(t)}<span class="x">×</span></button>`).join("")
+    + `<button type="button" class="ghost" data-add-tag aria-label="加一个标签">＋</button>`;
 }
 const calGrid = $("#calGrid");
 if (calGrid) calGrid.addEventListener("click", (e) => {
@@ -4559,6 +4570,11 @@ if (calPrev) calPrev.addEventListener("click", () => shiftMonth(-1));
 if (calNext) calNext.addEventListener("click", () => shiftMonth(1));
 const calTags = $("#calTags");
 if (calTags) calTags.addEventListener("click", (e) => {
+  if (e.target.closest("button[data-add-tag]")){
+    const f = $("#calAddForm"); f.hidden = !f.hidden;
+    if (!f.hidden) setTimeout(() => $("#calAddInput").focus(), 30);
+    return;
+  }
   const b = e.target.closest("button[data-tag]");
   if (!b) return;
   const t = b.dataset.tag, day = calDay(calSel);
@@ -4589,6 +4605,7 @@ if (calAddForm) calAddForm.addEventListener("submit", (e) => {
   if (!day.tags.includes(t)) day.tags.push(t);
   calSave(calSel, day);
   calAddInput.value = "";
+  calAddForm.hidden = true;
   renderCalendar();
 });
 
