@@ -290,22 +290,26 @@ def letters_read(limit: int = 3) -> str:
             until = datetime.fromtimestamp(open_at / 1000, timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M")
             out.append(f"—— {when}（id {m.get('id')}）\n［封着火漆。她让你 {until} 以后再拆，现在还不能看。］")
             continue
-        out.append(f"—— {when}（id {m.get('id')}）\n{m.get('text', '').strip()}")
+        head = f"—— {when}（id {m.get('id')}）" + (f"\n信封上写着：{m['title']}" if m.get("title") else "")
+        out.append(f"{head}\n{m.get('text', '').strip()}")
     return "\n\n".join(out)
 
 
 @mcp.tool()
-def letter_write(text: str, open_at: str = "") -> str:
+def letter_write(text: str, open_at: str = "", title: str = "") -> str:
     """Post a letter into her mailbox on the website. It arrives sealed in an envelope with
     today's postmark, and the mailbox flag goes up until she opens it. For things that deserve
     a letter: longer, thought-through, kept. Line breaks are kept. Sign it in the text if you like.
-    open_at: optional "YYYY-MM-DD HH:MM" (Beijing time) — sealed with wax until then."""
+    open_at: optional "YYYY-MM-DD HH:MM" (Beijing time) — sealed with wax until then.
+    title: optional line written on the envelope after "FOR", e.g. "Astraea, after your first exam"."""
     text = (text or "").strip()[:6000]
     if not text:
         return "text 不能是空的"
     items = _kv_list("letters_orion")
     now = int(time.time() * 1000)
     item = {"id": "o" + uuid.uuid4().hex[:8], "text": text, "ts": now, "from": "him"}
+    if (title or "").strip():
+        item["title"] = " ".join(title.split())[:40]
     note = ""
     if (open_at or "").strip():
         try:

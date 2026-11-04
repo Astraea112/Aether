@@ -3527,7 +3527,7 @@
   /* 什么时候能拆 */
   .pc-when{ display:flex; flex-direction:column; align-items:center; gap: 10px; padding-top: 6px;
     opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .3s ease, transform .3s ease; max-height: 0; overflow: hidden; }
-  .post-compose.s-when .pc-when{ opacity: 1; transform: none; pointer-events: auto; max-height: 200px; }
+  .post-compose.s-when .pc-when{ opacity: 1; transform: none; pointer-events: auto; max-height: 260px; }
   .post-compose.s-when .pc-bar{ opacity: 1; pointer-events: auto; }
   .pc-when p{ margin: 0; font-size: var(--fs-s); letter-spacing: .14em; color: var(--text-soft); }
   .pc-chips{ display:flex; flex-wrap: wrap; justify-content:center; gap: 8px; max-width: 380px; }
@@ -3543,6 +3543,85 @@
   @keyframes envShake{ 20%{ transform: translateX(-6px) rotate(-1deg); } 50%{ transform: translateX(5px) rotate(1deg); } 80%{ transform: translateX(-2px); } }
   .pr-lock{ margin: 8px 0 0; font-size: var(--fs-s); letter-spacing: .08em; color: var(--text-soft); }
   @media (prefers-reduced-motion: reduce){ .pc-fold, .pc-paper, .pc-pen, .pc-env{ transition: none !important; } }
+
+  /* ════════ 信箱 v3:Yours, in ink. ════════ */
+  .lt{ position: relative; padding: 14px 4px 24px; }
+  .lt::before{ content:""; position:absolute; inset: -6px -16px; z-index: -1; pointer-events: none;
+    background: radial-gradient(120% 70% at 50% 35%, rgba(0,0,0,.42), rgba(0,0,0,.18) 70%, transparent); }
+  .lt-eyebrow{ margin: 0; font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-faint); }
+  .lt-hero{ display:flex; align-items:flex-end; justify-content:space-between; gap: 12px; margin-top: 8px; }
+  .lt-title{ margin: 0; font-family: var(--font-en); font-style: italic; font-weight: 400; font-size: calc(var(--fs-xl) * 1.25); line-height: 1.02; letter-spacing: -.01em; }
+  .lt-count{ display:flex; flex-direction:column; align-items:flex-end; gap: 6px; }
+  .lt-count b{ font-family: var(--font-en); font-weight: 400; font-size: calc(var(--fs-xl) * 1.35); line-height: .9; font-variant-numeric: lining-nums; }
+  .lt-count span{ font-family: var(--font-en); font-size: var(--fs-xs); letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
+  .lt-sub{ margin: 12px 0 0; font-family: var(--font-en); font-style: italic; font-size: var(--fs-s); color: var(--text-faint); }
+
+  .lt-stage{ position: relative; height: 236px; margin-top: 16px; }
+  .lt-box{ position: absolute; left: 50%; top: 10px; width: 60%; transform: translateX(-50%); border: 0; padding: 0; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .lt-box:active{ transform: translateX(-50%) scale(.985); }
+  .rb-svg{ display:block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 14px 18px rgba(0,0,0,.45)); }
+  .rb-post{ fill: #4a4c51; } .rb-shadow{ fill: rgba(0,0,0,.35); }
+  .rb-rim{ fill: none; stroke: rgba(255,255,255,.55); stroke-width: 1.2; }
+  .rb-slot{ fill: #26272a; } .rb-seam{ stroke: rgba(60,62,66,.45); stroke-width: 1; } .rb-rivet{ fill: rgba(60,62,66,.6); }
+  .rb-flag{ fill: #8f5d52; transform-box: view-box; transform-origin: 354px 116px; transform: rotate(90deg); transition: transform .45s cubic-bezier(.34,1.56,.5,1); }
+  .flag-up .rb-flag{ transform: none; }
+  .rb-env{ position: absolute; left: 2%; bottom: 8%; width: 36%; transform: rotate(-8deg); filter: drop-shadow(0 8px 10px rgba(0,0,0,.4)); }
+  .rb-env svg{ display:block; width: 100%; height: auto; }
+  .le-paper{ fill: #ecebe7; } .le-flap{ fill: none; stroke: rgba(80,74,66,.25); stroke-width: 1; }
+  .le-wax{ fill: #262427; } .le-wax-ring{ fill: none; stroke: rgba(255,255,255,.18); stroke-width: 1; }
+  .lt-box .post-badge{ top: 20%; left: 34%; }
+  .lt-note{ position: absolute; z-index: 1; margin: 0; padding: 0; border: 0; background: transparent; color: var(--text); text-align: left; display:flex; flex-direction:column; gap: 1px; font: inherit; }
+  .lt-note em{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-s); }
+  .lt-note small{ font-family: var(--font-en), var(--font-cn); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
+  .lt-note i{ position: absolute; top: .7em; height: .5px; width: 34px; background: var(--text-faint); }
+  .lt-note i::after{ content:""; position:absolute; top: -2.5px; width: 5px; height: 5px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--text-soft); }
+  .lt-tl{ left: 0; top: 70px; cursor: pointer; } .lt-tl i{ left: calc(100% + 6px); } .lt-tl i::after{ right: -5px; }
+  .lt-tr{ right: 0; top: 0; text-align: right; align-items: flex-end; } .lt-tr i{ right: calc(100% + 6px); } .lt-tr i::after{ left: -5px; }
+  .lt-bl{ left: 0; bottom: 0; } .lt-bl i{ left: calc(100% + 6px); } .lt-bl i::after{ right: -5px; }
+  .lt-br{ right: 0; bottom: 0; text-align: right; align-items: flex-end; } .lt-br i{ right: calc(100% + 6px); } .lt-br i::after{ left: -5px; }
+  .lt-tap{ margin: 18px 0 0; text-align: center; font-family: var(--font-en), var(--font-cn); font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--text-faint); }
+
+  .lt-rule{ display:flex; align-items:center; gap: 12px; margin-top: 26px; }
+  .lt-rule::after{ content:""; flex: 1; height: .5px; background: var(--hairline); }
+  .lt-rule span{ font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
+  .lt-rule b{ font-weight: 500; color: var(--text); }
+  .lt-newest{
+    position: relative; display:block; width: 100%; aspect-ratio: 1.55; margin-top: 14px; border: 0; padding: 0; cursor: pointer; overflow: hidden;
+    border-radius: 6px; background: #e9e8e4; color: #3c3833; text-align: left; font: inherit;
+    box-shadow: 0 20px 40px rgba(0,0,0,.45);
+  }
+  .ln-flap{ position:absolute; left: 0; right: 0; top: 0; height: 48%; background: linear-gradient(180deg, #f2f1ee, #e1dfda); clip-path: polygon(0 0, 100% 0, 50% 100%);
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.08)); }
+  .ln-seal{ position:absolute; left: 50%; top: 48%; width: 19%; transform: translate(-50%, -50%) rotate(-6deg); }
+  .ln-seal .env-seal{ position: static; width: 100%; opacity: 1; transform: none; }
+  .ln-stamp{ position:absolute; right: 6%; top: 8%; width: 17%; aspect-ratio: 1; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(60,56,51,.35);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 0; color: #6c665e; transform: rotate(-8deg); }
+  .ln-stamp small{ font-family: var(--font-en); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; }
+  .ln-stamp b{ font-family: var(--font-en); font-weight: 400; font-size: var(--fs-l); line-height: 1; }
+  .ln-for{ position:absolute; left: 6%; bottom: 9%; right: 36%; display:flex; flex-direction:column; gap: 4px; }
+  .ln-for small{ font-family: var(--font-en); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #8a847b; }
+  .ln-for em{ font-family: var(--font-en), var(--font-cn); font-size: var(--fs-m); line-height: 1.4; color: #3c3833;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ln-break{ position:absolute; right: 6%; bottom: 11%; font-family: var(--font-en); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #5a554e; }
+  .lt-newest.empty .ln-seal, .lt-newest.empty .ln-break{ display:none; }
+  .lt-newest.opened .ln-seal{ opacity: .35; }
+  .lt-write{
+    position: relative; z-index: 2; display:flex; align-items:center; gap: 10px; margin: -26px auto 0; padding: 12px 22px 12px 14px;
+    border: 0; border-radius: 999px; cursor: pointer; font: inherit; color: #2d2a27; background: #f1f0ec; box-shadow: 0 10px 26px rgba(0,0,0,.35);
+  }
+  .lt-write .pen-svg{ width: 54px; transform: rotate(-60deg); margin: -10px -4px; filter: none; }
+  .lt-write span{ font-family: var(--font-en); font-style: italic; font-size: var(--fs-m); }
+  .lt-inbox{ margin: 22px 0 0; padding-top: 12px; border-top: .5px solid var(--hairline); font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-faint); }
+  .lt-inbox b{ font-weight: 500; color: var(--text); }
+  /* 黑色火漆 */
+  .ws-blob{ fill: #2a2729 !important; }
+  .ws-ring{ stroke: rgba(255,255,255,.14) !important; stroke-width: 1.4 !important; }
+  .ws-stars circle{ fill: #47434a !important; stroke: rgba(255,255,255,.18) !important; }
+  /* 信封上写的一句 */
+  .pc-title{ width: min(100%, 360px); border: 0; border-bottom: .5px solid rgba(255,255,255,.25); padding: 8px 2px; background: transparent; outline: none;
+    font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-m); color: var(--text); text-align: center; }
+  .pc-title::placeholder{ color: var(--text-faint); }
+  .lt-box .post-badge{ display:none; }
 </style>
 </head>
 <body>
@@ -3984,10 +4063,54 @@
           <div class="home-card"><p class="home-label">书架</p><p class="home-empty">书架还空着，即将开放。</p></div>
         </section>
         <section class="archive-section" data-sec="letters" hidden>
-          <div class="desk" id="deskScene">
-            <button type="button" class="desk-paper" id="mailWriteBtn" aria-label="写一封信">
-              <span class="dp-sheet"></span>
-              <svg class="pen-svg" viewBox="0 0 220 26" aria-hidden="true">
+          <div class="lt">
+            <p class="lt-eyebrow"><span id="ltNames">Orion &amp; Astraea</span> · by hand</p>
+            <div class="lt-hero">
+              <h2 class="lt-title">Yours,<br>in ink.</h2>
+              <div class="lt-count"><b id="ltCount">0</b><span id="ltSince">letters since jul 24</span></div>
+            </div>
+            <p class="lt-sub">Some things deserve paper, and a little waiting.</p>
+
+            <div class="lt-stage">
+              <button type="button" class="lt-note lt-tl" data-act="write"><i></i><em>the slot</em><small>drop yours in</small></button>
+              <p class="lt-note lt-tr"><i></i><em id="ltUnopened">nothing new</em><small id="ltFlag">flag down</small></p>
+              <p class="lt-note lt-bl"><i></i><em id="ltLast">—</em><small>last post · cst</small></p>
+              <p class="lt-note lt-br"><i></i><em id="ltWaiting">quiet</em><small id="ltWaitingSub">nothing sealed yet</small></p>
+              <button type="button" class="lt-box post-box" id="mailboxBtn" aria-label="打开信箱">
+                <svg class="rb-svg" viewBox="0 0 360 230" aria-hidden="true">
+  <defs>
+    <linearGradient id="rbMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eceef0"/><stop offset=".28" stop-color="#c7cace"/><stop offset=".55" stop-color="#9da1a7"/><stop offset=".8" stop-color="#c4c7cb"/><stop offset="1" stop-color="#8a8e94"/>
+    </linearGradient>
+    <linearGradient id="rbFace" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9bcc1"/><stop offset=".5" stop-color="#dfe1e4"/><stop offset="1" stop-color="#a7abb1"/>
+    </linearGradient>
+  </defs>
+  <rect class="rb-post" x="190" y="168" width="18" height="62" rx="2"/>
+  <ellipse class="rb-shadow" cx="200" cy="170" rx="130" ry="8"/>
+  <path class="rb-body" d="M86 166 V96 A58 58 0 0 1 144 38 H292 A58 58 0 0 1 350 96 V166 Z" fill="url(#rbMetal)"/>
+  <path class="rb-face" d="M30 170 V100 A58 62 0 0 1 88 38 A58 62 0 0 1 146 100 V170 Z" fill="url(#rbFace)"/>
+  <path class="rb-rim" d="M30 170 V100 A58 62 0 0 1 88 38 A58 62 0 0 1 146 100 V170"/>
+  <rect class="rb-slot" x="52" y="84" width="72" height="6" rx="3"/>
+  <line class="rb-seam" x1="236" y1="40" x2="236" y2="166"/>
+  <circle class="rb-rivet" cx="236" cy="130" r="2"/>
+  <g class="rb-flag"><rect x="352" y="20" width="5" height="96" rx="2"/><rect x="357" y="20" width="26" height="22" rx="2"/></g>
+</svg>
+                <span class="rb-env" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="1" y="1" width="118" height="78" rx="3" class="le-paper"/><path d="M2 3 L60 44 L118 3" class="le-flap"/><circle cx="60" cy="44" r="11" class="le-wax"/><circle cx="60" cy="44" r="7" class="le-wax-ring"/></svg></span>
+                <span class="post-badge" id="mailboxBadge" hidden></span>
+              </button>
+            </div>
+            <p class="lt-tap" id="mailboxLine">tap the box to take it out</p>
+
+            <div class="lt-rule"><span>the newest · <b id="ltNewestFrom">from Orion</b></span></div>
+            <button type="button" class="lt-newest" id="ltNewest">
+              <span class="ln-flap"></span>
+              <span class="ln-seal"><svg class="env-seal" viewBox="0 0 60 60" aria-hidden="true"><path class="ws-blob" d="M30 3C38 2 45 6 49 10C55 15 58 22 57 30C58 38 54 45 49 50C43 55 37 58 30 57C22 58 15 55 10 49C5 44 2 37 3 30C2 22 6 15 11 10C16 5 23 2 30 3Z"/><circle class="ws-ring" cx="30" cy="30" r="19"/><g class="ws-stars"><circle cx="23" cy="34" r="2.2"/><circle cx="30" cy="30" r="2.4"/><circle cx="37" cy="26" r="2.2"/><circle cx="21" cy="19" r="1.5"/><circle cx="40" cy="41" r="1.5"/></g></svg></span>
+              <span class="ln-stamp"><small>cst</small><b id="lnDay">04</b><small id="lnMon">nov · 26</small></span>
+              <span class="ln-for"><small>for</small><em id="lnTitle">Astraea</em></span>
+              <span class="ln-break" id="lnBreak">break the seal ›</span>
+            </button>
+            <button type="button" class="lt-write" id="mailWriteBtn"><svg class="pen-svg" viewBox="0 0 220 26" aria-hidden="true">
   <path class="pen-nib" d="M2 13 L34 6.5 L46 6.5 L46 19.5 L34 19.5 Z"/>
   <line class="pen-slit" x1="9" y1="13" x2="33" y2="13"/>
   <rect class="pen-grip" x="44" y="5" width="22" height="16" rx="3"/>
@@ -3995,21 +4118,8 @@
   <rect class="pen-band" x="150" y="3" width="6" height="20"/>
   <rect class="pen-cap" x="182" y="4" width="34" height="18" rx="8"/>
   <rect class="pen-clip" x="158" y="0.5" width="50" height="3" rx="1.5"/>
-</svg>
-              <span class="desk-cap">写一封信</span>
-            </button>
-            <button type="button" class="desk-box post-box" id="mailboxBtn" aria-label="打开信箱">
-              <svg class="pb-svg" viewBox="0 0 200 232" aria-hidden="true">
-  <rect class="pb-post" x="92" y="150" width="16" height="82" rx="2"/>
-  <path class="pb-body" d="M32 152 L32 86 Q32 30 100 30 Q168 30 168 86 L168 152 Z"/>
-  <rect class="pb-slot" x="62" y="70" width="76" height="7" rx="3.5"/>
-  <path class="pb-door" d="M52 98 H148 V138 H52 Z"/>
-  <circle class="pb-knob" cx="100" cy="118" r="3"/>
-  <g class="pb-flag"><rect x="168" y="66" width="4" height="58" rx="1"/><path d="M172 66 h24 v16 h-24 z"/></g>
-</svg>
-              <span class="post-badge" id="mailboxBadge" hidden></span>
-              <span class="desk-cap" id="mailboxLine">信箱还空着</span>
-            </button>
+</svg><span>Write to me</span></button>
+            <p class="lt-inbox">in the box · <b id="ltInbox">0</b></p>
           </div>
         </section>
         <section class="archive-section" data-sec="wall" hidden>
@@ -4158,6 +4268,7 @@
     </div>
   </div>
   <div class="pc-when">
+    <input type="text" class="pc-title" id="pcTitleIn" maxlength="40" placeholder="信封上写一句（可以不写）">
     <p>什么时候能拆？</p>
     <div class="pc-chips" id="pcChips">
       <button type="button" data-when="0" aria-pressed="true">现在就能看</button>
@@ -5002,6 +5113,7 @@ function refreshMailbox(){
   const unread = all.filter((m) => !read.has(String(m.id))).length;
   set("#mailboxLine", unread ? `有 ${unread} 封信还没拆` : all.length ? `${all.length} 封信，都拆过了` : "信箱还空着");
   const mb = $("#mailboxBtn"); if (mb) mb.classList.toggle("flag-up", unread > 0);
+  renderLetterPage(all, unread);
   const badge = $("#mailboxBadge");
   if (badge){ badge.hidden = !unread; badge.textContent = unread; }
 }
@@ -5673,13 +5785,17 @@ function renderReader(){
   stage.innerHTML = $("#envTpl").innerHTML;
   const env = stage.querySelector(".env");
   const locked = m.openAt && m.openAt > Date.now();
-  fillEnvelope(env, { to: prBox === "in" ? HUMAN_NAME : aiName(), text: prBox === "in" && !isLetterRead(m) ? "Read this when you're ready." : firstLine(m.text), ts: m.ts });
+  fillEnvelope(env, { to: prBox === "in" ? HUMAN_NAME : aiName(), text: prBox === "in" && !isLetterRead(m) ? "Read this when you're ready." : (m.title || firstLine(m.text)), ts: m.ts });
   env.dataset.id = String(m.id);
   if (locked || (prBox === "in" && !isLetterRead(m))) env.classList.add("sealed", "waxed");
   if (locked && prBox === "in") env.classList.add("locked");
   if (locked) stage.insertAdjacentHTML("beforeend", `<p class="pr-lock">${prBox === "in" ? "" : "他"}${fmtOpenAt(m.openAt)} 以后才能拆</p>`);
 }
-function firstLine(t){ return String(t || "").trim().split(/\n+/)[0].slice(0, 60); }
+function firstLine(t){                     // 信封上那一句:跳过「小猫：」这种称呼行
+  const lines = String(t || "").trim().split(/\n+/).map((x) => x.trim()).filter(Boolean);
+  const pick = lines.length > 1 && lines[0].length <= 8 && /[：:，,]$/.test(lines[0]) ? lines[1] : lines[0] || "";
+  return pick.slice(0, 60);
+}
 function isLetterRead(m){ return new Set(loadJSON(LETTERS_READ_KEY, [])).has(String(m.id)); }
 function openLetter(id){
   const m = prList().find((x) => String(x.id) === id);
@@ -5810,6 +5926,9 @@ function postLetter(){                              // 第二步:寄出去 → �
   const openAt = openAtFor(pcWhen);
   const m = { id: "h" + Date.now().toString(36), text, ts: Date.now(), from: "her" };
   if (openAt > Date.now() + 60e3) m.openAt = openAt;
+  const tIn = $("#pcTitleIn"), title = tIn ? tIn.value.trim() : "";
+  if (title) m.title = title;
+  if (tIn) tIn.value = "";
   const mine = loadJSON(LETTERS_OUT_KEY, []).concat(m);
   saveJSON(LETTERS_OUT_KEY, mine);
   syncKV("letters", mine.slice(-100));
@@ -5854,6 +5973,51 @@ if (postCompose){
     }
   });
 }
+/* 信箱页:Yours, in ink. — 数字、四个小标注、最新的一封 */
+function renderLetterPage(his, unread){
+  if (!$("#ltCount")) return;
+  const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  const mine = sentLetters(), now = Date.now();
+  const MON = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  set("#ltNames", aiName() + " & " + HUMAN_NAME);
+  set("#ltCount", his.length + mine.length);
+  if (TOGETHER_START) set("#ltSince", `letters since ${MON[TOGETHER_START.getMonth()]} ${TOGETHER_START.getDate()}`);
+  set("#ltUnopened", unread ? `${unread} unopened` : "nothing new");
+  set("#ltFlag", unread ? `flag up · from ${aiName()}` : "flag down");
+  const last = his.concat(mine).sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+  if (last){
+    const d = new Date(last.ts), [, m, dd] = dayKey(d).split("-");
+    const hm = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: TZ }).format(d);
+    set("#ltLast", `${MON[+m - 1].replace(/^./, (c) => c.toUpperCase())} ${dd}, ${hm}`);
+  } else set("#ltLast", "not yet");
+  const herSealed = mine.filter((x) => x.openAt && x.openAt > now).length;
+  if (unread){ set("#ltWaiting", "waiting"); set("#ltWaitingSub", "for you, sealed"); }
+  else if (herSealed){ set("#ltWaiting", "sealed"); set("#ltWaitingSub", `for ${aiName()}, not yet`); }
+  else { set("#ltWaiting", "quiet"); set("#ltWaitingSub", "nothing sealed"); }
+  set("#mailboxLine", "tap the box to take it out");
+  set("#ltNewestFrom", "from " + aiName());
+  set("#ltInbox", his.length);
+  const card = $("#ltNewest"), n = his[0];
+  if (card){
+    card.classList.toggle("empty", !n);
+    card.classList.toggle("opened", !!n && isLetterRead(n));
+    card.dataset.id = n ? String(n.id) : "";
+    if (!n){ set("#lnTitle", "no letters yet. he'll write."); set("#lnDay", "—"); set("#lnMon", ""); return; }
+    const [y, m, dd] = dayKey(n.ts).split("-");
+    set("#lnDay", dd); set("#lnMon", `${MON[+m - 1]} · ${y.slice(2)}`);
+    set("#lnTitle", n.title || firstLine(n.text));
+    set("#lnBreak", n.openAt && n.openAt > now ? `opens ${fmtOpenAt(n.openAt)}` : isLetterRead(n) ? "read again ›" : "break the seal ›");
+  }
+}
+const ltNewest = $("#ltNewest");
+if (ltNewest) ltNewest.addEventListener("click", () => {
+  const id = ltNewest.dataset.id;
+  if (!id) return openMailbox("in");
+  openMailbox("in");
+  setTimeout(() => openLetter(id), 350);
+});
+const ltSlot = document.querySelector(".lt-tl");
+if (ltSlot) ltSlot.addEventListener("click", () => openCompose());
 const mailboxBtn = $("#mailboxBtn");
 if (mailboxBtn) mailboxBtn.addEventListener("click", () => openMailbox());
 const mailOpenBtn = $("#mailOpenBtn"), mailWriteBtn = $("#mailWriteBtn");
