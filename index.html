@@ -2859,6 +2859,7 @@
   .mk-ring{ fill: none; stroke: currentColor; stroke-width: 1.3; opacity: .8; }
   .mk-dash{ stroke-dasharray: 2 1.6; }
   .mk-orion{ fill: currentColor; opacity: .62; }
+  .mk-tag{ fill: #CDB2B6; }
   .cal-legend .mk{ width: 10px; height: 10px; display:inline-block; vertical-align: -1px; margin-right: 4px; }
   .card-planner .cal-legend{ gap: 6px 12px; }
   .cal-legend2{ margin-top: 2px !important; padding-top: 0 !important; border-top: 0 !important; }
@@ -4434,8 +4435,9 @@ const MK_SVG = {
   yearly:   '<svg class="mk mk-ring" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.5"/></svg>',
   monthly:  '<svg class="mk mk-ring mk-dash" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.5"/></svg>',
   orion:    '<svg class="mk mk-orion" viewBox="0 0 10 10"><path d="M5 1.4 8.6 5 5 8.6 1.4 5z"/></svg>',
+  tag:      '<svg class="mk mk-tag" viewBox="0 0 10 10"><rect x="1.2" y="3.5" width="7.6" height="3" rx="1.5"/></svg>',
 };
-const MK_LABEL = { period: "经期", intimate: "亲密", once: "单次", yearly: "每年", monthly: "每月", orion: "他放的" };
+const MK_LABEL = { period: "经期", intimate: "亲密", tag: "标签", once: "单次", yearly: "每年", monthly: "每月", orion: "他放的" };
 function addDays(k, n){ const d = new Date(k + "T12:00:00+08:00"); d.setUTCDate(d.getUTCDate() + n); return dayKey(d); }
 function daysBetween(a, b){ return Math.round((new Date(b + "T12:00:00+08:00") - new Date(a + "T12:00:00+08:00")) / 86400000); }
 function periodInfo(){
@@ -4516,8 +4518,9 @@ function renderCalendar(){
     const kinds = new Set();
     if (p) kinds.add("period");
     if (intimate.has(k)) kinds.add("intimate");
+    if ((d.tags || []).some((t) => t !== PERIOD)) kinds.add("tag");
     for (const e of dayEvents(k)) kinds.add(e.src === "orion" ? "orion" : (e.it.kind || "once"));
-    const marks = ["period", "intimate", "once", "yearly", "monthly", "orion"].filter((x) => kinds.has(x)).slice(0, 4).map((x) => MK_SVG[x]).join("");
+    const marks = ["period", "intimate", "tag", "once", "yearly", "monthly", "orion"].filter((x) => kinds.has(x)).slice(0, 4).map((x) => MK_SVG[x]).join("");
     cells.push(`<button type="button" class="${cls.join(" ")}" data-day="${k}"><span class="n">${+k.slice(8)}</span><span class="cal-marks">${marks}</span></button>`);
   }
   grid.innerHTML = cells.join("");
@@ -4525,7 +4528,7 @@ function renderCalendar(){
   if (mnow){ const ph = moonPhase(today); mnow.innerHTML = moonSvg(ph) + "今晚 · " + moonName(ph); }
   const leg = $("#calLegend");
   if (leg && !leg.childElementCount){
-    leg.innerHTML = ["period", "intimate", "once", "yearly", "monthly", "orion"].map((x) => `<span>${MK_SVG[x]}${MK_LABEL[x]}</span>`).join("")
+    leg.innerHTML = ["period", "intimate", "tag", "once", "yearly", "monthly", "orion"].map((x) => `<span>${MK_SVG[x]}${MK_LABEL[x]}</span>`).join("")
       + `<span><i class="sw dash"></i>预计</span>`;
   }
   const hint = $("#calNextHint");
