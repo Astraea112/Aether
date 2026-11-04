@@ -980,7 +980,7 @@
   .row[data-vkey].enter-human .bubble{ transform-origin: bottom right; animation: enterHuman .44s cubic-bezier(.34,1.46,.5,1) both; }
   .row[data-vkey].enter-ai .bubble{ transform-origin: bottom left; animation: enterAi .44s cubic-bezier(.34,1.46,.5,1) both; }
   @keyframes enterHuman{ from{ transform: translate(6px, 9px) scale(.95); opacity:0; } 55%{ opacity:1; } to{ transform:none; opacity:1; } }
-  @keyframes enterAi{ from{ transform: translate(-6px, 9px) scale(.95); opacity:0; } 55%{ opacity:1; } to{ transform:none; opacity:1; } }
+  @keyframes enterAi{ from{ transform: translate(-4px, 22px) scale(.96); opacity:0; } 45%{ opacity:1; } to{ transform:none; opacity:1; } }
   .row.ai .bubble{
     background: var(--bubble-ai-bg);
     color: var(--bubble-ai-fg);
@@ -8556,8 +8556,11 @@ function buildVirtualRows(){
       prevBubble = { from:m.from, ts:t, row:trow };
       return;
     }
-    const parts = bubbleParts(m);
+    let parts = bubbleParts(m);
     if (parts.length > 1){                          // 一行一个气泡,像微信那样一句一句
+      // 他刚发来的好几句:先只放第一句,后面一句一句从下面顶上来
+      if (m.from === "ai" && freshKeys.has(m._key) && !revealing.has(m._key) && !String(m._key).startsWith("stream:")) startReveal(m._key, parts.length);
+      if (revealing.has(m._key)) parts = parts.slice(0, revealing.get(m._key));
       if (grouped && prevBubble.row) prevBubble.row.tail = false;
       let last = null;
       parts.forEach((seg, i) => {
@@ -8575,6 +8578,25 @@ function buildVirtualRows(){
     prevBubble = { from:m.from, ts:t, row };
   });
   return rows;
+}
+/* 一句一句地出来:每隔一会儿多放一句,列表跟着平滑往上滚,新的一句从下面把前面的顶上去 */
+const revealing = new Map();
+const REVEAL_GAP_MS = 750;
+let smoothStick = false;
+function startReveal(key, total){
+  revealing.set(key, 1);
+  const step = () => {
+    const n = (revealing.get(key) || 1) + 1;
+    if (n > total){ revealing.delete(key); return; }
+    revealing.set(key, n);
+    freshKeys.add(key);                             // 新放出来的那一句也播入场
+    const stick = nearBottom();
+    rowsDirty = true;
+    smoothStick = stick;
+    scheduleRender({ stickToBottom: stick });
+    if (n < total) setTimeout(step, REVEAL_GAP_MS); else setTimeout(() => revealing.delete(key), 50);
+  };
+  setTimeout(step, REVEAL_GAP_MS);
 }
 /* 一条消息按换行拆成几个气泡;有代码块的、只有一行的不拆 */
 function bubbleParts(m){
@@ -8780,19 +8802,17 @@ function makeMessage(rowData){
   const row = document.createElement("div");
   row.className = `row ${m.from === "human" ? "human" : "ai"}${rowData.grouped ? " grouped" : ""}${rowData.tail ? " tail" : ""}`;
   row.dataset.id = m.id; row.dataset.from = m.from; row.dataset.ts = tsMs(m); row.dataset.messageKey = m._key;
-  if (freshKeys.has(m._key)){                       // 只对刚发/刚收到的那条播一次入场动画
+  const revealingNow = rowData.part === "seg" && revealing.has(m._key);
+  const isNewestSeg = rowData.part !== "seg" || rowData.lastSeg || (revealingNow && rowData.segIndex === revealing.get(m._key) - 1);
+  if (freshKeys.has(m._key) && isNewestSeg){        // 只对刚发/刚收到的那一句播一次入场动画
     const cls = m.from === "human" ? "enter-human" : "enter-ai";
     row.classList.add(cls);
-    if (rowData.part !== "seg" || rowData.lastSeg) freshKeys.delete(m._key);
+    if (!revealingNow || rowData.segIndex === revealing.get(m._key) - 1) freshKeys.delete(m._key);
     row.addEventListener("animationend", () => row.classList.remove(cls), { once:true });
   }
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  // 他一下回好几句:第一句先出来,后面的一句一句隔一会儿再冒出来
-  if (row.classList.contains("enter-ai") && rowData.part === "seg" && rowData.segIndex){
-    bubble.style.animationDelay = Math.min(rowData.segIndex, 12) * 0.6 + "s";
-  }
   const part = rowData.part || "";
   const atts = part === "txt" ? [] : ((m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : []);
   const text = part === "att" ? "" : part === "seg" ? rowData.seg : (m.from === "human" ? stripSceneTag(m.text) : m.text);
@@ -9020,7 +9040,10 @@ function scheduleMeasure(reStick){
 }
 // 把 scrollTop 直接钉到底(下一帧)。前提:调用前窗口已贴底(domEnd===n,最新行已物化),否则会落进 bottomSpacer 空白。
 function jumpToBottom(){
-  requestAnimationFrame(() => { scrollEl.scrollTop = scrollEl.scrollHeight; });
+  requestAnimationFrame(() => {
+    if (smoothStick && scrollEl.scrollTo){ smoothStick = false; scrollEl.scrollTo({ top: scrollEl.scrollHeight, behavior: "smooth" }); }
+    else scrollEl.scrollTop = scrollEl.scrollHeight;
+  });
 }
 function renderVirtualList({ stickToBottom = false, anchor = null, recenter = false } = {}){
   if (rowsDirty || !virtualRows.length){
