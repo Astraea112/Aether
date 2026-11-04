@@ -148,3 +148,12 @@ relay 还没有这个接口时请求会 404,前端静默忽略、不影响使用
 - 另外两个 key:`mood_set`(她自定义的颜文字列表)和 `orion_mood`。
   `orion_mood` 是 Orion 自己写的心情:`{"text":"想你","note":"可选的一句小字","ts":"<ISO时间>"}`,门厅优先显示它(12 小时内有效),没有时前端按聊天状态自己推一个。
 - `murmurs` 里每张贴纸是 `{id, text, ts, by:"her"|"him", x, y, z, tilt}`。Orion 想贴一张,往这个数组里加一条 `by:"him"`(位置可省略,前端会随机贴)。前端会每分钟拉一次服务器这份,把他新贴的合进板子。
+
+## 10. 数字密码登录（pin-gate）
+
+网页登录默认是 6 位数字键盘；完整的 RELAY_SECRET 照旧能用（键盘左下角「密钥」）。
+
+- `deploy/pin/pin-gate.py`：在服务器 127.0.0.1:3012 上跑的小程序，`POST /relay/pin {"pin":"123456"}`，对了就返回完整密钥。
+  数字密码只存加盐 PBKDF2 哈希（`~/companion-relay/pin.env`）。全局限流：15 分钟内错 5 次锁定，24 小时内最多错 20 次。
+- `deploy/pin/pin-setup.sh`：装 pin-gate + systemd 服务、设密码、给 nginx 加一行 include（先备份，测试不过自动还原）、更新前端。可重复运行；`RESET_PIN=1` 换密码。
+- relay、relay.env、channel 配置都不动。

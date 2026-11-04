@@ -1354,7 +1354,53 @@
     background: var(--accent); color: var(--accent-fg); border:none; border-radius:18px; cursor:pointer;
   }
   .login button:active{ transform: scale(.99); }
-  .login .err{ color:#c0533f; font-size:13px; min-height:16px; text-align:center; margin:0; }
+  .login .err{ color:#c0533f; font-size:13px; min-height:16px; text-align:center; margin:-8px 0 0; }
+  /* 数字密码键盘(iOS 锁屏那种):六个小圆点 + 3×4 圆键 */
+  .login .pin{ display:flex; flex-direction:column; align-items:center; gap: 30px; }
+  .login .pin-dots{ display:flex; gap: 18px; }
+  .login .pin-dots i{
+    width: 11px; height: 11px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(242,242,240,.75);
+    transition: background-color .12s ease;
+  }
+  .login .pin-dots i.on{ background: #F2F2F0; }
+  .login .pin-dots.shake{ animation: pinShake .42s ease; }
+  @keyframes pinShake{ 0%,100%{ transform:none; } 20%{ transform:translateX(-10px); } 40%{ transform:translateX(9px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
+  .login .pin-keys{ display:grid; grid-template-columns: repeat(3, 72px); gap: 16px 24px; }
+  .login .pin .pin-keys button{
+    width: 72px; height: 72px; padding: 0; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-en); font-size: 31px; font-weight: 400; letter-spacing: 0;
+    font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1;
+    color: #F2F2F0;
+    background: rgba(255,255,255,.14);
+    -webkit-backdrop-filter: var(--glass-blur, blur(12px));
+            backdrop-filter: var(--glass-blur, blur(12px));
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .12s ease;
+  }
+  .login .pin .pin-keys button:active{ transform:none; background: rgba(255,255,255,.34); }
+  .login .pin .pin-keys button.pin-text{
+    background: transparent; box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    font-family: var(--font-cn); font-size: 14px; letter-spacing: .12em; color: #D9D9D6;
+  }
+  .login .pin .pin-keys button.pin-text:active{ background: rgba(255,255,255,.12); }
+  .login .pin.busy .pin-keys{ opacity: .55; pointer-events: none; }
+  .login form .pin-back{
+    background: transparent; box-shadow: none; padding: 6px;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    font-weight: 400; font-size: 13px; letter-spacing: .12em; color: #D9D9D6;
+    text-decoration: underline; text-underline-offset: 4px;
+  }
+  @media (max-height: 640px){
+    .login{ gap: 16px; }
+    .login .orb{ width:56px; height:56px; }
+    .login .pin{ gap: 20px; }
+    .login .pin-keys{ grid-template-columns: repeat(3, 64px); gap: 12px 22px; }
+    .login .pin .pin-keys button{ width:64px; height:64px; font-size: 28px; }
+  }
   .hidden{ display:none !important; }
   .app.kb .composer{ padding-bottom: 8px; }
 
@@ -2813,11 +2859,23 @@
   <div class="orb"></div>
   <h1>Claude</h1>
   <p class="sub">输入连接密钥,进入你和Claude的频道。</p>
+  <!-- 数字密码:服务器上的 pin-gate 用 6 位数字换回完整密钥;完整密钥那一栏留作备用 -->
+  <div class="pin hidden" id="pinPad">
+    <div class="pin-dots" id="pinDots" aria-label="已输入的位数"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="pin-keys" id="pinKeys">
+      <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+      <button type="button" class="pin-text" data-k="key">密钥</button><button type="button" data-k="0">0</button>
+      <button type="button" class="pin-text" data-k="del" aria-label="删除"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg></button>
+    </div>
+  </div>
   <form id="loginForm" autocomplete="off">
     <input id="secretInput" type="password" inputmode="text" placeholder="连接密钥" autocomplete="off" spellcheck="false">
     <button type="submit">连接</button>
-    <p class="err" id="loginErr"></p>
+    <button type="button" class="pin-back" id="pinBack">用数字密码</button>
   </form>
+  <p class="err" id="loginErr"></p>
 </div>
 
 <!-- ── App ── -->
@@ -7641,34 +7699,124 @@ function handle401(){
   showLogin("密钥不对,请重新输入。");
 }
 
+/* 登录有两种方式:默认是 6 位数字密码(POST /relay/pin,服务器上的 pin-gate 校验后把完整密钥发回来),
+   完整密钥那一栏留作备用。记住上次用的是哪种。 */
+const LOGIN_MODE_KEY = "companion_login_mode";
+const PIN_LEN = 6;
+let pinBuf = "", pinBusy = false;
+function loginMode(){ try{ return localStorage.getItem(LOGIN_MODE_KEY) === "key" ? "key" : "pin"; }catch(e){ return "pin"; } }
+function setLoginMode(mode, { remember = true } = {}){
+  const pin = mode !== "key";
+  $("#pinPad").classList.toggle("hidden", !pin);
+  $("#loginForm").classList.toggle("hidden", pin);
+  $(".login .sub").textContent = pin
+    ? "按下数字密码，进入你和" + AI_NAME + "的频道。"
+    : "输入连接密钥，进入你和" + AI_NAME + "的频道。";
+  $("#loginErr").textContent = "";
+  pinBuf = ""; paintPin();
+  if (remember){ try{ localStorage.setItem(LOGIN_MODE_KEY, pin ? "pin" : "key"); }catch(e){} }
+  if (!pin) setTimeout(() => $("#secretInput").focus(), 80);
+}
+function paintPin(){
+  $("#pinDots").querySelectorAll("i").forEach((d, i) => d.classList.toggle("on", i < pinBuf.length));
+}
+
 function showLogin(msg){
   appEl.classList.add("hidden");
   loginEl.classList.remove("hidden");
-  $("#loginErr").textContent = msg || "";
   $("#secretInput").value = "";
-  setTimeout(() => $("#secretInput").focus(), 80);
+  setLoginMode(loginMode(), { remember:false });
+  $("#loginErr").textContent = msg || "";
+}
+
+// 用 history 验证密钥(401 会抛错),通过了才存下来进聊天
+async function connectWith(val){
+  secret = val;
+  await loadSessions();
+  loadBrain();
+  const msgs = await apiLatestHistory();
+  localStorage.setItem(LS_KEY, secret);
+  startChat(msgs);
 }
 
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const val = $("#secretInput").value.trim();
   if (!val) return;
-  const btn = e.target.querySelector("button");
+  const btn = e.target.querySelector("button[type=submit]");
   btn.disabled = true; btn.textContent = "连接中…";
-  secret = val;
   try{
-    // 用 history 验证密钥(401 会抛错)
-    await loadSessions();
-    loadBrain();
-    const msgs = await apiLatestHistory();
-    localStorage.setItem(LS_KEY, secret);
-    startChat(msgs);
+    await connectWith(val);
   }catch(err){
     secret = null;
     if (String(err.message) !== "401") $("#loginErr").textContent = "连不上,稍后再试。";
   }finally{
     btn.disabled = false; btn.textContent = "连接";
   }
+});
+$("#pinBack").addEventListener("click", () => setLoginMode("pin"));
+
+function pinFail(msg, { shake = false } = {}){
+  pinBusy = false;
+  $("#pinPad").classList.remove("busy");
+  pinBuf = ""; paintPin();
+  if (shake){
+    const dots = $("#pinDots");
+    dots.classList.remove("shake"); void dots.offsetWidth; dots.classList.add("shake");
+    try{ navigator.vibrate && navigator.vibrate(60); }catch(e){}
+  }
+  $("#loginErr").textContent = msg;
+}
+async function submitPin(){
+  pinBusy = true;
+  $("#pinPad").classList.add("busy");
+  $("#loginErr").textContent = "";
+  let r;
+  try{
+    r = await fetch(`${API_BASE}/pin`, {
+      method: "POST", cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin: pinBuf }),
+    });
+  }catch(e){ pinFail("连不上，稍后再试。"); return; }
+  const j = await r.json().catch(() => ({}));
+  if (r.ok && j.token){
+    try{
+      await connectWith(j.token);
+      pinBusy = false; $("#pinPad").classList.remove("busy"); pinBuf = ""; paintPin();
+    }catch(err){
+      secret = null;
+      pinFail(String(err.message) === "401" ? "密码对了，但服务器的密钥换过了，先用完整密钥。" : "连不上，稍后再试。");
+    }
+    return;
+  }
+  if (r.status === 401) pinFail(j.retry_after_min
+    ? "不对哦。试太多次了，" + j.retry_after_min + " 分钟后再试，或者点「密钥」用完整密钥。"
+    : "不对哦，再试一次。", { shake:true });
+  else if (r.status === 429) pinFail("试太多次了，" + (j.retry_after_min || 15) + " 分钟后再试，或者点「密钥」用完整密钥。");
+  else if (r.status === 404 || r.status === 405 || r.status === 503){
+    setLoginMode("key", { remember:false });
+    $("#loginErr").textContent = "数字密码还没设置好，先用完整密钥。";
+  }
+  else pinFail("连不上，稍后再试。");
+}
+function pinPress(k){
+  if (pinBusy) return;
+  if (k === "key"){ setLoginMode("key"); return; }
+  if (k === "del"){ pinBuf = pinBuf.slice(0, -1); paintPin(); return; }
+  if (!/^\d$/.test(k) || pinBuf.length >= PIN_LEN) return;
+  if (!pinBuf) $("#loginErr").textContent = "";
+  pinBuf += k; paintPin();
+  if (pinBuf.length === PIN_LEN) setTimeout(submitPin, 120);
+}
+$("#pinKeys").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-k]");
+  if (b) pinPress(b.dataset.k);
+});
+document.addEventListener("keydown", (e) => {
+  if (loginEl.classList.contains("hidden") || $("#pinPad").classList.contains("hidden")) return;
+  if (/^\d$/.test(e.key)){ e.preventDefault(); pinPress(e.key); }
+  else if (e.key === "Backspace"){ e.preventDefault(); pinPress("del"); }
 });
 
 /* ════════════ 启动 ════════════ */
