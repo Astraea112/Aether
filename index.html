@@ -161,14 +161,14 @@
   /* ── ORION · 星图(纯黑白杂志皮肤:黑底 · 灰白衬线 · 细线边框 · 星点) ── */
   :root[data-theme="harbor"]{
       /* 同名不同值:黑底上要亮的字;气泡换成深雾蓝 / 暖奶白 */
-      --ink: #E8E8E6; --ink-soft: #A9A9A6; --ink-faint: #8C8C88;
+      --ink: #E6E4E0; --ink-soft: #A8A6A2; --ink-faint: #8A8885;
       --paper: rgba(22,22,24,.92); --glass: rgba(255,255,255,.12);
       --line: rgba(255,255,255,.14);
       --shadow: 0 2px 8px rgba(0,0,0,.35);
       --him: #33475C; --him-ink: #F2F4F6; --her: #F4EFE6; --her-ink: #253447;
       --wall-default: var(--wall-harbor);
       --menu-wall-default: var(--menu-wall-harbor);
-      --bg: #000000;
+      --bg: #0D0D0E;
       --header-bg: rgba(0,0,0,.85);
       --hairline: var(--line);
       --text: var(--ink);
@@ -252,9 +252,9 @@
   /* ── 饱满磨砂:Orion .18 / 你 .24 的白,blur 10px;无边框,一层轻投影让泡泡微微浮起。
      圆角 20px,单行短消息就是胶囊;内边距收紧、气泡贴着文字。只靠填充亮度区分双方。 ── */
   [data-theme="harbor"] .row.ai .bubble,
-  [data-theme="harbor"] .msg-menu-clone.clone-ai{ --g-fill: var(--him); --b-ink: var(--him-ink); }
+  [data-theme="harbor"] .msg-menu-clone.clone-ai{ --g-fill: rgba(255,255,255,.18); --b-ink: var(--ink); }
   [data-theme="harbor"] .row.human .bubble,
-  [data-theme="harbor"] .msg-menu-clone.clone-human{ --g-fill: var(--her); --b-ink: var(--her-ink); }
+  [data-theme="harbor"] .msg-menu-clone.clone-human{ --g-fill: rgba(255,255,255,.24); --b-ink: var(--ink); }
   :root[data-theme="harbor"] .row .bubble,
   :root[data-theme="harbor"] .msg-menu-clone{
     border: 0;
@@ -269,7 +269,7 @@
     font-size: var(--fs-m);
     line-height: 1.5;
     letter-spacing: .03em;
-    text-shadow: none;
+    text-shadow: 0 0 6px rgba(0,0,0,.28);
   }
   /* 不对称圆角:说话人那一侧的下角收小,像话从那边说出来;连发时相邻一侧也收小,让一串泡连着往下流 */
   :root[data-theme="harbor"] .row.human .bubble{ border-radius: var(--bubble-radius) var(--bubble-radius) var(--bubble-nook) var(--bubble-radius); }
@@ -3038,6 +3038,25 @@
   .cal-tags-block .tag-add[hidden]{ display:none; }
   .cal-tags-block .tag-add input{ background: rgba(58,52,53,.82); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.14); }
   .cal-tags-block .tag-add button{ background: var(--period-mark); color: var(--her-ink); }
+
+  /* ═══ Harbor · 雾一点:背景压虚,时间戳更轻,分隔线换成缎带 ═══ */
+  /* 背景:多一层雾,百合的细节压虚,字压上去更干净 */
+  :root[data-theme="harbor"] .wall::after{
+    background: linear-gradient(180deg, rgba(13,13,14,.62), rgba(13,13,14,.40) 24%, rgba(13,13,14,.40) 70%, rgba(13,13,14,.58));
+    -webkit-backdrop-filter: blur(5px) saturate(.9); backdrop-filter: blur(5px) saturate(.9);
+  }
+  /* 时间戳:还是最小那一档,但更淡 */
+  :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{ opacity: .45; letter-spacing: .05em; }
+  :root[data-theme="harbor"] .row .bubble.has-att .meta{ opacity: .6; }
+  /* 分隔线:一条缎带从左边飘过来,在右边系成结;日期在缎带下面 */
+  :root[data-theme="harbor"] .scroll .day,
+  :root[data-theme="harbor"] .scroll .new-divider{
+    padding-top: 50px; margin: 18px 0 14px;
+    background: url("ribbon-divider.webp") no-repeat center top / 152px auto;
+    color: var(--ink-faint); letter-spacing: .12em;
+  }
+  :root[data-theme="harbor"] .scroll .day::before, :root[data-theme="harbor"] .scroll .day::after,
+  :root[data-theme="harbor"] .scroll .new-divider::before, :root[data-theme="harbor"] .scroll .new-divider::after{ display:none; }
 
   /* 顶栏多了一个额度按钮:手机上把按钮间距收紧一点,别压到名字 */
   @media (max-width: 600px){
