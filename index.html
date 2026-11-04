@@ -3063,8 +3063,8 @@
     -webkit-mask-image: none; mask-image: none;
   }
 
-  /* 顶栏只留额度仪表;API 窗口、终端、电话、⋮ 收起来。设置改成点名字进入 */
-  #sessionBtn, #terminalBtn, #callBtn, #moreBtn{ display:none !important; }
+  /* 顶栏只留额度仪表和 ⋮(设置);API 窗口、终端、电话收起来。点名字也能进设置 */
+  #sessionBtn, #terminalBtn, #callBtn{ display:none !important; }
   .topbar .peerpill{ cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
   /* 选好的图片/文件:收在输入框里面最上面一排,右上角 × 可以拿掉 */
@@ -3909,7 +3909,7 @@ applyRemark(localStorage.getItem(REMARK_KEY));
 /* 主题只由日夜 toggle 控制(持久化),不再实时跟随系统;首次打开的初始值由 <head> 早期脚本取一次系统值 */
 if (avatarBtn) avatarBtn.addEventListener("click", openProfile);
 if (moreBtn) moreBtn.addEventListener("click", openProfile);
-// 顶栏只留额度按钮了:点他的名字打开个人信息 / 设置(原来右上角 ⋮ 的入口)
+// 点他的名字也能打开个人信息 / 设置(和右上角 ⋮ 一样)
 const peerPillEl = document.querySelector(".topbar .peerpill");
 if (peerPillEl){
   peerPillEl.setAttribute("role", "button");
