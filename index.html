@@ -2278,7 +2278,8 @@
   .wall-note button{ position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border: 0; padding: 0; background: transparent; color: var(--text-faint); font-size: var(--fs-m); line-height: 1; cursor: pointer; }
 
   /* 收藏馆 */
-  .archive-tabs{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .archive-tabs{ display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .room-mail-badge[hidden]{ display:none; }
   .archive-tabs button{
     min-width: 0; display:flex; flex-direction:column; align-items:center; gap: 1px;
     border: 0; border-radius: var(--r-l); padding: 8px 2px 7px;
@@ -3745,27 +3746,24 @@
           <div class="menu-private">收藏馆</div>
         </header>
         <div class="archive-tabs" id="archiveTabs" role="tablist" aria-label="收藏馆分区">
-          <button type="button" role="tab" data-sec="album" aria-selected="true"><span>Album</span>相册</button>
+          <button type="button" role="tab" data-sec="tides" aria-selected="true"><span>Tides</span>日历</button>
           <button type="button" role="tab" data-sec="library" aria-selected="false"><span>Library</span>书架</button>
-          <button type="button" role="tab" data-sec="movie" aria-selected="false"><span>Movie</span>电影</button>
-          <button type="button" role="tab" data-sec="memory" aria-selected="false"><span>Memory</span>大事记</button>
-          <button type="button" role="tab" data-sec="tides" aria-selected="false"><span>Tides</span>日历</button>
+          <button type="button" role="tab" data-sec="letters" aria-selected="false"><span>Letters</span>信箱</button>
           <button type="button" role="tab" data-sec="wall" aria-selected="false"><span>Wall</span>留言墙</button>
         </div>
 
-        <section class="archive-section" data-sec="album">
-          <button class="home-card home-album" id="albumCard" type="button">
-            <span class="home-album-copy"><span class="home-album-name">Album</span><span class="home-album-sub">Collect what matters.</span></span>
-          </button>
-        </section>
         <section class="archive-section" data-sec="library" hidden>
           <div class="home-card"><p class="home-label">书架</p><p class="home-empty">书架还空着，即将开放。</p></div>
         </section>
-        <section class="archive-section" data-sec="movie" hidden>
-          <div class="home-card"><p class="home-label">电影</p><p class="home-empty">片单还空着，即将开放。</p></div>
-        </section>
-        <section class="archive-section" data-sec="memory" hidden>
-          <div class="home-card"><p class="home-label">大事记</p><ol class="milestones" id="milestoneList"></ol></div>
+        <section class="archive-section" data-sec="letters" hidden>
+          <button class="home-card room-mailbox card-line" id="mailboxBtn" type="button">
+            <span class="room-mail-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></span>
+            <span class="room-mail-copy">
+              <span class="home-eyebrow">Letters · 信箱</span>
+              <span class="room-mail-line" id="mailboxLine">信箱还空着</span>
+            </span>
+            <span class="room-mail-badge" id="mailboxBadge" hidden></span>
+          </button>
         </section>
         <section class="archive-section" data-sec="wall" hidden>
           <section class="murmurs" aria-label="自言自语">
@@ -3785,7 +3783,7 @@
           <ul class="murmur-drawer" id="murmurDrawer" hidden></ul>
         </section>
         </section>
-        <section class="archive-section" data-sec="tides" hidden>
+        <section class="archive-section" data-sec="tides">
           <section class="home-card cal-card card-planner" aria-label="日历">
             <div class="cal-head">
               <button type="button" id="calPrev" aria-label="上个月">‹</button>
@@ -4676,12 +4674,16 @@ function refreshRoom(){
       : `<li class="home-empty" style="border:0">他还没在这里留下痕迹</li>`;
   }
 
+  refreshMailbox();
+  renderWall();
+}
+function refreshMailbox(){
+  const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
   const all = letters(), read = new Set(loadJSON(LETTERS_READ_KEY, []));
   const unread = all.filter((m) => !read.has(String(m.id))).length;
   set("#mailboxLine", unread ? `有 ${unread} 封信还没拆` : all.length ? `${all.length} 封信，都拆过了` : "信箱还空着，他写的长信会收在这里");
   const badge = $("#mailboxBadge");
   if (badge){ badge.hidden = !unread; badge.textContent = unread; }
-  renderWall();
 }
 /* 自言自语:纸条错落贴着,每张的歪度和胶带位置由它的时间决定(刷新不乱跳) */
 function seeded(n){ const x = Math.sin(n) * 10000; return x - Math.floor(x); }
@@ -5353,6 +5355,7 @@ const albumCard = $("#albumCard");
 if (albumCard) albumCard.addEventListener("click", () => location.assign("album.html"));
 function ymd(d){ return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`; }
 function refreshArchive(){
+  refreshMailbox();
   const ol = $("#milestoneList");
   if (ol){
     if (!TOGETHER_START){
