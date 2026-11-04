@@ -168,3 +168,16 @@ relay 还没有这个接口时请求会 404,前端静默忽略、不影响使用
 - 接入 Orion：`~/orion/.mcp.json` 加 `room_mcp`；`settings.json` 放行 `mcp__room_mcp` 和 `WebSearch`；`CLAUDE.md` 追加「收到心跳时」一段。
 - 常驻：systemd `room-scheduler`（TZ=Asia/Shanghai）；`crontab @reboot` 拉起 `start-orion.sh`。
 - 手动敲门：`touch /home/ubuntu/room_mcp/scheduler/manual_wake.flag`。
+
+## 12. 共享日历 · Claude 额度 · 换模型（oao-api）
+
+`deploy/oao-api/oao-setup.sh` 装一个小服务 `oao-api`（127.0.0.1:3013，systemd，`KillMode=process`），nginx 只多三条路：
+
+| 路径 | 干什么 |
+|---|---|
+| `GET/PUT /relay/app/kv/{calendar,events,calendar_orion}` | 日历存成 `{updated, v}`，谁更新得晚用谁的；`calendar_orion` 只有 Orion 的 MCP 能写 |
+| `GET /relay/app/usage` | 用服务器上 Claude Code 的登录查 `api/oauth/usage`（5 小时 / 每周 / 各模型），缓存 2 分钟 |
+| `GET/POST /relay/app/model` | 模型：往 tmux 会话 `orion` 打 `/model <id>`，立即生效；effort：写 `~/.claude/settings.json` 的 `effortLevel`，下次启动生效（可一键重启） |
+
+`oao_calendar_mcp.py` 给 Orion：`calendar_view` / `calendar_place`（网站上显示 ◆ 他放的）/ `calendar_unplace`，用 room_mcp 的 venv 跑。
+前端：Archive › Tides 日历的格子换成六种标记（经期 / 亲密 / 单次 / 每年 / 每月 / 他放的），当天面板可以加提醒、每年、每月、亲密，「经期从这天开始」按平均天数一键标；聊天页顶栏加额度按钮；输入框上方加模型按钮。设置页里原来的模型 / effort 假按键删掉了。

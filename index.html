@@ -2156,7 +2156,7 @@
 
   .cal-day{ display:flex; flex-direction:column; gap: 14px; }
   .cal-day-title{ display:flex; align-items:baseline; gap: 10px; margin: 0; }
-  .cal-day-title b{ font-family: var(--font-en); font-weight: 400; font-size: 34px; line-height: 1; }
+  .cal-day-title b{ font-family: var(--font-en); font-weight: 400; font-size: 34px; line-height: 1; font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; }
   .cal-day-title span{ font-size: 13px; color: var(--text-soft); }
   .cal-sub{ margin: 0 0 8px; font-size: 11px; letter-spacing: .14em; color: var(--text-faint); }
   .cal-chips{ display:flex; flex-wrap:wrap; gap: 7px; }
@@ -2850,6 +2850,130 @@
     }
   }
 
+  /* ═══ 日历:六种标记 + 这一天的提醒 ═══ */
+  .cal-marks .mk{ width: 7px; height: 7px; display:block; flex:none; }
+  .card-planner .cal-marks{ height: 8px; gap: 2px; margin-top: 3px; justify-content:center; }
+  .mk-period{ fill: var(--period-mark); }
+  .mk-heart{ fill: currentColor; opacity: .82; }
+  .mk-once{ fill: currentColor; opacity: .7; }
+  .mk-ring{ fill: none; stroke: currentColor; stroke-width: 1.3; opacity: .8; }
+  .mk-dash{ stroke-dasharray: 2 1.6; }
+  .mk-orion{ fill: currentColor; opacity: .62; }
+  .cal-legend .mk{ width: 10px; height: 10px; display:inline-block; vertical-align: -1px; margin-right: 4px; }
+  .card-planner .cal-legend{ gap: 6px 12px; }
+  .cal-legend2{ margin-top: 2px !important; padding-top: 0 !important; border-top: 0 !important; }
+  .cal-legend2:empty{ display:none; }
+
+  .cal-events{ display:flex; flex-direction:column; gap: 2px; }
+  .cal-events[hidden]{ display:none; }
+  .cal-ev{ display:flex; align-items:center; gap: 10px; padding: 7px 0; border-bottom: .5px solid var(--hairline); font-size: 14.5px; }
+  .cal-ev:last-child{ border-bottom: 0; }
+  .cal-ev-mk .mk{ width: 10px; height: 10px; display:block; }
+  .cal-ev-t{ flex: 1; min-width: 0; overflow-wrap:anywhere; }
+  .cal-ev-t em{ font-style: normal; color: var(--text-faint); margin-left: 2px; }
+  .cal-ev-t small{ margin-left: 8px; font-size: 11px; letter-spacing: .08em; color: var(--text-faint); }
+  .cal-ev.done .cal-ev-t{ text-decoration: line-through; text-decoration-thickness: .5px; color: var(--text-faint); }
+  .cal-ev-acts{ display:flex; gap: 12px; flex:none; }
+  .cal-ev-acts button{ border: 0; background: transparent; padding: 4px 0; font: inherit; font-size: 12px; color: var(--text-soft); cursor: pointer; }
+  .cal-addrow{ display:flex; flex-wrap:wrap; gap: 8px; }
+  .cal-addrow button{
+    border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; letter-spacing: .04em;
+    color: var(--text); background: var(--home-chip); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .cal-addrow button:active{ transform: scale(.95); }
+  .cal-addrow button.active{ background: var(--text); color: var(--bg); }
+  .cal-addrow button[data-add="intimate"].on{ background: var(--text); color: var(--bg); }
+  .cal-ev-form[hidden]{ display:none; }
+  .cal-period-link{
+    align-self: flex-start; border: 0; background: transparent; padding: 2px 0; font: inherit; font-size: 13.5px;
+    color: var(--text-soft); text-decoration: underline; text-decoration-thickness: .5px; text-underline-offset: 4px; cursor: pointer;
+  }
+
+  /* ═══ Claude 额度面板 ═══ */
+  .usage-pop{
+    position: fixed; z-index: 150;
+    top: calc(env(safe-area-inset-top) + 62px); right: max(12px, calc((100vw - var(--ref-width, 100vw)) / 2 + 12px));
+    width: min(360px, calc(100vw - 24px));
+    padding: 18px 20px 16px; border-radius: 24px;
+    color: #F2F2F0; background: rgba(28,28,28,.72);
+    -webkit-backdrop-filter: blur(22px) saturate(1.1); backdrop-filter: blur(22px) saturate(1.1);
+    box-shadow: 0 0 0 .5px rgba(255,255,255,.16) inset, 0 18px 40px rgba(0,0,0,.45);
+    animation: usageIn .22s var(--ease-soft);
+  }
+  .usage-pop[hidden]{ display:none; }
+  @keyframes usageIn{ from{ opacity: 0; transform: translateY(-6px) scale(.98); } to{ opacity: 1; transform: none; } }
+  .usage-head{ display:flex; align-items:baseline; justify-content:space-between; gap: 12px; margin-bottom: 14px; }
+  .usage-title{ font-family: var(--font-en), var(--font-cn); font-size: 21px; letter-spacing: .01em; }
+  .usage-at{ font-family: var(--font-en), var(--font-cn); font-size: 12.5px; color: rgba(255,255,255,.55); font-variant-numeric: lining-nums; }
+  .usage-rows{ display:flex; flex-direction:column; gap: 16px; }
+  .usage-line{ display:flex; justify-content:space-between; align-items:baseline; font-family: var(--font-en), var(--font-cn); font-size: 16.5px; font-variant-numeric: lining-nums; }
+  .usage-line b{ font-weight: 500; }
+  .usage-bar{ height: 6px; margin: 9px 0 7px; border-radius: 999px; background: rgba(255,255,255,.12); overflow:hidden; }
+  .usage-bar i{ display:block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, rgba(255,255,255,.55), #fff); }
+  .usage-reset{ text-align: right; font-family: var(--font-en), var(--font-cn); font-size: 13px; color: rgba(255,255,255,.55); font-variant-numeric: lining-nums; }
+  .usage-note{ margin: 0; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.7); }
+
+  /* ═══ 输入框上方的模型按钮 ═══ */
+  .composer{ flex-wrap: wrap; row-gap: 0; }
+  .model-row{ flex: 0 0 100%; display:none; padding: 0 2px 8px; }
+  .app.has-model .model-row{ display:flex; }
+  .model-chip{
+    display:none; align-items:center; gap: 6px; height: 28px; padding: 0 10px 0 12px; border: 0; border-radius: 999px;
+    font-family: var(--font-en), var(--font-cn); font-size: 14px; color: #EDEDEA;
+    background: rgba(255,255,255,.14);
+    -webkit-backdrop-filter: var(--glass-blur, blur(10px)); backdrop-filter: var(--glass-blur, blur(10px));
+    box-shadow: 0 2px 8px rgba(0,0,0,.3); cursor: pointer; -webkit-tap-highlight-color: transparent;
+    font-variant-numeric: lining-nums;
+  }
+  .model-chip.ready{ display:inline-flex; }
+  .model-chip:active{ transform: scale(.97); }
+  .model-chip .mc-eff{ color: rgba(255,255,255,.55); }
+  .model-chip .mc-eff:empty{ display:none; }
+  .model-chip svg{ width: 14px; height: 14px; opacity: .7; }
+  .app.has-model{ --composer-zone: calc(var(--composer-h) + 16px + 34px + env(safe-area-inset-bottom) + var(--keyboard-offset)); }
+
+  /* ═══ 模型切换面板 ═══ */
+  .model-sheet{ position: fixed; inset: 0; z-index: 240; display:flex; align-items:flex-end; justify-content:center; pointer-events: none; }
+  .model-scrim{ position:absolute; inset: 0; background: rgba(0,0,0,.42); opacity: 0; transition: opacity .24s ease; }
+  .model-panel{
+    position: relative; width: min(calc(100% - 20px), 480px);
+    margin-bottom: calc(env(safe-area-inset-bottom) + 10px);
+    padding: 10px 18px 20px; border-radius: 26px; color: #F2F2F0;
+    background: rgba(26,26,26,.8); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+    box-shadow: 0 0 0 .5px rgba(255,255,255,.14) inset, 0 -2px 30px rgba(0,0,0,.4);
+    transform: translateY(24px); opacity: 0; transition: transform .3s var(--ease-soft), opacity .2s ease;
+  }
+  .model-sheet.open{ pointer-events: auto; }
+  .model-sheet.open .model-scrim{ opacity: 1; }
+  .model-sheet.open .model-panel{ transform: none; opacity: 1; }
+  .model-grab{ width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 999px; background: rgba(255,255,255,.25); }
+  .model-title, .model-sub{ margin: 4px 4px 8px; font-family: var(--font-en), var(--font-cn); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+  .model-sub{ margin-top: 16px; }
+  .model-list{ display:flex; flex-direction:column; border-radius: 16px; overflow:hidden; background: rgba(255,255,255,.07); }
+  .model-list button{
+    display:flex; align-items:center; justify-content:space-between; padding: 13px 16px; border: 0;
+    border-bottom: .5px solid rgba(255,255,255,.1); background: transparent; color: inherit;
+    font-family: var(--font-en), var(--font-cn); font-size: 18px; text-align: left; cursor: pointer; font-variant-numeric: lining-nums;
+  }
+  .model-list button:last-child{ border-bottom: 0; }
+  .model-list button:active{ background: rgba(255,255,255,.08); }
+  .model-list button svg{ width: 18px; height: 18px; }
+  .model-effort{ display:flex; gap: 6px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.07); }
+  .model-effort button{
+    flex: 1; padding: 8px 0; border: 0; border-radius: 999px; background: transparent; color: rgba(255,255,255,.7);
+    font-family: var(--font-en), var(--font-cn); font-size: 14.5px; cursor: pointer;
+  }
+  .model-effort button.on{ background: rgba(255,255,255,.9); color: #111; }
+  .model-hint{ min-height: 1em; margin: 12px 4px 0; font-size: 13px; line-height: 1.6; color: rgba(255,255,255,.62); }
+  .model-hint:empty{ display:none; }
+  .model-restart{
+    margin-top: 12px; width: 100%; padding: 12px; border: 0; border-radius: 16px; font: inherit; font-size: 14.5px;
+    color: #F2F2F0; background: rgba(255,255,255,.14); cursor: pointer;
+  }
+  .model-restart[hidden]{ display:none; }
+  /* 顶栏多了一个额度按钮:手机上把按钮间距收紧一点,别压到名字 */
+  @media (max-width: 600px){ .header-actions{ gap: 15px; } }
+
 </style>
 </head>
 <body>
@@ -2896,6 +3020,9 @@
       <button class="topbtn terminal" id="terminalBtn" type="button" aria-label="终端视图" title="终端视图">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4-4 4"/><path d="M12 16h6"/></svg>
       </button>
+      <button class="topbtn usage" id="usageBtn" type="button" aria-label="Claude 额度" title="额度" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 17.5a8.5 8.5 0 1 1 15 0"/><path d="M12 13.2l3.6-3.6"/><circle cx="12" cy="13.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+      </button>
       <button class="topbtn call" id="callBtn" type="button" aria-label="语音通话（占位）" title="语音通话">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v2.4a2 2 0 0 1-2.2 2 19.4 19.4 0 0 1-8.4-3 19 19 0 0 1-5.9-5.9 19.4 19.4 0 0 1-3-8.4A2 2 0 0 1 4.5 2h2.4a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.4a15.6 15.6 0 0 0 6.6 6.6l1-1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 1.8z"/></svg>
       </button>
@@ -2912,6 +3039,10 @@
     </div>
     <div class="session-list" id="sessionList"></div>
   </div>
+  <div class="usage-pop" id="usagePop" role="dialog" aria-label="Claude 额度" hidden>
+    <div class="usage-head"><span class="usage-title">Claude 额度</span><span class="usage-at" id="usageAt"></span></div>
+    <div class="usage-rows" id="usageRows"><p class="usage-note">读取中…</p></div>
+  </div>
   <main class="scroll" id="scroll">
     <div class="empty" id="empty">
       <div class="orb"></div>
@@ -2919,6 +3050,12 @@
     </div>
   </main>
   <footer class="composer">
+    <div class="model-row">
+    <button type="button" class="model-chip" id="modelChip" aria-haspopup="dialog" aria-label="切换模型">
+      <span class="mc-name" id="modelChipName">Orion</span><span class="mc-eff" id="modelChipEffort"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+    </button>
+    </div>
     <div class="field">
       <button class="floatbtn clip-in-field" id="clipBtn" aria-label="附件" title="附件">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-8.8 8.8a5 5 0 0 1-7.1-7.1l8.8-8.8a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.6 1.6 0 0 1-2.3-2.3l8-8"/></svg>
@@ -2940,6 +3077,20 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg>
     <span>新消息</span>
   </button>
+</div>
+
+<!-- ── 模型切换:切的是服务器上的 Orion(oao-api → tmux /model)── -->
+<div class="model-sheet" id="modelSheet" aria-hidden="true">
+  <div class="model-scrim" id="modelScrim"></div>
+  <div class="model-panel" role="dialog" aria-modal="true" aria-labelledby="modelTitle">
+    <div class="model-grab" aria-hidden="true"></div>
+    <p class="model-title" id="modelTitle">Model</p>
+    <div class="model-list" id="modelList"></div>
+    <p class="model-sub">Effort</p>
+    <div class="model-effort" id="modelEffort" role="group" aria-label="推理强度"></div>
+    <p class="model-hint" id="modelHint"></p>
+    <button type="button" class="model-restart" id="modelRestart" hidden>现在重启，马上生效</button>
+  </div>
 </div>
 
 <!-- ── Terminal renderer (same conversation, different skin) ── -->
@@ -3076,29 +3227,6 @@
         </div>
         <div class="loop-actions"><button type="button" class="loop-btn primary" id="loopMcpAdd">添加 / 更新并连接</button></div>
         <div class="push-hint" id="loopMcpHint"></div>
-      </section>
-
-      <!-- 模型选择（占位 · 假按键，以后接真切换）-->
-      <section class="settings-card">
-        <div class="settings-label">模型选择</div>
-        <div class="segmented" id="modelSeg" role="group" aria-label="模型选择">
-          <button type="button" data-val="Opus 4.6">Opus 4.6</button>
-          <button type="button" data-val="Opus 4.7" class="active">Opus 4.7</button>
-          <button type="button" data-val="Opus 4.8">Opus 4.8</button>
-          <button type="button" data-val="Fable 5">Fable 5</button>
-        </div>
-      </section>
-
-      <!-- effort（占位 · 假按键）-->
-      <section class="settings-card">
-        <div class="settings-label">effort <i class="info-i" title="推理强度：越高越细，耗时越长">i</i></div>
-        <div class="segmented" id="effortSeg" role="group" aria-label="effort">
-          <button type="button" data-val="low">low</button>
-          <button type="button" data-val="medium">medium</button>
-          <button type="button" data-val="high">high</button>
-          <button type="button" data-val="xhigh" class="active">xhigh</button>
-          <button type="button" data-val="max">max</button>
-        </div>
       </section>
 
       <!-- 上下文阈值（占位 · 假按键）-->
@@ -3298,10 +3426,23 @@
             </div>
             <div class="cal-week"><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span></div>
             <div class="cal-grid" id="calGrid"></div>
-            <div class="cal-legend"><span class="cal-moonnow" id="calMoonNow"></span><span><i class="sw"></i>经期</span><span><i class="sw dash"></i>预计</span><span class="cal-next" id="calNextHint"></span></div>
+            <div class="cal-legend" id="calLegend"></div>
+            <div class="cal-legend cal-legend2"><span class="cal-moonnow" id="calMoonNow"></span><span class="cal-next" id="calNextHint"></span></div>
           </section>
           <section class="home-card cal-day card-line" aria-label="这一天">
             <p class="cal-day-title"><b id="calDayNum">3</b><span id="calDayLabel">11月 · 周二 · 今天</span></p>
+            <div class="cal-events" id="calEvents"></div>
+            <div class="cal-addrow" id="calAddRow">
+              <button type="button" data-add="once">＋提醒</button>
+              <button type="button" data-add="yearly">＋每年</button>
+              <button type="button" data-add="monthly">＋每月</button>
+              <button type="button" data-add="intimate">＋亲密</button>
+            </div>
+            <form class="cal-add cal-ev-form" id="calEvForm" autocomplete="off" hidden>
+              <input id="calEvInput" maxlength="24" placeholder="提醒什么…">
+              <button type="submit">加上</button>
+            </form>
+            <button type="button" class="cal-period-link" id="calPeriodLink">经期从这天开始</button>
             <div>
               <div class="cal-sub-row"><p class="cal-sub">心情</p><button type="button" id="moodEdit">整理</button></div>
               <div class="cal-chips" id="homeMoods"></div>
@@ -3730,7 +3871,7 @@ function setTab(tab){
   });
   if (tab === "home"){ refreshDays(); refreshHome(); }
   else if (tab === "room") refreshRoom();
-  else if (tab === "archive") refreshArchive();
+  else if (tab === "archive"){ refreshArchive(); pullCalendarKV(); }
 }
 function openMenu(){ setTab(lastPlaceTab); }
 function closeMenu(){ setTab("chat"); }
@@ -4100,16 +4241,52 @@ if (wallBoard){
   });
 }
 
-/* 同步到自己的服务器(relay 的 /app/kv/<name>)。后端还没这个接口时静默失败,数据照样留在本机。 */
+/* 同步到自己的服务器(oao-api 的 /relay/app/kv/<name>)。存成 {updated, v}:
+   谁更新得晚用谁的——手机、平板、服务器上的 Orion 看到同一份。接口不在时静默失败,数据照样留在本机。 */
+const KV_TS_KEY = "companion_kv_ts";
 function syncKV(name, value){
   if (typeof USE_MOCK !== "undefined" && USE_MOCK) return;
+  const ts = loadJSON(KV_TS_KEY, {});
+  ts[name] = Date.now();
+  saveJSON(KV_TS_KEY, ts);
   try{
     fetch(`${API_BASE}/app/kv/${encodeURIComponent(name)}`, {
       method: "PUT",
       headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify(value)
+      body: JSON.stringify({ updated: ts[name], v: value })
     }).catch(() => {});
   }catch(_){}
+}
+// 拉一份服务器上的;服务器的更新就覆盖本机,本机的更新就推上去。返回本机是否变了。
+async function kvPull(name, localKey, { readOnly = false } = {}){
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return false;
+  let d;
+  try{
+    const r = await fetch(`${API_BASE}/app/kv/${encodeURIComponent(name)}`, { headers: authHeaders(), cache: "no-store" });
+    if (!r.ok) return false;
+    d = await r.json();
+  }catch(_){ return false; }
+  const ts = loadJSON(KV_TS_KEY, {}), mine = ts[name] || 0;
+  const theirs = d && typeof d === "object" && "v" in d ? (+d.updated || 0) : 0;
+  if (theirs > mine){
+    saveJSON(localKey, d.v);
+    ts[name] = theirs; saveJSON(KV_TS_KEY, ts);
+    return true;
+  }
+  if (!readOnly && mine > theirs){
+    const local = loadJSON(localKey, null);
+    if (local != null) syncKV(name, local);
+  }
+  return false;
+}
+let kvPulling = null;
+function pullCalendarKV(){
+  if (kvPulling) return kvPulling;
+  kvPulling = Promise.all([
+    kvPull("calendar", CAL_KEY), kvPull("events", EV_KEY),
+    kvPull("calendar_orion", ORION_CAL_KEY, { readOnly:true }), kvPull("mood_set", MOOD_SET_KEY),
+  ]).then((ch) => { if (ch.some(Boolean)) renderCalendar(); }).finally(() => { setTimeout(() => { kvPulling = null; }, 20000); });
+  return kvPulling;
 }
 
 /* ── Tides 日历:每天可记心情、标签、经期;经期按历史推算下一次 ── */
@@ -4139,6 +4316,36 @@ function calSave(k, d){
   saveJSON(CAL_KEY, all);
   syncKV("calendar", all);
 }
+/* 提醒 / 每年 / 每月 / 亲密:跟每天的心情标签分开存,重复的事只存一条 */
+const EV_KEY = "companion_events", ORION_CAL_KEY = "companion_calendar_orion";
+function evAll(){
+  const v = loadJSON(EV_KEY, null) || {};
+  v.items = v.items || []; v.intimate = v.intimate || []; v.hidden = v.hidden || []; v.orionDone = v.orionDone || {};
+  return v;
+}
+function evSave(v){ saveJSON(EV_KEY, v); syncKV("events", v); }
+function orionItems(){ const v = loadJSON(ORION_CAL_KEY, null); return (v && Array.isArray(v.items)) ? v.items : []; }
+function evOccurs(it, k){
+  if (!it || !it.date || k < it.date) return false;
+  if (it.kind === "yearly") return k.slice(5) === it.date.slice(5);
+  if (it.kind === "monthly") return k.slice(8) === it.date.slice(8);
+  return k === it.date;
+}
+function dayEvents(k){
+  const ev = evAll(), hidden = new Set(ev.hidden), out = [];
+  for (const it of ev.items) if (evOccurs(it, k)) out.push({ src: "her", it, done: (it.done || []).includes(k) });
+  for (const it of orionItems()) if (!hidden.has(it.id) && evOccurs(it, k)) out.push({ src: "orion", it, done: (ev.orionDone[it.id] || []).includes(k) });
+  return out;
+}
+const MK_SVG = {
+  period:   '<svg class="mk mk-period" viewBox="0 0 10 10"><path d="M5 1.2C3.6 3.3 2.6 4.6 2.6 6.1a2.4 2.4 0 0 0 4.8 0C7.4 4.6 6.4 3.3 5 1.2z"/></svg>',
+  intimate: '<svg class="mk mk-heart" viewBox="0 0 10 10"><path d="M5 8.6 1.6 5.4A2 2 0 0 1 5 2.6a2 2 0 0 1 3.4 2.8z"/></svg>',
+  once:     '<svg class="mk mk-once" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.6"/></svg>',
+  yearly:   '<svg class="mk mk-ring" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.5"/></svg>',
+  monthly:  '<svg class="mk mk-ring mk-dash" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.5"/></svg>',
+  orion:    '<svg class="mk mk-orion" viewBox="0 0 10 10"><path d="M5 1.4 8.6 5 5 8.6 1.4 5z"/></svg>',
+};
+const MK_LABEL = { period: "经期", intimate: "亲密", once: "单次", yearly: "每年", monthly: "每月", orion: "他放的" };
 function addDays(k, n){ const d = new Date(k + "T12:00:00+08:00"); d.setUTCDate(d.getUTCDate() + n); return dayKey(d); }
 function daysBetween(a, b){ return Math.round((new Date(b + "T12:00:00+08:00") - new Date(a + "T12:00:00+08:00")) / 86400000); }
 function periodInfo(){
@@ -4149,7 +4356,7 @@ function periodInfo(){
     const last = runs[runs.length - 1];
     if (last && daysBetween(last.end, k) <= 2) last.end = k; else runs.push({ start: k, end: k });
   }
-  if (!runs.length) return { predicted: new Set(), next: null };
+  if (!runs.length) return { predicted: new Set(), next: null, len: 5 };
   const gaps = [];
   for (let i = 1; i < runs.length; i++){ const g = daysBetween(runs[i - 1].start, runs[i].start); if (g >= 20 && g <= 45) gaps.push(g); }
   const cycle = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 28;
@@ -4163,7 +4370,7 @@ function periodInfo(){
     const s0 = addDays(next, c * cycle);
     for (let i = 0; i < len; i++){ const k = addDays(s0, i); if (!(all[k] && (all[k].tags || []).includes(PERIOD))) predicted.add(k); }
   }
-  return { predicted, next };
+  return { predicted, next, len };
 }
 let calSel = null, calView = null;      // 首次用到时再取今天(TZ 常量在脚本后面才初始化)
 function calInit(){ if (!calSel){ calSel = dayKey(Date.now()); calView = calSel.slice(0, 7); } }
@@ -4197,6 +4404,7 @@ function renderCalendar(){
   const today = dayKey(Date.now());
   const { predicted, next } = periodInfo();
   const isP = (k) => !!(all[k] && (all[k].tags || []).includes(PERIOD));
+  const intimate = new Set(evAll().intimate);
   const cells = [];
   for (let i = 0; i < 42; i++){
     const k = addDays(first, i - lead);
@@ -4214,13 +4422,22 @@ function renderCalendar(){
       if (col === 0 || !band(addDays(k, -1))) cls.push("p-start");
       if (col === 6 || !band(addDays(k, 1))) cls.push("p-end");
     }
-    const others = (d.tags || []).filter((t) => t !== PERIOD).length + (d.moods || []).length;
-    const marks = (p ? `<i class="pm"></i>` : "") + (others ? `<i></i>` : "");
-    cells.push(`<button type="button" class="${cls.join(" ")}" data-day="${k}"><span class="n">${+k.slice(8)}</span>${moonSvg(moonPhase(k))}<span class="cal-marks">${marks}</span></button>`);
+    // 标记:经期 / 亲密 / 单次 / 每年 / 每月 / 他放的,每种最多一个,按这个顺序
+    const kinds = new Set();
+    if (p) kinds.add("period");
+    if (intimate.has(k)) kinds.add("intimate");
+    for (const e of dayEvents(k)) kinds.add(e.src === "orion" ? "orion" : (e.it.kind || "once"));
+    const marks = ["period", "intimate", "once", "yearly", "monthly", "orion"].filter((x) => kinds.has(x)).slice(0, 4).map((x) => MK_SVG[x]).join("");
+    cells.push(`<button type="button" class="${cls.join(" ")}" data-day="${k}"><span class="n">${+k.slice(8)}</span><span class="cal-marks">${marks}</span></button>`);
   }
   grid.innerHTML = cells.join("");
   const mnow = $("#calMoonNow");
   if (mnow){ const ph = moonPhase(today); mnow.innerHTML = moonSvg(ph) + "今晚 · " + moonName(ph); }
+  const leg = $("#calLegend");
+  if (leg && !leg.childElementCount){
+    leg.innerHTML = ["period", "intimate", "once", "yearly", "monthly", "orion"].map((x) => `<span>${MK_SVG[x]}${MK_LABEL[x]}</span>`).join("")
+      + `<span><i class="sw dash"></i>预计</span>`;
+  }
   const hint = $("#calNextHint");
   if (hint) hint.textContent = next ? `预计下次 · ${+next.slice(5, 7)}月${+next.slice(8)}日` : "";
 
@@ -4229,6 +4446,7 @@ function renderCalendar(){
   const wd = "一二三四五六日"[(new Date(calSel + "T12:00:00+08:00").getUTCDay() + 6) % 7];
   $("#calDayNum").textContent = +calSel.slice(8);
   $("#calDayLabel").textContent = `${+calSel.slice(5, 7)}月 · 周${wd}` + (calSel === today ? " · 今天" : "");
+  renderDayEvents(calSel, today, all, isP);
   const set = moodSet(), extra = day.moods.filter((m) => !set.includes(m));
   homeMoods.classList.toggle("editing", moodEditing);
   homeMoods.innerHTML = [...set, ...extra].map((m) =>
@@ -4291,6 +4509,141 @@ if (calAddForm) calAddForm.addEventListener("submit", (e) => {
   if (!day.tags.includes(t)) day.tags.push(t);
   calSave(calSel, day);
   calAddInput.value = "";
+  renderCalendar();
+});
+
+/* 这一天:提醒 / 每年 / 每月 / 亲密 / 他放的,以及"经期从这天开始" */
+let calEvAdding = null, calEvEditing = null;     // 正在加哪种 / 正在改哪一条(id)
+const EV_KIND_CN = { once: "提醒", yearly: "每年", monthly: "每月" };
+function renderDayEvents(k, today, all, isP){
+  const box = $("#calEvents");
+  if (!box) return;
+  const rows = [];
+  if (evAll().intimate.includes(k)){
+    rows.push(`<div class="cal-ev"><span class="cal-ev-mk">${MK_SVG.intimate}</span><span class="cal-ev-t">亲密</span>`
+      + `<span class="cal-ev-acts"><button type="button" data-act="unintimate">删</button></span></div>`);
+  }
+  for (const e of dayEvents(k)){
+    const it = e.it, mine = e.src === "orion";
+    const past = !e.done && (it.kind || "once") === "once" && k < today;
+    const tag = mine ? "他放的" : (it.kind && it.kind !== "once" ? EV_KIND_CN[it.kind] : "");
+    rows.push(`<div class="cal-ev${e.done ? " done" : ""}" data-id="${escapeHtml(it.id)}" data-src="${e.src}">`
+      + `<span class="cal-ev-mk">${MK_SVG[mine ? "orion" : (it.kind || "once")]}</span>`
+      + `<span class="cal-ev-t">${escapeHtml(it.title || "")}${past ? "<em>（已过）</em>" : ""}${tag ? `<small>${tag}</small>` : ""}</span>`
+      + `<span class="cal-ev-acts"><button type="button" data-act="done">${e.done ? "撤销" : "做完了"}</button>`
+      + (mine ? `<button type="button" data-act="hide">收起</button>` : `<button type="button" data-act="edit">改</button><button type="button" data-act="del">删</button>`)
+      + `</span></div>`);
+  }
+  box.innerHTML = rows.join("");
+  box.hidden = !rows.length;
+  const intimateOn = evAll().intimate.includes(k);
+  const ib = $('#calAddRow button[data-add="intimate"]');
+  if (ib) ib.classList.toggle("on", intimateOn);
+  $("#calAddRow").querySelectorAll("button[data-add]").forEach((b) => b.classList.toggle("active", b.dataset.add === calEvAdding));
+  const f = $("#calEvForm");
+  if (f) f.hidden = !calEvAdding;
+  // 经期:不是经期 → 从这天开始;是经期且后一天也是 → 到这天结束;否则 → 这天不算
+  const pl = $("#calPeriodLink");
+  if (pl){
+    if (!isP(k)) pl.textContent = "经期从这天开始";
+    else if (isP(addDays(k, 1))) pl.textContent = "经期到这天结束";
+    else pl.textContent = "这天不算经期";
+  }
+}
+function calOpenForm(kind, prefill){
+  calEvAdding = kind;
+  renderCalendar();
+  const inp = $("#calEvInput");
+  inp.placeholder = kind === "once" ? "提醒什么…" : kind === "yearly" ? "每年这天是…" : "每月这天是…";
+  inp.value = prefill || "";
+  setTimeout(() => inp.focus(), 30);
+}
+const calAddRow = $("#calAddRow");
+if (calAddRow) calAddRow.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-add]");
+  if (!b) return;
+  calInit();
+  const kind = b.dataset.add;
+  if (kind === "intimate"){
+    const ev = evAll();
+    ev.intimate = ev.intimate.includes(calSel) ? ev.intimate.filter((x) => x !== calSel) : [...ev.intimate, calSel].sort();
+    evSave(ev);
+    renderCalendar();
+    return;
+  }
+  calEvEditing = null;
+  if (calEvAdding === kind){ calEvAdding = null; renderCalendar(); return; }
+  calOpenForm(kind, "");
+});
+const calEvForm = $("#calEvForm");
+if (calEvForm) calEvForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const title = ($("#calEvInput").value || "").trim();
+  if (!title || !calEvAdding) return;
+  const ev = evAll();
+  if (calEvEditing){
+    const it = ev.items.find((x) => x.id === calEvEditing);
+    if (it){ it.title = title; it.kind = calEvAdding; }
+  } else {
+    ev.items.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: calSel, title, kind: calEvAdding, done: [], created: Date.now() });
+  }
+  evSave(ev);
+  calEvAdding = null; calEvEditing = null;
+  $("#calEvInput").value = "";
+  renderCalendar();
+});
+const calEventsBox = $("#calEvents");
+if (calEventsBox) calEventsBox.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-act]");
+  if (!b) return;
+  const act = b.dataset.act, row = b.closest(".cal-ev"), ev = evAll();
+  if (act === "unintimate"){ ev.intimate = ev.intimate.filter((x) => x !== calSel); evSave(ev); renderCalendar(); return; }
+  const id = row && row.dataset.id, src = row && row.dataset.src;
+  if (!id) return;
+  if (src === "orion"){
+    if (act === "hide"){ if (!ev.hidden.includes(id)) ev.hidden.push(id); }
+    if (act === "done"){ const d = ev.orionDone[id] || []; ev.orionDone[id] = d.includes(calSel) ? d.filter((x) => x !== calSel) : [...d, calSel]; }
+    evSave(ev); renderCalendar(); return;
+  }
+  const it = ev.items.find((x) => x.id === id);
+  if (!it) return;
+  if (act === "del"){
+    const occ = it.kind && it.kind !== "once" ? "以后每次都不再出现。" : "";
+    if (!confirm(`删掉「${it.title}」？${occ}`)) return;
+    ev.items = ev.items.filter((x) => x.id !== id);
+  } else if (act === "done"){
+    const d = it.done || [];
+    it.done = d.includes(calSel) ? d.filter((x) => x !== calSel) : [...d, calSel];
+  } else if (act === "edit"){
+    calEvEditing = id;
+    calOpenForm(it.kind || "once", it.title);
+    return;
+  }
+  evSave(ev);
+  renderCalendar();
+});
+const calPeriodLink = $("#calPeriodLink");
+if (calPeriodLink) calPeriodLink.addEventListener("click", () => {
+  calInit();
+  const all = calAll(), has = (k) => !!(all[k] && (all[k].tags || []).includes(PERIOD));
+  const setP = (k, on) => {
+    const d = calDay(k);
+    if (on && !d.tags.includes(PERIOD)) d.tags.push(PERIOD);
+    if (!on) d.tags = d.tags.filter((t) => t !== PERIOD);
+    calSave(k, d);
+  };
+  if (!has(calSel)){
+    const { len } = periodInfo();
+    for (let i = 0; i < (len || 5); i++){
+      const k = addDays(calSel, i);
+      if (i > 0 && has(k)) break;          // 碰到已经记过的就停
+      setP(k, true);
+    }
+  } else if (has(addDays(calSel, 1))){
+    for (let k = addDays(calSel, 1); has(k); k = addDays(k, 1)) setP(k, false);
+  } else {
+    setP(calSel, false);
+  }
   renderCalendar();
 });
 
@@ -7865,6 +8218,8 @@ function startChat(initialMsgs, { connect = true, fromCache = false } = {}){
   if (!fromCache) scheduleCacheSave();
   if (connect) startRealtime();
   refreshContextStatus();
+  loadModelState();
+  pullCalendarKV();
 }
 
 async function init(){
@@ -7898,6 +8253,150 @@ document.addEventListener("visibilitychange", () => {
   backfill();
   refreshContextStatus();
   if (!es || es.readyState !== 1 || Date.now() - lastStreamEventAt > STREAM_STALE_MS) openStream();
+});
+
+/* ════════════ Claude 额度(oao-api → 服务器上 Claude Code 的登录)════════════ */
+const usageBtn = $("#usageBtn"), usagePop = $("#usagePop");
+const USAGE_NAMES = { five_hour: "5-hour limit", seven_day: "Weekly" };
+function usageTitle(k){
+  if (USAGE_NAMES[k]) return USAGE_NAMES[k];
+  const m = /^seven_day_(.+)$/.exec(k);
+  if (!m) return null;
+  const n = m[1].replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return `Current week (${n})`;
+}
+function usageReset(iso){
+  if (!iso) return "";
+  const t = new Date(iso), ms = t - Date.now();
+  if (isNaN(t)) return "";
+  if (ms <= 0) return "Resets soon";
+  if (ms < 86400000){
+    const h = Math.floor(ms / 3600000), m = Math.round((ms % 3600000) / 60000);
+    return `Resets in ${h ? h + " hr " : ""}${m} min`;
+  }
+  const mon = t.toLocaleString("en-US", { month: "short", timeZone: TZ });
+  const d = +t.toLocaleString("en-US", { day: "numeric", timeZone: TZ });
+  const suf = (d % 10 === 1 && d !== 11) ? "st" : (d % 10 === 2 && d !== 12) ? "nd" : (d % 10 === 3 && d !== 13) ? "rd" : "th";
+  const tm = t.toLocaleString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: TZ });
+  return `Resets ${mon} ${d}${suf} ${tm}`;
+}
+function renderUsage(res){
+  const rows = $("#usageRows"), at = $("#usageAt");
+  if (!res || !res.ok){
+    at.textContent = "";
+    rows.innerHTML = `<p class="usage-note">${escapeHtml((res && res.message) || "读不到额度。服务器上的 oao-api 还没装好？")}</p>`;
+    return;
+  }
+  const d = res.data || {};
+  at.textContent = fmtTime(res.fetched_at) + " 更新";
+  const keys = Object.keys(d).filter((k) => d[k] && typeof d[k] === "object" && "utilization" in d[k] && d[k].utilization != null && usageTitle(k));
+  keys.sort((a, b) => (a === "five_hour" ? -2 : a === "seven_day" ? -1 : 0) - (b === "five_hour" ? -2 : b === "seven_day" ? -1 : 0));
+  rows.innerHTML = keys.length ? keys.map((k) => {
+    const u = Math.max(0, Math.min(100, Math.floor(+d[k].utilization || 0)));
+    return `<div class="usage-row"><div class="usage-line"><span>${escapeHtml(usageTitle(k))}</span><b>${u}%</b></div>`
+      + `<div class="usage-bar"><i style="width:${u}%"></i></div>`
+      + `<div class="usage-reset">${escapeHtml(usageReset(d[k].resets_at))}</div></div>`;
+  }).join("") : `<p class="usage-note">这个账号没有额度数据。</p>`;
+}
+async function loadUsage(){
+  try{
+    const r = await fetch(`${API_BASE}/app/usage`, { headers: authHeaders(), cache: "no-store" });
+    renderUsage(r.ok ? await r.json() : { ok:false, message: r.status === 404 ? "服务器上还没装额度接口（oao-api）。" : "读不到额度（" + r.status + "）。" });
+  }catch(_){ renderUsage({ ok:false, message: "连不上服务器。" }); }
+}
+function toggleUsage(open){
+  if (!usagePop) return;
+  const on = open == null ? usagePop.hidden : open;
+  usagePop.hidden = !on;
+  usageBtn.setAttribute("aria-expanded", on ? "true" : "false");
+  if (on) loadUsage();
+}
+if (usageBtn) usageBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleUsage(); });
+document.addEventListener("click", (e) => {
+  if (usagePop && !usagePop.hidden && !usagePop.contains(e.target)) toggleUsage(false);
+});
+
+/* ════════════ 模型切换(oao-api:/model 打进 tmux 里的 Orion;effort 下次启动生效)════════════ */
+const modelChip = $("#modelChip"), modelSheet = $("#modelSheet");
+let modelState = null;
+function paintModelChip(){
+  if (!modelChip) return;
+  if (!modelState || !modelState.ok){ modelChip.classList.remove("ready"); appEl.classList.remove("has-model"); return; }
+  modelChip.classList.add("ready");
+  appEl.classList.add("has-model");
+  $("#modelChipName").textContent = modelState.label || "默认";
+  const e = modelState.effort || "";
+  $("#modelChipEffort").textContent = e ? e.charAt(0).toUpperCase() + e.slice(1) : "";
+}
+async function loadModelState(){
+  if (USE_MOCK || !secret) return;
+  try{
+    const r = await fetch(`${API_BASE}/app/model`, { headers: authHeaders(), cache: "no-store" });
+    modelState = r.ok ? await r.json() : null;
+  }catch(_){ modelState = null; }
+  paintModelChip();
+  if (modelSheet && modelSheet.classList.contains("open")) renderModelSheet();
+}
+function renderModelSheet(note){
+  const st = modelState || {};
+  $("#modelList").innerHTML = (st.models || []).map((m) =>
+    `<button type="button" data-model="${escapeHtml(m.id)}" class="${m.id === st.model ? "on" : ""}"><span>${escapeHtml(m.label)}</span>${m.id === st.model ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>' : ""}</button>`).join("");
+  $("#modelEffort").innerHTML = (st.efforts || []).map((e) =>
+    `<button type="button" data-effort="${e}" class="${e === st.effort ? "on" : ""}">${e}</button>`).join("");
+  const hint = $("#modelHint"), rb = $("#modelRestart");
+  let h = note || "";
+  if (!h && st.effort_pending) h = "推理强度要等" + aiName() + "下次重启才生效。";
+  if (!h && st.running === false) h = aiName() + "现在没在运行，改了会在他下次启动时生效。";
+  hint.textContent = h;
+  rb.hidden = !st.effort_pending;
+}
+function openModelSheet(){
+  if (!modelSheet) return;
+  renderModelSheet();
+  modelSheet.classList.add("open");
+  modelSheet.setAttribute("aria-hidden", "false");
+  loadModelState();
+}
+function closeModelSheet(){
+  if (!modelSheet) return;
+  modelSheet.classList.remove("open");
+  modelSheet.setAttribute("aria-hidden", "true");
+}
+async function postModel(body, note){
+  try{
+    const r = await fetch(`${API_BASE}/app/model`, {
+      method: "POST", headers: { ...authHeaders(), "Content-Type": "application/json" }, body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error(String(r.status));
+    modelState = await r.json();
+    paintModelChip();
+    renderModelSheet(note);
+  }catch(_){ renderModelSheet("没切成功，稍后再试。"); }
+}
+if (modelChip) modelChip.addEventListener("click", openModelSheet);
+const modelScrim = $("#modelScrim");
+if (modelScrim) modelScrim.addEventListener("click", closeModelSheet);
+const modelListEl = $("#modelList");
+if (modelListEl) modelListEl.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-model]");
+  if (!b || (modelState && b.dataset.model === modelState.model)) return;
+  postModel({ model: b.dataset.model }, "已经切过去了，下一句就是新的" + (b.textContent || "").trim() + "。");
+});
+const modelEffortEl = $("#modelEffort");
+if (modelEffortEl) modelEffortEl.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-effort]");
+  if (!b || (modelState && b.dataset.effort === modelState.effort)) return;
+  postModel({ effort: b.dataset.effort });
+});
+const modelRestartBtn = $("#modelRestart");
+if (modelRestartBtn) modelRestartBtn.addEventListener("click", () => {
+  if (!confirm("重启" + aiName() + "？他会重新醒来，记忆都在，只是这一段对话的上下文会断开。")) return;
+  postModel({ restart: true }, "重启了，大概半分钟后他就回来。");
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (modelSheet && modelSheet.classList.contains("open")) closeModelSheet();
+  if (usagePop && !usagePop.hidden) toggleUsage(false);
 });
 
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener("message",(e)=>{
