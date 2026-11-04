@@ -3750,6 +3750,9 @@
   .lt-desk .lt-box::after{ background: linear-gradient(90deg, #1c1d20, #3a3c40 45%, #26272a 75%, #1a1b1e) !important;
     -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.8) 30%, rgba(0,0,0,.35) 70%, transparent 100%) !important;
             mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.8) 30%, rgba(0,0,0,.35) 70%, transparent 100%) !important; height: 360px !important; }
+
+  /* 他寄的信还没拆:底栏 Archive 上一个小红点 */
+  .tab.has-mail::before{ content:""; position:absolute; top: 10px; right: calc(50% - 16px); width: 7px; height: 7px; border-radius: 50%; background: #b86a5a; box-shadow: 0 0 0 2px rgba(20,20,22,.6); }
 </style>
 </head>
 <body>
@@ -4878,6 +4881,7 @@ function refreshHome(){
   if (nn) nn.textContent = aiName() + " · now";
   refreshNextDay();
   fitHomeSoon();
+  try{ refreshMailbox(); }catch(_){}
   const lm = $("#homeLastMine"), lr = $("#homeLastReply");
   if (lm) lm.textContent = lastMe ? fmtWhen(lastMe.ts) : "—";
   if (lr) lr.textContent = lastAi ? fmtWhen(lastAi.ts) : "—";
@@ -5194,6 +5198,7 @@ function refreshMailbox(){
   const unread = all.filter((m) => !read.has(String(m.id))).length;
   set("#mailboxLine", unread ? `有 ${unread} 封信还没拆` : all.length ? `${all.length} 封信，都拆过了` : "信箱还空着");
   const mb = $("#mailboxBtn"); if (mb) mb.classList.toggle("flag-up", unread > 0);
+  const at = tabbar && tabbar.querySelector('.tab[data-tab="archive"]'); if (at) at.classList.toggle("has-mail", unread > 0);
   renderLetterPage(all, unread);
   const badge = $("#mailboxBadge");
   if (badge){ badge.hidden = !unread; badge.textContent = unread; }
@@ -6100,7 +6105,6 @@ function postLetter(){                              // 第二步:寄出去 → �
     const lp = $("#ltPaper"); if (lp) setTimeout(() => lp.classList.remove("taken"), 400);
     showToast(m.openAt ? `寄出去了，${fmtOpenAt(m.openAt)} 他才能拆` : "寄出去了");
     refreshMailbox();
-    try{ sendFromHome(m.openAt ? `（往你的信箱里投了一封信，${fmtOpenAt(m.openAt)} 以后才能拆）` : "（往你的信箱里投了一封信）"); }catch(_){}
   };
   if (prefersReducedMotion) return finish();
   // 盖好火漆的信封轻轻往下沉一点,慢慢淡掉

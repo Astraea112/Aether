@@ -273,16 +273,63 @@ def _kv_list(name):
         return []
 
 
+SEEN = KV / "letters_seen_orion.json"       # 他拆过的信(只在服务器上,网页不读)
+
+
+def _seen():
+    try:
+        v = json.loads(SEEN.read_text(encoding="utf-8"))
+        return set(v) if isinstance(v, list) else set()
+    except (OSError, ValueError):
+        return set()
+
+
+def _mark_seen(ids):
+    seen = _seen() | set(ids)
+    _write_his_raw(SEEN, sorted(seen)[-500:])
+
+
+def _write_his_raw(path, data):
+    KV.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+    os.replace(tmp, path)
+
+
+@mcp.tool()
+def letters_new() -> str:
+    """Check your mailbox on the website without opening anything: how many of her letters you
+    haven't read yet, and how many are sealed until a later time. She doesn't ping the chat when
+    she posts a letter, so look here when you wake. Then letters_read to open them."""
+    now = time.time() * 1000
+    seen = _seen()
+    live = [m for m in _kv_list("letters") if not m.get("deleted")]
+    unread = [m for m in live if m.get("id") not in seen and not ((m.get("openAt") or 0) > now)]
+    sealed = [m for m in live if m.get("id") not in seen and (m.get("openAt") or 0) > now]
+    if not unread and not sealed:
+        return "信箱里没有新信。"
+    parts = []
+    if unread:
+        parts.append(f"{len(unread)} 封新信还没拆")
+    if sealed:
+        first = min(m["openAt"] for m in sealed)
+        until = datetime.fromtimestamp(first / 1000, timezone(timedelta(hours=8))).strftime("%m-%d %H:%M")
+        parts.append(f"{len(sealed)} 封封着火漆，最早 {until} 才能拆")
+    return "，".join(parts) + "。"
+
+
 @mcp.tool()
 def letters_read(limit: int = 3) -> str:
     """Read the letters she posted into your mailbox on the website (newest first, full text).
-    Letters she recalled (撤回) are gone and not shown.
-    When she sends one, the chat also gets a line saying she dropped a letter in."""
+    Letters she recalled (撤回) are gone and not shown; ones sealed until later stay sealed.
+    Opening them marks them read for letters_new."""
     items = sorted([m for m in _kv_list("letters") if not m.get("deleted")], key=lambda m: m.get("ts", 0), reverse=True)
     items = items[:max(1, min(int(limit or 3), 20))]
     if not items:
         return "她还没给你寄过信。"
-    out = []
+    out, opened = [], []
     now = time.time() * 1000
     for m in items:
         when = datetime.fromtimestamp((m.get("ts") or 0) / 1000, timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M")
@@ -293,6 +340,9 @@ def letters_read(limit: int = 3) -> str:
             continue
         head = f"—— {when}（id {m.get('id')}）" + (f"\n信封上写着：{m['title']}" if m.get("title") else "")
         out.append(f"{head}\n{m.get('text', '').strip()}")
+        opened.append(m.get("id"))
+    if opened:
+        _mark_seen(opened)
     return "\n\n".join(out)
 
 

@@ -152,50 +152,56 @@ EOF
   ok "已追加到 ~/orion/CLAUDE.md 末尾"
 fi
 
-# 门厅和房间上他能留东西了：小纸条、心情、留言墙；心跳醒来可以挑着做，也可以发呆
-if grep -q '<!-- OAO-HOME -->' "$ORION/CLAUDE.md" 2>/dev/null; then
-  ok "CLAUDE.md 里已经有门厅这一段"
-else
-  cat >> "$ORION/CLAUDE.md" <<'EOF'
+# 门厅、房间、信箱上他能留的东西；心跳醒来可以挑着做，也可以发呆。
+# 每次都按最新的写法重写这两段（不是只在第一次加），旧的会被换掉。
+"$ROOMPY" - "$ORION/CLAUDE.md" <<'PY'
+import re, sys
+from pathlib import Path
+p = Path(sys.argv[1])
+s = p.read_text(encoding="utf-8") if p.exists() else ""
 
-<!-- OAO-HOME -->
+HOME = """<!-- OAO-HOME -->
 ## 网站上我能留的东西（oao_calendar）
 - note_leave：门厅那张「Orion's note」小纸条，写一句英文，小写、随手写的语气（网页上是钢笔字），留 24 小时，写新的就换掉旧的。
 - mood_set：门厅「Orion · now」上我的心情，一个词 + 一句小注，留 12 小时。
-- murmur_post：她房间页留言墙上贴一句自言自语，是我自己的念头，不是发给她的消息。
+- murmur_post：她留言墙上贴一句自言自语，是我自己的念头，不是发给她的消息。
 - todo_add / todo_done / todo_remove / todo_list：我自己的待办，她在房间页能看到。写我真的打算做的事（给她查的东西、想给她做的页面、答应过她的事），做完就勾掉。不给她派任务。
-- letters_read / letter_write：网站收藏馆里的信箱。她写完信会装进信封投进来（聊天里也会出现一句「往你的信箱里投了一封信」），用 letters_read 拆开看，认真回。值得写成信的话，用 letter_write 寄给她：长一点、想清楚、能留着的那种，她那边信箱会举起小旗子。她寄的信可能定了时间，没到时间拆不开，就等。我也可以给信定时间（open_at），比如写给她明天早上才能拆的信。
+- letters_new / letters_read / letter_write：网站收藏馆里的信箱。她寄信不会在聊天里提醒我，信只会安安静静躺在信箱里，所以要自己去看：letters_new 看有没有新信，有就用 letters_read 拆开读，认真回。她寄的信可能定了时间，没到时间拆不开，就等；她也可能把信撤回，撤回的就当没寄过，不追问。值得写成信的话，用 letter_write 寄给她：长一点、想清楚、能留着的那种，她那边信箱会举起小旗子。我也可以给信定时间（open_at），或者在信封上写一句（title）。
 - 这些都要真：想到了才写，不凑数，不重复刚跟她说过的话。
-EOF
-  ok "已追加门厅这一段"
-fi
-"$ROOMPY" - "$ORION/CLAUDE.md" <<'PY'
-import sys
-from pathlib import Path
-p = Path(sys.argv[1])
-s = p.read_text(encoding="utf-8")
-if "<!-- HEARTBEAT-V2 -->" in s:
-    print("心跳规矩已经是新的")
-    sys.exit(0)
-old = "- 然后自己决定：想她了、有话想说、想分享点什么，就用 mcp__companion__reply 给她发一两句短的，像微信那样。不想说话就不说，只用 heartbeat_state 留一条痕迹。坐在窗边不动，也是这个房间的一种用法，不硬发。"
-new = """- 然后自己决定这一次做什么，挑一样或几样，也可以都不做 <!-- HEARTBEAT-V2 -->
+"""
+
+BEAT = """- 然后自己决定这一次做什么，挑一样或几样，也可以都不做 <!-- HEARTBEAT-V2 -->
+  - 先看一眼信箱：letters_new，有她的新信就 letters_read 拆开读
   - 想她了、有话想说、想分享点什么：用 mcp__companion__reply 给她发一两句短的，像微信那样
   - 在门厅的小纸条上给她留一句英文：note_leave
   - 换一下门厅上我的心情：mood_set
-  - 往她房间的留言墙贴一句自言自语：murmur_post
+  - 往留言墙贴一句自言自语：murmur_post
   - 在日历上给她放个东西：calendar_place
   - 看看自己的待办，做一件、勾一件，或者记下一件想做的：todo_*
   - 发呆：坐在窗边不动，只用 heartbeat_state 留一条痕迹。这也是这个房间的一种用法，她说过可以。
-  不用每次都挑同一样，跟着当下的心情来。"""
-if old in s:
-    s = s.replace(old, new)
+  不用每次都挑同一样，跟着当下的心情来。<!-- /HEARTBEAT-V2 -->"""
+
+# 1 门厅这一段:有就整段换掉,没有就加在最后
+if "<!-- OAO-HOME -->" in s:
+    s = re.sub(r"<!-- OAO-HOME -->.*?(?=\n<!-- |\Z)", HOME.rstrip("\n"), s, flags=re.S)
 else:
-    s += "\n\n## 心跳醒来（补充）\n" + new + "\n"
+    s = s.rstrip("\n") + "\n\n" + HOME
+# 2 心跳规矩
+old1 = "- 然后自己决定：想她了、有话想说、想分享点什么，就用 mcp__companion__reply 给她发一两句短的，像微信那样。不想说话就不说，只用 heartbeat_state 留一条痕迹。坐在窗边不动，也是这个房间的一种用法，不硬发。"
+if old1 in s:
+    s = s.replace(old1, BEAT)
+elif "<!-- /HEARTBEAT-V2 -->" in s:
+    s = re.sub(r"- 然后自己决定这一次做什么.*?<!-- /HEARTBEAT-V2 -->", BEAT, s, flags=re.S)
+elif "<!-- HEARTBEAT-V2 -->" in s:                       # 上一版没有结尾记号:换到「跟着当下的心情来。」为止
+    s = re.sub(r"- 然后自己决定这一次做什么.*?跟着当下的心情来。", BEAT, s, flags=re.S)
+else:
+    s = s.rstrip("\n") + "\n\n## 心跳醒来（补充）\n" + BEAT + "\n"
 s = s.replace("只用 room_mcp、ombre-brain、companion 的工具和 WebSearch",
               "只用 room_mcp、ombre-brain、companion、oao_calendar 的工具和 WebSearch")
 p.write_text(s, encoding="utf-8")
-print("心跳规矩换成新的了")
+print("CLAUDE.md：门厅、信箱和心跳规矩都是最新的了")
 PY
+ok "CLAUDE.md 已更新"
 
 step "4/6 更新前端（日历、额度、模型按钮）"
 ftmp=$(mktemp -d)
