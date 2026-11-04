@@ -6981,21 +6981,20 @@ function renderMessage(m, opts = {}){
   return item ? findRenderedMessageRow(item._key) : null;
 }
 
+// 时间分隔只在"隔了很久又说话"的时候出现:跟上一条消息差 3 小时以上(或者整段对话的第一条)
+const TIME_GAP_MS = 3 * 60 * 60 * 1000;
 function buildVirtualRows(){
   const rows = [];
-  let lastDayKey = null;
+  let lastTs = null;
   let prevBubble = null;
   sortedMessages().forEach((m) => {
-    const k = dayKey(m.ts);
-    if (k !== lastDayKey){
-      lastDayKey = k;
-      rows.push({ type:"day", key:`day:${k}:${m._key}`, text:fmtDay(m.ts) });
+    const at = new Date(m.ts).getTime();
+    if (lastTs == null || (isFinite(at) && at - lastTs >= TIME_GAP_MS)){
+      rows.push({ type:"day", key:`day:${dayKey(m.ts)}:${m._key}`, text:fmtDay(m.ts) });
       prevBubble = null;
     }
-    if (newDividerBeforeKey && m._key === newDividerBeforeKey){
-      rows.push({ type:"new", key:`new:${newDividerBeforeKey}` });
-      prevBubble = null;
-    }
+    if (isFinite(at)) lastTs = at;
+    // 「New Messages」那条不要了(newDividerBeforeKey 仍然记着,只是不再画出来)
     if (m.kind === "thinking"){
       rows.push({ type:"thinking", key:`m:${m._key}`, message:m });
       prevBubble = null;
