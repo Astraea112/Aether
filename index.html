@@ -3675,6 +3675,15 @@
   .lt-meta p:last-child{ text-align: right; align-items: flex-end; }
   .lt-meta em{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-s); }
   .lt-meta small{ font-family: var(--font-en), var(--font-cn); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
+
+  /* 「算了」:纸飞回桌上 */
+  .post-overlay{ transition: opacity .25s ease, background-color .5s ease, -webkit-backdrop-filter .5s ease, backdrop-filter .5s ease; }
+  .post-overlay.instant{ transition: none !important; }
+  .post-compose.s-return{ background-color: rgba(10,10,12,0); -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
+  .post-compose.s-return .pc-ink{ opacity: 0; transition: opacity .2s ease; }
+  .post-compose.s-return .pc-bar, .post-compose.s-return .pc-when{ opacity: 0; pointer-events: none; transition: opacity .15s ease; }
+  .post-compose.s-return .pc-paper{ transition: transform .58s cubic-bezier(.45,0,.25,1); }
+  .post-compose.s-return .pc-pen{ transition: transform .5s cubic-bezier(.45,0,.25,1), opacity .35s ease .15s; }
 </style>
 </head>
 <body>
@@ -5911,10 +5920,37 @@ function openCompose(){
 }
 function closeCompose(){
   if (!postCompose) return;
-  const lp = $("#ltPaper"); if (lp) setTimeout(() => lp.classList.remove("taken"), 200);
-  postCompose.className = "post-overlay post-compose";
-  postCompose.setAttribute("aria-hidden", "true");
+  const lp = $("#ltPaper"), desk = lp && lp.querySelector(".lp-sheet");
+  const paper = $("#pcPaper"), pen = $("#pcPen");
+  const back = desk && desk.getBoundingClientRect();
+  const done = () => {
+    if (lp) lp.classList.remove("taken");
+    postCompose.classList.add("instant");
+    postCompose.className = "post-overlay post-compose instant";
+    postCompose.setAttribute("aria-hidden", "true");
+    paper.style.transform = ""; pen.style.transform = ""; pen.style.opacity = "";
+    requestAnimationFrame(() => requestAnimationFrame(() => postCompose.classList.remove("instant")));
+  };
   pcEnvReady = false;
+  $("#postText").blur();
+  // 「算了」:纸上的字淡掉,纸转回原来歪着的样子飞回桌上,背景慢慢亮回来,落下以后才换成桌上那张
+  if (!back || !back.width || prefersReducedMotion || postCompose.classList.contains("s-fold")){
+    if (lp) setTimeout(() => lp.classList.remove("taken"), 200);
+    postCompose.className = "post-overlay post-compose";
+    postCompose.setAttribute("aria-hidden", "true");
+    return;
+  }
+  const now = paper.getBoundingClientRect();
+  const cur = getComputedStyle(paper).transform;
+  const base = cur && cur !== "none" ? new DOMMatrix(cur) : new DOMMatrix();
+  const w = now.width / Math.hypot(base.a, base.b), h = now.height / Math.hypot(base.c, base.d) || now.height;
+  const cx = now.left + now.width / 2 - base.e, cy = now.top + now.height / 2 - base.f;
+  const sx = back.width / (paper.offsetWidth || w), sy = back.height / (paper.offsetHeight || h);
+  const dx = back.left + back.width / 2 - cx, dy = back.top + back.height / 2 - cy;
+  postCompose.className = "post-overlay post-compose open s-return";
+  paper.style.transform = `translate(${dx}px, ${dy}px) rotate(-9deg) scale(${sx}, ${sy})`;
+  pen.style.transform = `translate(${dx * .9}px, ${dy * .9}px) rotate(16deg) scale(.7)`; pen.style.opacity = "0";
+  setTimeout(done, 620);
 }
 function openAtFor(key){
   const now = Date.now();
