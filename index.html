@@ -3654,11 +3654,18 @@
   .lt-paper:active .lp-sheet{ transform: rotate(-9deg) translateY(-3px); }
   .lt-paper:hover .lp-pen{ transform: rotate(18deg) translateY(-4px); }
   .lt-desk .lt-box{ left: auto; right: 0; top: 10px; width: 64%; transform: none; z-index: 1; }
-  .lt-desk .lt-box .lt-cap{ position: absolute; right: 4%; top: calc(100% - 4px); align-items: flex-end; text-align: right; margin: 0; }
+  .lt-desk .lt-box .lt-cap{ position: absolute; left: 60%; right: 2%; top: calc(100% + 26px); align-items: flex-start; text-align: left; margin: 0; }
+  .lt-desk .lt-box .lt-cap small{ line-height: 1.6; }
   .lt-paper.taken .lp-sheet, .lt-paper.taken .lp-pen{ opacity: 0; transition: opacity .15s ease; }
   .lt-desk .lt-box:active{ transform: scale(.985); }
   .lt-desk .lt-box .rb-img{ filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)) brightness(.8) saturate(.75); }
-  .lt-desk .lt-box::after{ content:""; position:absolute; left: 12%; right: 8%; top: 56%; height: 12px; border-radius: 50%; background: rgba(0,0,0,.5); filter: blur(6px); z-index: -1; }
+  /* 撑着邮筒的杆子:越往下越淡,邮筒本身不变 */
+  .lt-desk .lt-box::after{
+    content:""; position:absolute; z-index: -1; left: 53%; top: 86%; width: 3.4%; height: 300px; transform: translateX(-50%);
+    background: linear-gradient(90deg, #3e4044, #8d9095 42%, #5b5e63 70%, #3a3c40);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.75) 22%, rgba(0,0,0,.3) 60%, transparent 100%);
+            mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.75) 22%, rgba(0,0,0,.3) 60%, transparent 100%);
+  }
   .lt-cap{ display:flex; flex-direction:column; align-items:center; gap: 2px; margin-top: 12px; text-align: center; }
   .lt-cap em{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-s); color: var(--text); }
   .lt-cap small{ font-family: var(--font-en), var(--font-cn); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
