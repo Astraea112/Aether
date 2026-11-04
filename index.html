@@ -538,7 +538,7 @@
   [data-theme="harbor"] .row.human::after,
   [data-theme="harbor"] .profile-avatar,
   [data-theme="harbor"] .my-avatar-preview,
-  [data-theme="harbor"] .login .orb{ box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
+  [data-theme="harbor"] .login .orb{ box-shadow: none; }   /* 头像不要白边 */
   /* 杂志黑白:头像照片走灰度,与星图同一个墨色世界 */
   [data-theme="harbor"] .avatar,
   [data-theme="harbor"] .row.ai::before,
@@ -3090,7 +3090,7 @@
   /* 背景:多一层雾,百合的细节压虚,字压上去更干净 */
   :root[data-theme="harbor"] .wall::after{
     background: linear-gradient(180deg, rgba(13,13,14,.62), rgba(13,13,14,.40) 24%, rgba(13,13,14,.40) 70%, rgba(13,13,14,.58));
-    -webkit-backdrop-filter: blur(5px) saturate(.9); backdrop-filter: blur(5px) saturate(.9);
+    -webkit-backdrop-filter: blur(1.2px) saturate(.9); backdrop-filter: blur(1.2px) saturate(.9);   /* 百合清楚一点,只留一点点柔 */
   }
   /* 时间戳:还是最小那一档,但更淡 */
   :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{ opacity: .45; letter-spacing: .05em; }
@@ -3753,6 +3753,11 @@
 
   /* 他寄的信还没拆:底栏 Archive 上一个小红点 */
   .tab.has-mail::before{ content:""; position:absolute; top: 10px; right: calc(50% - 16px); width: 7px; height: 7px; border-radius: 50%; background: #b86a5a; box-shadow: 0 0 0 2px rgba(20,20,22,.6); }
+
+  /* 聊天页:模型按钮平平的,不要立体;不要表情按钮 */
+  .model-chip{ box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    background: rgba(255,255,255,.1) !important; }
+  #emojiBtn{ display: none !important; }
 </style>
 </head>
 <body>
