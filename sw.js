@@ -2,13 +2,14 @@
    IMPORTANT: bump CACHE on every front-end change, or installed clients keep the
    old shell (the precached index.html won't refresh until the SW reinstalls). */
 const AI_NAME = "Orion";           // push-title fallback; keep in sync with index.html CONFIG.AI_NAME
-const CACHE = "companion-v53-yours-in-ink";
+const CACHE = "companion-v54-letter-art";
 const PRECACHE = [
   "./index.html",
   "./chat-light.webp", "./chat-lily.webp",
   "./menu-light.webp", "./menu-flower.webp", "./menu-harbor.webp", "./chat-harbor.webp",
   "./ribbon-drift.svg", "./ribbon-bow.svg", "./ribbon-line.svg",
   "./avatar-sea.png", "./avatar-lily.webp",
+  "./letter-mailbox.webp", "./letter-envelope.webp", "./letter-paper.webp", "./letter-pen.webp",
 ];
 
 self.addEventListener("install", (e) => {
