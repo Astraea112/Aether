@@ -3131,6 +3131,9 @@
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .note-meta{ margin: auto 0 0; display:flex; align-items:center; gap: 8px; font-size: var(--fs-xs); color: var(--text-faint); letter-spacing: .04em; }
   .note-meta .status-dot{ width: 6px; height: 6px; }
+  .note-meta{ flex-wrap: nowrap; min-width: 0; }
+  .note-meta #homeStatusLine{ flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-poke{ flex: none; white-space: nowrap; }
 
   /* 今天 + 天气 */
   .home-card.wx-card{ display:flex; flex-direction:column; justify-content:space-between; gap: 10px; }
@@ -3145,6 +3148,21 @@
   .wx-temp{ display:flex; align-items:baseline; gap: 8px; }
   .wx-temp b{ font-family: var(--font-en); font-weight: 400; font-size: var(--fs-l); font-variant-numeric: lining-nums; }
   .wx-temp em{ font-style: normal; font-size: var(--fs-s); color: var(--text-soft); }
+
+  /* 下面三块的质感:深一点、带一点点暖紫的烟色玻璃,一圈很细的亮边 + 顶上一线高光 + 柔和的深投影,
+     不再是半透明的灰,背景的花不会透上来抢眼 */
+  .home-card.hnote-card, .home-card.wx-card, .home-card.msg-strip{
+    background: linear-gradient(180deg, rgba(44,41,48,.66), rgba(26,25,29,.74));
+    -webkit-backdrop-filter: blur(18px) saturate(1.1); backdrop-filter: blur(18px) saturate(1.1);
+    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.13), inset 0 1px 0 rgba(255,255,255,.07), 0 12px 30px rgba(0,0,0,.38);
+  }
+  .note-reply{ margin: 0; font-size: var(--fs-s); line-height: 1.5; color: var(--text-soft); }
+  .note-reply:empty{ display:none; }
+  .note-poke{ margin-left: auto; display:inline-flex; align-items:center; gap: 4px; border: 0; padding: 4px 0 4px 6px; background: transparent;
+    font: inherit; font-size: var(--fs-s); color: var(--text-soft); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .note-poke svg{ width: 15px; height: 15px; }
+  .note-poke.poked svg{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
+  .msg-ic{ background: rgba(255,255,255,.04); }
 
   /* 最近一条消息 */
   .home-card.msg-strip{ display:flex; align-items:center; gap: 14px; width: 100%; cursor: pointer; padding: 14px 18px; border-radius: 999px; }
@@ -3497,31 +3515,16 @@
   <div class="menu-page">
     <div class="menu-scroll">
       <div class="home">
-        <header class="home-head home-head2">
-          <p class="home-kicker"><span>Our little world</span><time id="homeClock"></time></p>
-          <h1 class="home-greet" id="homeGreet">Hi, baby <span class="heart">♡</span></h1>
-          <p class="home-pair"><span id="homeNameAi">Orion</span> <i>&amp;</i> <span id="homeNameMe">Astraea</span></p>
+        <header class="home-head">
+          <h1 class="menu-title">Aether</h1>
+          <div class="menu-private">PRIVATE<br>SPACE</div>
         </header>
 
-        <!-- 天数:一张带照片的大卡,两个人的头像夹着天数 -->
-        <section class="home-card days-card home-hero" aria-label="在一起的天数">
-          <div class="days-photo">
-            <span class="days-eyebrow">Our days</span>
-            <div class="days-mid">
-              <span class="days-av days-av-me" aria-hidden="true"></span>
-              <div class="menu-days"><span class="num" id="menuDays">113</span></div>
-              <span class="days-av days-av-him" aria-hidden="true"></span>
-            </div>
-            <p class="days-sub"><span>♡</span> days together <span>♡</span></p>
-          </div>
-          <div class="days-foot">
-            <p class="menu-since">since 2026/01/01</p>
-            <div class="days-acts">
-              <button type="button" class="days-act" id="daysChatBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5z"/></svg>Chat</button>
-              <button type="button" class="days-act" id="pokeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V10a1.5 1.5 0 0 1 3 0v2M14 11.5a1.5 1.5 0 0 1 3 0V13M17 12.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/></svg>戳他</button>
-            </div>
-          </div>
-          <p class="days-reply" id="pokeReply"></p>
+        <section class="home-card home-hero card-bare" aria-label="在一起的天数">
+          <p class="home-names"><span id="homeNameAi">Orion</span> &amp; <span id="homeNameMe">Astraea</span></p>
+          <p class="home-eyebrow">Already together</p>
+          <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
+          <p class="menu-since">since 2026/01/01</p>
         </section>
 
         <div class="home-row">
@@ -3529,7 +3532,10 @@
           <section class="home-card hnote-card" aria-label="他的小纸条">
             <p class="home-label"><span id="homeStatusName">Orion's note</span></p>
             <p class="note-text" id="homeThought"></p>
-            <p class="note-meta"><span class="status-dot" id="homeStatusDot"></span><span id="homeStatusLine">在房间里</span></p>
+            <p class="note-reply" id="pokeReply"></p>
+            <p class="note-meta"><span class="status-dot" id="homeStatusDot"></span><span id="homeStatusLine">在房间里</span>
+              <button type="button" class="note-poke" id="pokeBtn" aria-label="戳他一下"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V10a1.5 1.5 0 0 1 3 0v2M14 11.5a1.5 1.5 0 0 1 3 0V13M17 12.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/></svg>戳他</button>
+            </p>
           </section>
           <!-- 今天 + 顺德的天气 -->
           <section class="home-card wx-card" aria-label="今天">
@@ -4315,8 +4321,7 @@ async function loadWeather(){
   }catch(_){ }
   finally{ wxLoading = false; }
 }
-const daysChatBtn = $("#daysChatBtn"), msgStripBtn = $("#msgStrip");
-if (daysChatBtn) daysChatBtn.addEventListener("click", () => setTab("chat"));
+const msgStripBtn = $("#msgStrip");
 if (msgStripBtn) msgStripBtn.addEventListener("click", () => setTab("chat"));
 /* 从门厅发一句(心情 / 戳一戳):不打断你在输入框里没写完的话,等他真的回了,把回复显示在卡片上 */
 function sendFromHome(text, out){
