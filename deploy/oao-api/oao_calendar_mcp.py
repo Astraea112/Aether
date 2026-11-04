@@ -122,6 +122,7 @@ def calendar_place(date: str, title: str, kind: str = "once") -> str:
             "created": int(time.time() * 1000)}
     items.append(item)
     _save_orion(v)
+    _trace(f"在日历上放了 ◆{title}")
     return f"放好了：{d.isoformat()} ◆{title}（{KINDS[kind]}，id {item['id']}）"
 
 
@@ -148,6 +149,22 @@ def _write_his(name, data):
     os.replace(tmp, p)
 
 
+def _trace(text):
+    """留一条痕迹,网页房间页「Traces」会显示(kv: orion_traces,最近 60 条)。"""
+    try:
+        try:
+            d = json.loads((KV / "orion_traces.json").read_text(encoding="utf-8"))
+            items = d.get("v") if isinstance(d, dict) else []
+            items = items if isinstance(items, list) else []
+        except (OSError, ValueError):
+            items = []
+        now = int(time.time() * 1000)
+        items.append({"ts": now, "text": " ".join(str(text).split())[:60]})
+        _write_his("orion_traces", {"updated": now, "v": items[-60:]})
+    except Exception:
+        pass
+
+
 def _now_iso():
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
@@ -162,6 +179,7 @@ def note_leave(text: str) -> str:
     if not text:
         return "text 不能是空的"
     _write_his("orion_note", {"text": text, "ts": _now_iso(), "updated": int(time.time() * 1000)})
+    _trace("给你写了一张小纸条")
     return f"纸条留好了：{text}"
 
 
@@ -175,6 +193,7 @@ def mood_set(word: str, note: str = "") -> str:
         return "word 不能是空的"
     note = " ".join((note or "").split())[:30]
     _write_his("orion_mood", {"text": word, "note": note, "ts": _now_iso(), "updated": int(time.time() * 1000)})
+    _trace(f"把心情换成了「{word}」")
     return f"心情换好了：{word}" + (f" · {note}" if note else "")
 
 
@@ -194,6 +213,7 @@ def murmur_post(text: str) -> str:
     now = int(time.time() * 1000)
     items.append({"id": "o" + uuid.uuid4().hex[:8], "text": text, "ts": now, "by": "him"})
     _write_his("murmurs_orion", {"updated": now, "v": items[-30:]})
+    _trace("在留言墙上贴了一句")
     return f"贴上墙了：{text}"
 
 
@@ -214,11 +234,12 @@ def _save_todos(items):
 
 @mcp.tool()
 def todo_list() -> str:
-    """See your own to-do list (shown on her room page as "To-do · 他的待办")."""
+    """See the to-do list on her room page ("To-do"). It's shared: she can add, tick, edit and
+    delete items too; ones she wrote are marked （她写的）."""
     items = _todos()
     if not items:
         return "待办是空的。"
-    return "\n".join(f"{'☑' if t.get('done') else '☐'} [{t.get('when', 'now')}] {t.get('text', '')}"
+    return "\n".join(f"{'☑' if t.get('done') else '☐'} [{t.get('when', 'now')}] {t.get('text', '')}{'（她写的）' if t.get('by') == 'her' else ''}"
                      f"{' ' + t['time'] if t.get('time') else ''}（id {t.get('id')}）" for t in items)
 
 
@@ -237,6 +258,7 @@ def todo_add(text: str, when: str = "now", time_label: str = "") -> str:
             "time": (time_label or "").strip()[:8], "ts": int(time.time() * 1000)}
     items.append(item)
     _save_todos(items)
+    _trace(f"记下一件待办：{text}")
     return f"记下了：☐ {text}（id {item['id']}）"
 
 
@@ -249,6 +271,7 @@ def todo_done(id: str) -> str:
             t["done"] = True
             t["doneAt"] = int(time.time() * 1000)
             _save_todos(items)
+            _trace(f"勾掉了：{t.get('text', '')}")
             return f"做完了：☑ {t.get('text', '')}"
     return f"没找到 id {id}"
 
@@ -342,7 +365,10 @@ def letters_read(limit: int = 3) -> str:
         out.append(f"{head}\n{m.get('text', '').strip()}")
         opened.append(m.get("id"))
     if opened:
+        new = [i for i in opened if i not in _seen()]
         _mark_seen(opened)
+        if new:
+            _trace(f"拆了你的 {len(new)} 封信")
     return "\n\n".join(out)
 
 
@@ -373,6 +399,7 @@ def letter_write(text: str, open_at: str = "", title: str = "") -> str:
             return "open_at 要写成 YYYY-MM-DD HH:MM（北京时间）"
     items.append(item)
     _write_his("letters_orion", {"updated": now, "v": items[-100:]})
+    _trace("给你寄了一封信")
     return f"信寄出去了（{len(text)} 字）{note}，她的信箱会举起小旗子。"
 
 

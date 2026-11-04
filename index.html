@@ -3761,6 +3761,16 @@
 
   /* 一行一个气泡:中间那几个不带时间,挨得近一点 */
   .bubble.no-meta{ padding-bottom: var(--bubble-pad-y, 8px); }
+
+  /* 待办:她也能改 */
+  .todo-tabs .todo-add{ margin-left: auto; width: 34px; height: 34px; border: 0; border-radius: 50%; padding: 0; cursor: pointer; font-family: inherit; font-size: 20px; line-height: 34px; text-align: center;
+    color: var(--text); background: rgba(255,255,255,.1); }
+  .todo-list li button{ border: 0; padding: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; }
+  .todo-list .todo-box{ flex: none; }
+  .todo-list .todo-t{ flex: 1; min-width: 0; color: var(--text-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .todo-list li.done .todo-t{ color: var(--text-faint); text-decoration: line-through; }
+  .todo-list li.hers .todo-t::after{ content: " · 你写的"; font-size: var(--fs-xs); color: var(--text-faint); text-decoration: none; }
+  .todo-x{ flex: none; width: 22px; height: 22px; font-size: 16px !important; line-height: 22px; text-align: center !important; color: var(--text-faint) !important; opacity: .7; }
 </style>
 </head>
 <body>
@@ -4168,6 +4178,7 @@
             <button type="button" role="tab" data-when="now" aria-selected="true">now</button>
             <button type="button" role="tab" data-when="later" aria-selected="false">later</button>
             <button type="button" role="tab" data-when="done" aria-selected="false">done</button>
+            <button type="button" class="todo-add" id="todoAdd" aria-label="加一件">+</button>
           </div>
           <ul class="todo-list" id="todoList"></ul>
           <div class="todo-pager">
@@ -5123,6 +5134,19 @@ const LETTERS_READ_KEY = "companion_letters_read";
 const WALL_KEY = "companion_wall_notes";
 /* 他的待办:{updated, v:{items:[{id, text, done, ts, doneAt}]}},没做完的在上面,做完的留最近 3 条 */
 let todoRemote = null, todoFetched = 0;
+/* 痕迹:聊天里的工具记录 + 他在服务器上用工具时留的(kv: orion_traces) */
+let tracesRemote = null, tracesFetched = 0;
+function fetchTraces(){
+  if (typeof USE_MOCK !== "undefined" && USE_MOCK && !tracesRemote){
+    tracesRemote = [{ ts: Date.now() - 20 * 60e3, text: "给你写了一张小纸条" }, { ts: Date.now() - 50 * 60e3, text: "记下一件待办：查一下 12 月 20 号去香港的跨境车" }, { ts: Date.now() - 3 * 3600e3, text: "把心情换成了「想你」" }];
+  }
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - tracesFetched < 60e3) return;
+  tracesFetched = Date.now();
+  fetch(`${API_BASE}/app/kv/orion_traces`, { headers: authHeaders(), cache: "no-store" })
+    .then((r) => r.ok ? r.json() : null)
+    .then((d) => { if (d && Array.isArray(d.v)){ tracesRemote = d.v; if (currentTab === "room") refreshRoom(); } })
+    .catch(() => {});
+}
 function fetchTodos(){
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - todoFetched < 60e3) return;
   todoFetched = Date.now();
@@ -5154,8 +5178,13 @@ function renderTodos(){
   const pages = Math.max(1, Math.ceil(pick.length / TODO_PER_PAGE));
   todoPageN = Math.min(todoPageN, pages - 1);
   const shown = pick.slice(todoPageN * TODO_PER_PAGE, (todoPageN + 1) * TODO_PER_PAGE);
+  todoShown = items;
   ul.innerHTML = shown.length
-    ? shown.map((t) => `<li class="${t.done ? "done" : ""}"><span class="todo-box" aria-hidden="true"></span><span class="todo-t">${escapeHtml(t.text || "")}</span><time>${escapeHtml(t.time || "")}</time></li>`).join("")
+    ? shown.map((t) => `<li class="${t.done ? "done" : ""}${t.by === "her" ? " hers" : ""}" data-id="${escapeHtml(String(t.id))}">`
+        + `<button type="button" class="todo-box" data-act="tick" aria-label="${t.done ? "取消勾选" : "勾掉"}"></button>`
+        + `<button type="button" class="todo-t" data-act="edit">${escapeHtml(t.text || "")}</button>`
+        + `<time>${escapeHtml(t.time || "")}</time>`
+        + `<button type="button" class="todo-x" data-act="del" aria-label="删掉">×</button></li>`).join("")
     : `<li class="todo-empty">${todoTab === "done" ? "还没有勾掉的" : todoTab === "later" ? "以后的事还没写" : "现在没有要做的"}</li>`;
   const pg = $("#todoPage"); if (pg) pg.textContent = `${todoPageN + 1} / ${pages}`;
   const pv = $("#todoPrev"), nx = $("#todoNext");
@@ -5164,7 +5193,43 @@ function renderTodos(){
   const tabs = $("#todoTabs");
   if (tabs) tabs.querySelectorAll("button[data-when]").forEach((b) => b.setAttribute("aria-selected", b.dataset.when === todoTab ? "true" : "false"));
 }
+/* 她也能改待办:勾 / 改字 / 删 / 加 */
+let todoShown = [];
+function saveTodos(items){
+  todoRemote = items;
+  renderTodos();
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return;
+  fetch(`${API_BASE}/app/kv/orion_todo`, {
+    method: "PUT", headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ updated: Date.now(), v: { items } })
+  }).then(() => { todoFetched = Date.now(); }).catch(() => showToast("待办没存上，等会儿再试"));
+}
 document.addEventListener("click", (e) => {
+  const act = e.target.closest("#todoList [data-act]");
+  if (act){
+    const id = act.closest("li").dataset.id, items = todoShown.map((t) => ({ ...t })), t = items.find((x) => String(x.id) === id);
+    if (!t) return;
+    if (act.dataset.act === "tick"){ t.done = !t.done; if (t.done) t.doneAt = Date.now(); else delete t.doneAt; }
+    else if (act.dataset.act === "edit"){
+      const v = prompt("改一下这件事", t.text || "");
+      if (v == null || !v.trim()) return;
+      t.text = v.trim().slice(0, 80);
+    }
+    else if (act.dataset.act === "del"){
+      if (!confirm(`删掉「${t.text}」？`)) return;
+      return saveTodos(items.filter((x) => x !== t));
+    }
+    return saveTodos(items);
+  }
+  if (e.target.closest("#todoAdd")){
+    const v = prompt(todoTab === "later" ? "以后要做的事" : "现在要做的事");
+    if (!v || !v.trim()) return;
+    const items = todoShown.map((t) => ({ ...t }));
+    items.unshift({ id: "h" + Date.now().toString(36), text: v.trim().slice(0, 80), done: false, when: todoTab === "later" ? "later" : "now", by: "her", ts: Date.now() });
+    if (todoTab === "done") todoTab = "now";
+    todoPageN = 0;
+    return saveTodos(items);
+  }
   const tb = e.target.closest("#todoTabs button[data-when]");
   if (tb){ todoTab = tb.dataset.when; todoPageN = 0; renderTodos(); return; }
   if (e.target.closest("#todoPrev")){ todoPageN = Math.max(0, todoPageN - 1); renderTodos(); return; }
@@ -5191,9 +5256,11 @@ function refreshRoom(){
   const traceList = $("#traceList");
   if (traceList){
     let acts = [];
-    try{ acts = chatMessages.filter((m) => m.kind === "act").slice(-8).reverse(); }catch(e){}
-    traceList.innerHTML = acts.length
-      ? acts.map((m) => `<li><span>${escapeHtml(aiName() + (m.text || "做了点什么"))}</span><span class="trace-when">${escapeHtml(fmtWhen(m.ts))}</span></li>`).join("")
+    try{ acts = chatMessages.filter((m) => m.kind === "act").slice(-12).map((m) => ({ ts: tsMs(m), text: m.text || "做了点什么" })); }catch(e){}
+    fetchTraces();
+    const all = acts.concat(tracesRemote || []).filter((x) => x && x.text).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 8);
+    traceList.innerHTML = all.length
+      ? all.map((x) => `<li><span>${escapeHtml(aiName() + x.text)}</span><span class="trace-when">${escapeHtml(fmtWhen(x.ts))}</span></li>`).join("")
       : `<li class="home-empty" style="border:0">他还没在这里留下痕迹</li>`;
   }
 
