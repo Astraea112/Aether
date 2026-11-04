@@ -44,9 +44,9 @@ TMUX_SESSION = "orion"
 HOST, PORT = "127.0.0.1", int(os.environ.get("OAO_API_PORT", "3013"))
 
 KV_NAMES = {"calendar", "events", "calendar_orion", "mood_set", "murmurs",
-            "orion_mood", "orion_note", "murmurs_orion"}
+            "orion_mood", "orion_note", "murmurs_orion", "orion_todo"}
 # his shelves: only his MCP tools write these, the website only reads them
-HIS_KV = {"calendar_orion", "orion_mood", "orion_note", "murmurs_orion"}
+HIS_KV = {"calendar_orion", "orion_mood", "orion_note", "murmurs_orion", "orion_todo"}
 KV_MAX = 512 * 1024
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 USAGE_TTL = 120

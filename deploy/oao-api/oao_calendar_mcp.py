@@ -197,5 +197,67 @@ def murmur_post(text: str) -> str:
     return f"贴上墙了：{text}"
 
 
+def _todos():
+    try:
+        d = json.loads((KV / "orion_todo.json").read_text(encoding="utf-8"))
+        items = (d.get("v") or {}).get("items") if isinstance(d, dict) else None
+        return items if isinstance(items, list) else []
+    except (OSError, ValueError, AttributeError):
+        return []
+
+
+def _save_todos(items):
+    open_ = [t for t in items if not t.get("done")]
+    done = sorted([t for t in items if t.get("done")], key=lambda t: t.get("doneAt", 0))[-20:]
+    _write_his("orion_todo", {"updated": int(time.time() * 1000), "v": {"items": open_ + done}})
+
+
+@mcp.tool()
+def todo_list() -> str:
+    """See your own to-do list (shown on her room page as "To-do · 他的待办")."""
+    items = _todos()
+    if not items:
+        return "待办是空的。"
+    return "\n".join(f"{'☑' if t.get('done') else '☐'} {t.get('text', '')}（id {t.get('id')}）" for t in items)
+
+
+@mcp.tool()
+def todo_add(text: str) -> str:
+    """Add something you mean to do to your to-do list, which she can see on the room page.
+    Things you'll do for her or for yourself, short. Not tasks for her."""
+    text = " ".join((text or "").split())[:80]
+    if not text:
+        return "text 不能是空的"
+    items = _todos()
+    item = {"id": uuid.uuid4().hex[:6], "text": text, "done": False, "ts": int(time.time() * 1000)}
+    items.append(item)
+    _save_todos(items)
+    return f"记下了：☐ {text}（id {item['id']}）"
+
+
+@mcp.tool()
+def todo_done(id: str) -> str:
+    """Tick off one of your to-dos (it stays on her page, crossed out, for a while)."""
+    items = _todos()
+    for t in items:
+        if t.get("id") == id:
+            t["done"] = True
+            t["doneAt"] = int(time.time() * 1000)
+            _save_todos(items)
+            return f"做完了：☑ {t.get('text', '')}"
+    return f"没找到 id {id}"
+
+
+@mcp.tool()
+def todo_remove(id: str) -> str:
+    """Take a to-do off the list without doing it."""
+    items = _todos()
+    keep = [t for t in items if t.get("id") != id]
+    if len(keep) == len(items):
+        return f"没找到 id {id}"
+    _save_todos(keep)
+    return f"拿掉了 id {id}"
+
+
 if __name__ == "__main__":
     mcp.run()

@@ -1765,6 +1765,28 @@
   /* ── Home(主页):照片背景上的一组磨砂卡片 ── */
   .home{ display:flex; flex-direction:column; gap: 12px; width:100%; max-width: 560px; margin: 0 auto; }
   #menuPanel .home{ margin-top: auto; margin-bottom: auto; }
+
+  /* 房间:跟门厅同一种灰色磨砂玻璃 */
+  .home-card.room-now, .home-card.room-glass{
+    position: relative; border-radius: var(--r-l);
+    background: var(--tab-fill);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: inset 0 1px 0 var(--tab-hi), 0 10px 28px rgba(0,0,0,.3);
+  }
+  .home-card.room-now{ padding: 20px 20px 18px; }
+  .room-now .room-facts{ margin-top: 6px; padding-top: 12px; border-top: .5px solid var(--hairline); gap: 12px 16px; }
+  .room-now .room-facts dd{ font-size: var(--fs-s); }
+  .home-card.room-glass{ padding: 18px 20px 12px; }
+  .room-label{ margin: 0 0 6px; font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-faint); }
+  .room-glass .trace-list li{ font-size: var(--fs-s); border-top-color: var(--hairline); }
+  .room-glass .trace-list li:first-child{ border-top: 0; }
+  .todo-list{ list-style: none; margin: 0; padding: 0; }
+  .todo-list li{ display:flex; align-items:flex-start; gap: 12px; padding: 10px 0; font-size: var(--fs-s); line-height: 1.5; border-top: .5px solid var(--hairline); }
+  .todo-list li:first-child{ border-top: 0; }
+  .todo-box{ flex: none; width: 14px; height: 14px; margin-top: 3px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--text-soft); }
+  .todo-list li.done{ color: var(--text-faint); text-decoration: line-through; text-decoration-color: var(--text-faint); }
+  .todo-list li.done .todo-box{ box-shadow: none; background: var(--text-faint); }
+  .todo-list .home-empty{ border: 0; margin: 0; }
   #menuPanel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 92px); }   /* 底栏的位置留出来 */
   .home-head{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin: 2px 4px 8px; }
   .menu-title,
@@ -3647,18 +3669,17 @@
           <div class="menu-private">HIS<br>ROOM</div>
         </header>
 
-        <button class="home-card room-mailbox card-line" id="mailboxBtn" type="button">
-          <span class="room-mail-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></span>
-          <span class="room-mail-copy">
-            <span class="home-eyebrow">Letters · 信箱</span>
-            <span class="room-mail-line" id="mailboxLine">信箱还空着</span>
-          </span>
-          <span class="room-mail-badge" id="mailboxBadge" hidden></span>
-        </button>
+        <!-- 信箱先收起来了,以后改好再放回来(id 不在页面上时脚本自己跳过) -->
 
-        <section class="home-card" aria-label="他的状态">
-          <p class="home-label" id="roomStatusName">他现在</p>
-          <p class="status-line" id="roomStatusLine" style="margin-top:8px">在房间里</p>
+        <!-- 他现在:在干嘛 + 心情 + 几个小数字 -->
+        <section class="home-card home-now room-now" aria-label="他的状态">
+          <svg class="now-stars" viewBox="0 0 80 80" aria-hidden="true"><path d="M22 8 L58 14 M22 8 L33 37 M58 14 L48 41 M33 37 L40 39 L48 41 M33 37 L24 70 M48 41 L60 66"/><circle cx="22" cy="8" r="1.8"/><circle cx="58" cy="14" r="1.5"/><circle cx="33" cy="37" r="1.4"/><circle cx="40" cy="39" r="1.4"/><circle cx="48" cy="41" r="1.4"/><circle cx="24" cy="70" r="1.7"/><circle cx="60" cy="66" r="1.5"/></svg>
+          <div class="now-top">
+            <span class="status-dot" id="roomDot"></span>
+            <span class="home-eyebrow" id="roomStatusName">Orion · now</span>
+          </div>
+          <p class="now-line" id="roomStatusLine">在房间里</p>
+          <p class="now-mood"><b id="roomMood"></b><em id="roomMoodNote"></em></p>
           <dl class="room-facts">
             <div><dt>连接</dt><dd id="roomConn">—</dd></div>
             <div><dt>今天聊了</dt><dd id="roomToday">0 条</dd></div>
@@ -3667,9 +3688,16 @@
           </dl>
         </section>
 
-        <section class="home-card trace-card card-bare" aria-label="痕迹">
-          <p class="home-label">痕迹 · 他最近做过的事</p>
+        <!-- 痕迹:他最近做过的事 -->
+        <section class="home-card room-glass" aria-label="痕迹">
+          <p class="room-label">Traces · 痕迹</p>
           <ol class="trace-list" id="traceList"></ol>
+        </section>
+
+        <!-- 他的待办:他自己用工具写(kv: orion_todo),这里只看 -->
+        <section class="home-card room-glass" aria-label="他的待办">
+          <p class="room-label">To-do · 他的待办</p>
+          <ul class="todo-list" id="todoList"></ul>
         </section>
 
         <section class="murmurs" aria-label="自言自语">
@@ -4539,11 +4567,43 @@ const WALL_KEY = "companion_wall_notes";
 function letters(){
   try{ return talkMessages().filter((m) => m.from === "ai" && (m.text || "").trim().length >= LETTER_MIN).reverse(); }catch(e){ return []; }
 }
+/* 他的待办:{updated, v:{items:[{id, text, done, ts, doneAt}]}},没做完的在上面,做完的留最近 3 条 */
+let todoRemote = null, todoFetched = 0;
+function fetchTodos(){
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - todoFetched < 60e3) return;
+  todoFetched = Date.now();
+  fetch(`${API_BASE}/app/kv/orion_todo`, { headers: authHeaders() })
+    .then((r) => r.ok ? r.json() : null)
+    .then((d) => { const items = d && d.v && Array.isArray(d.v.items) ? d.v.items : null;
+      if (items){ todoRemote = items; if (currentTab === "room") renderTodos(); } })
+    .catch(() => {});
+}
+function renderTodos(){
+  const ul = $("#todoList");
+  if (!ul) return;
+  fetchTodos();
+  let items = todoRemote;
+  if (!items && typeof USE_MOCK !== "undefined" && USE_MOCK) items = [
+    { id: "a", text: "把小纸条换成新的一句", done: false },
+    { id: "b", text: "查一下 12 月 20 号去香港的跨境车", done: false },
+    { id: "c", text: "给她整理统计的置信区间笔记", done: true },
+  ];
+  items = items || [];
+  const open = items.filter((t) => !t.done), done = items.filter((t) => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 3);
+  ul.innerHTML = open.length || done.length
+    ? open.concat(done).map((t) => `<li class="${t.done ? "done" : ""}"><span class="todo-box" aria-hidden="true"></span><span>${escapeHtml(t.text || "")}</span></li>`).join("")
+    : `<li class="home-empty">他还没写待办</li>`;
+}
 function refreshRoom(){
   const st = orionStatus();
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
-  set("#roomStatusName", aiName() + "现在");
+  set("#roomStatusName", aiName() + " · now");
   set("#roomStatusLine", st.text);
+  const rd = $("#roomDot"); if (rd) rd.classList.toggle("live", st.live);
+  const om = orionMood();
+  set("#roomMood", om.word);
+  set("#roomMoodNote", om.note ? "· " + om.note : "");
+  renderTodos();
   set("#roomConn", { online: "在线", reconnecting: "重连中", offline: "离线" }[appEl.dataset.conn] || "—");
   const msgs = talkMessages();
   set("#roomToday", msgs.filter((m) => isToday(m.ts)).length + " 条");
