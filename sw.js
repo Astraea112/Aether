@@ -2,11 +2,11 @@
    IMPORTANT: bump CACHE on every front-end change, or installed clients keep the
    old shell (the precached index.html won't refresh until the SW reinstalls). */
 const AI_NAME = "Orion";           // push-title fallback; keep in sync with index.html CONFIG.AI_NAME
-const CACHE = "companion-v12-orion-skin";
+const CACHE = "companion-v13-instant-open";
 const PRECACHE = [
   "./index.html",
   "./chat-light.webp", "./chat-lily.webp",
-  "./menu-light.webp", "./menu-flower.webp",
+  "./menu-light.webp", "./menu-flower.webp", "./menu-harbor.webp", "./chat-harbor.webp",
   "./ribbon-drift.svg", "./ribbon-bow.svg", "./ribbon-line.svg",
   "./avatar-sea.png", "./avatar-lily.webp",
 ];
@@ -30,8 +30,14 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (url.pathname.startsWith("/relay/")) return;          // never intercept the API / SSE
   if (e.request.mode === "navigate") {
-    // network-first for the page → an online reload always gets the latest index.html
-    e.respondWith(fetch(e.request, { cache: "reload" }).catch(() => caches.match("./index.html")));
+    // stale-while-revalidate for the page: open instantly from cache, fetch the
+    // latest index.html in the background (it shows up on the next open).
+    const fresh = fetch(e.request, { cache: "no-cache" }).then((res) => {
+      if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put("./index.html", copy)); }
+      return res;
+    });
+    e.respondWith(caches.match("./index.html").then((hit) => hit || fresh).catch(() => fresh));
+    e.waitUntil(fresh.catch(() => {}));
     return;
   }
   if (e.request.method === "GET" && url.origin === location.origin) {
