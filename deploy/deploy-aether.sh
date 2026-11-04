@@ -160,16 +160,17 @@ NGINX
 sudo sed -i "s/__DOMAIN__/$DOMAIN/; s/__WWW__/$WWW/" /etc/nginx/sites-available/aether
 sudo ln -sf /etc/nginx/sites-available/aether /etc/nginx/sites-enabled/aether
 # 压缩文本类资源（index.html 有 360KB，压完只剩几十 KB）；放 conf.d 里，不碰站点配置和证书
-sudo tee /etc/nginx/conf.d/aether-gzip.conf >/dev/null <<'GZ'
-gzip on;
+# Ubuntu 自带的 nginx.conf 已经有 "gzip on;"，再写一次会报 duplicate，所以只在它没有时才加
+GZ_ON="gzip on;"
+grep -Eq '^[[:space:]]*gzip[[:space:]]+on;' /etc/nginx/nginx.conf && GZ_ON=""
+sudo tee /etc/nginx/conf.d/aether-gzip.conf >/dev/null <<GZ
+$GZ_ON
 gzip_comp_level 6;
 gzip_min_length 1024;
 gzip_vary on;
 gzip_proxied any;
 gzip_types text/css application/javascript text/javascript application/json application/manifest+json image/svg+xml;
 GZ
-# Ubuntu 默认 nginx.conf 自带 gzip on; 重复的话去掉我们这行
-if sudo nginx -t 2>&1 | grep -q 'duplicate'; then sudo sed -i '/^gzip on;/d' /etc/nginx/conf.d/aether-gzip.conf; fi
 sudo nginx -t
 sudo systemctl reload nginx
 # 证书:certbot 会把上面这个站点改成 443 + 自动把 80 跳到 https
