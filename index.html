@@ -2983,26 +2983,27 @@
   .card-planner .cal-head{ margin-bottom: 14px; padding: 0 6px; }
   .card-planner .cal-m-en{ font-size: 26px; font-style: italic; letter-spacing: .01em; }
   .card-planner .cal-head > button{ width: 30px; height: 30px; border: 0; background: transparent; font-size: 20px; color: var(--plan-soft); }
-  .card-planner .cal-week span{ font-size: 10px; letter-spacing: .16em; padding-bottom: 6px; opacity: .8; }
-  .card-planner .cal-grid{ gap: 2px 0; }
+  .card-planner .cal-week span{ font-family: var(--font-cn); font-size: 11px; letter-spacing: 0; padding-bottom: 8px; opacity: .75; }
+  .card-planner .cal-grid{ gap: 3px; }
+  /* 每天一个若有若无的小格子:很淡的磨砂,不描边 */
   .card-planner .cal-cell{
-    height: 54px; padding: 8px 0 0; border: 0; border-radius: 16px; background: transparent;
-    gap: 5px; transition: background-color .18s ease, box-shadow .18s ease;
+    height: 58px; padding: 9px 0 0; border: 0; border-radius: 14px; background: rgba(255,255,255,.035);
+    gap: 6px; transition: background-color .18s ease, box-shadow .18s ease;
   }
   .card-planner .cal-cell .n{ font-size: 16px; font-family: var(--font-en); font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; line-height: 1; }
-  .card-planner .cal-cell.other{ background: transparent; }
+  .card-planner .cal-cell.other{ background: transparent; box-shadow: none; }
   .card-planner .cal-cell.other .n{ opacity: .28; }
   .card-planner .cal-cell.today .n{ font-weight: 600; text-decoration: underline; text-decoration-thickness: .5px; text-underline-offset: 4px; }
-  .card-planner .cal-cell.sel{ border: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); background: rgba(255,255,255,.06); }
+  .card-planner .cal-cell.sel{ border: 0; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.72); background: rgba(255,255,255,.07); }
   .card-planner .cal-cell.period{ border: 0; background: rgba(217,179,186,.15); }
-  .card-planner .cal-cell.period.sel{ box-shadow: inset 0 0 0 1px rgba(232,200,206,.85); }
+  .card-planner .cal-cell.period.sel{ box-shadow: inset 0 0 0 1.5px rgba(232,200,206,.85); }
   .card-planner .cal-cell.predict{ border: 0; box-shadow: inset 0 0 0 1px rgba(217,179,186,.35); background: transparent; }
-  .card-planner .cal-cell.predict.sel{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
+  .card-planner .cal-cell.predict.sel{ box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.72); }
   .card-planner .cal-cell:active{ background: rgba(255,255,255,.08); }
-  .card-planner .cal-marks{ height: 7px; gap: 3px; margin-top: 0; }
-  .card-planner .cal-marks .mk{ width: 6px; height: 6px; }
-  .card-planner .cal-legend{ gap: 6px 13px; margin-top: 12px; padding-top: 12px; border-top: .5px solid rgba(255,255,255,.1); font-size: 11px; }
-  .card-planner .cal-legend .mk{ width: 8px; height: 8px; }
+  .card-planner .cal-marks{ height: 9px; gap: 3px; margin-top: 0; }
+  .card-planner .cal-marks .mk{ width: 9px; height: 9px; }
+  .card-planner .cal-legend{ gap: 6px 14px; margin-top: 12px; padding-top: 12px; border-top: 0; font-size: 11.5px; justify-content: flex-start; padding-left: 6px; }
+  .card-planner .cal-legend .mk{ width: 11px; height: 11px; margin-right: 5px; }
   .card-planner .cal-legend2{ justify-content: space-between; }
 
   /* 这一天:标题大一点,加东西的按钮轻一点,操作字小而淡 */
@@ -3468,7 +3469,7 @@
               <div class="cal-month"><span class="cal-m-num" id="calMonthNum">11</span><span class="cal-m-stack"><span class="cal-m-en" id="calMonth">November</span><span class="cal-y" id="calYear">2026</span><span class="cal-cn" id="calMonthCn">十一月</span></span></div>
               <button type="button" id="calNext" aria-label="下个月">›</button>
             </div>
-            <div class="cal-week"><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span></div>
+            <div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
             <div class="cal-grid" id="calGrid"></div>
             <div class="cal-legend" id="calLegend"></div>
             <div class="cal-legend cal-legend2"><span class="cal-moonnow" id="calMoonNow"></span><span class="cal-next" id="calNextHint"></span></div>
