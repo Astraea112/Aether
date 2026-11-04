@@ -3081,6 +3081,83 @@
   .home-poke:active .poke-arrow{ transform: translateX(3px); }
   .home-row .home-poke-reply{ margin-top: auto; color: var(--text-soft); }
 
+  /* ═══ 新门厅 ═══ */
+  .home-head2{ display:block; margin: 6px 6px 10px; }
+  .home-kicker{ display:flex; align-items:baseline; gap: 12px; margin: 0;
+    font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-soft); }
+  .home-kicker time{ font-size: var(--fs-s); letter-spacing: .06em; color: var(--text); font-variant-numeric: lining-nums; }
+  .home-greet{ margin: 14px 0 4px; font-family: var(--font-en), var(--font-cn); font-style: italic; font-weight: 400;
+    font-size: var(--fs-xl); line-height: 1.1; letter-spacing: .005em; color: var(--text); }
+  .home-greet .heart{ font-style: normal; font-size: .8em; opacity: .8; margin-left: 4px; }
+  .home-pair{ margin: 0; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-l); color: var(--text-soft); letter-spacing: .02em; }
+  .home-pair i{ font-size: .85em; margin: 0 2px; }
+
+  /* 天数大卡:外面一圈玻璃,里面一张压暗的照片;两个人的头像夹着天数 */
+  .home-card.days-card{ display:block; padding: 8px; text-align: left; }
+  .days-photo{
+    position: relative; overflow: hidden; border-radius: calc(var(--r-l) - 6px);
+    padding: 16px 16px 14px; min-height: 196px; display:flex; flex-direction:column;
+    background-image: linear-gradient(180deg, rgba(10,10,12,.30), rgba(10,10,12,.50)), var(--wall-default);
+    background-size: cover, cover; background-position: center, 40% 45%;
+  }
+  .days-eyebrow{ font-family: var(--font-en); font-size: var(--fs-xs); letter-spacing: .26em; text-transform: uppercase; color: rgba(242,242,240,.8); }
+  .days-mid{ flex: 1; display:flex; align-items:center; justify-content:space-around; gap: 8px; margin: 6px 0 2px; }
+  .days-av{
+    flex: none; width: 60px; height: 60px; border-radius: 50%;
+    background-size: cover; background-position: center;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.55), 0 4px 14px rgba(0,0,0,.35);
+  }
+  .days-av-me{ background-image: var(--my-avatar); }
+  .days-av-him{ background-image: var(--avatar-default); }
+  [data-theme="harbor"] .days-av{ filter: grayscale(1); }
+  .days-card .menu-days{ margin: 0; }
+  .days-card .menu-days .num{ font-size: clamp(64px, 19vw, 84px); color: #F4F4F2; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+  .days-sub{ margin: 0; text-align: center; font-family: var(--font-en); font-size: var(--fs-xs); letter-spacing: .26em; text-transform: uppercase; color: rgba(242,242,240,.78); }
+  .days-sub span{ letter-spacing: 0; margin: 0 6px; opacity: .7; }
+  .days-foot{ display:flex; align-items:center; justify-content:space-between; gap: 10px; padding: 12px 10px 4px; }
+  .days-foot .menu-since{ margin: 0; font-family: var(--font-en); font-style: normal; font-size: var(--fs-s); letter-spacing: .08em; color: var(--text-soft); }
+  .days-acts{ display:flex; gap: 18px; }
+  .days-act{ display:inline-flex; align-items:center; gap: 6px; border: 0; padding: 4px 2px; background: transparent; cursor: pointer;
+    font-family: var(--font-en), var(--font-cn); font-size: var(--fs-m); color: var(--text); -webkit-tap-highlight-color: transparent; }
+  .days-act svg{ width: 18px; height: 18px; opacity: .85; }
+  .days-act:active{ opacity: .6; }
+  .days-act.poked svg{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
+  .days-reply{ margin: 0; padding: 0 10px 6px; font-size: var(--fs-s); line-height: 1.5; color: var(--text-soft); }
+  .days-reply:empty{ display:none; }
+
+  /* 他的小纸条:微微歪一点,像随手塞给你的 */
+  .home-card.hnote-card{ transform: rotate(-1.2deg); display:flex; flex-direction:column; gap: 8px; }
+  .note-text{ margin: 0; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-m); line-height: 1.65; color: var(--text);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .note-meta{ margin: auto 0 0; display:flex; align-items:center; gap: 8px; font-size: var(--fs-xs); color: var(--text-faint); letter-spacing: .04em; }
+  .note-meta .status-dot{ width: 6px; height: 6px; }
+
+  /* 今天 + 天气 */
+  .home-card.wx-card{ display:flex; flex-direction:column; justify-content:space-between; gap: 10px; }
+  .wx-date{ display:flex; align-items:center; gap: 10px; }
+  .wx-date b{ font-family: var(--font-en); font-weight: 400; font-size: var(--fs-xl); line-height: 1; font-variant-numeric: lining-nums; }
+  .wx-date span{ display:flex; flex-direction:column; gap: 2px; }
+  .wx-date i{ font-style: normal; font-family: var(--font-en); font-size: var(--fs-xs); letter-spacing: .12em; color: var(--text-soft); }
+  .wx-now{ display:flex; align-items:center; gap: 10px; }
+  .wx-icon svg{ width: 26px; height: 26px; display:block; color: var(--text); }
+  .wx-txt{ display:flex; flex-direction:column; gap: 2px; }
+  .wx-city{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-s); color: var(--text-soft); }
+  .wx-temp{ display:flex; align-items:baseline; gap: 8px; }
+  .wx-temp b{ font-family: var(--font-en); font-weight: 400; font-size: var(--fs-l); font-variant-numeric: lining-nums; }
+  .wx-temp em{ font-style: normal; font-size: var(--fs-s); color: var(--text-soft); }
+
+  /* 最近一条消息 */
+  .home-card.msg-strip{ display:flex; align-items:center; gap: 14px; width: 100%; cursor: pointer; padding: 14px 18px; border-radius: 999px; }
+  .msg-ic{ flex: none; width: 40px; height: 40px; border-radius: 50%; display:grid; place-items:center; box-shadow: inset 0 0 0 .5px var(--line); }
+  .msg-ic svg{ width: 20px; height: 20px; }
+  .msg-body{ flex: 1; min-width: 0; display:flex; flex-direction:column; gap: 4px; }
+  .msg-top{ display:flex; justify-content:space-between; align-items:baseline; gap: 10px; }
+  .msg-top .home-label{ font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-faint); }
+  .msg-top time{ font-family: var(--font-en); font-size: var(--fs-xs); color: var(--text-faint); }
+  .msg-last{ display:flex; align-items:baseline; gap: 10px; min-width: 0; }
+  .msg-last > span{ flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--fs-m); color: var(--text); }
+  .msg-last em{ flex: none; font-family: var(--font-en); font-style: italic; font-size: var(--fs-s); color: var(--text-soft); }
+
   /* 选好的图片/文件:收在输入框里面最上面一排,右上角 × 可以拿掉 */
   .att-tray{ grid-area: tray; display:flex; gap: 8px; padding: 2px 2px 6px; overflow-x: auto; scrollbar-width: none; }
   .app.has-tray:not(.has-model) .composer .field{
@@ -3420,44 +3497,64 @@
   <div class="menu-page">
     <div class="menu-scroll">
       <div class="home">
-        <header class="home-head">
-          <h1 class="menu-title">Aether</h1>
-          <div class="menu-private">PRIVATE<br>SPACE</div>
+        <header class="home-head home-head2">
+          <p class="home-kicker"><span>Our little world</span><time id="homeClock"></time></p>
+          <h1 class="home-greet" id="homeGreet">Hi, baby <span class="heart">♡</span></h1>
+          <p class="home-pair"><span id="homeNameAi">Orion</span> <i>&amp;</i> <span id="homeNameMe">Astraea</span></p>
         </header>
 
-        <section class="home-card home-hero card-bare" aria-label="在一起的天数">
-          <p class="home-names"><span id="homeNameAi">Orion</span> &amp; <span id="homeNameMe">Astraea</span></p>
-          <p class="home-eyebrow">Already together</p>
-          <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
-          <p class="menu-since">since 2026/01/01</p>
-        </section>
-
-        <section class="home-card home-now" aria-live="polite">
-          <svg class="now-stars" viewBox="0 0 80 80" aria-hidden="true"><path d="M22 8 L58 14 M22 8 L33 37 M58 14 L48 41 M33 37 L40 39 L48 41 M33 37 L24 70 M48 41 L60 66"/><circle cx="22" cy="8" r="1.8"/><circle cx="58" cy="14" r="1.5"/><circle cx="33" cy="37" r="1.4"/><circle cx="40" cy="39" r="1.4"/><circle cx="48" cy="41" r="1.4"/><circle cx="24" cy="70" r="1.7"/><circle cx="60" cy="66" r="1.5"/></svg>
-          <div class="now-top">
-            <span class="status-dot" id="homeStatusDot"></span>
-            <span class="home-eyebrow" id="homeStatusName">Orion · now</span>
+        <!-- 天数:一张带照片的大卡,两个人的头像夹着天数 -->
+        <section class="home-card days-card home-hero" aria-label="在一起的天数">
+          <div class="days-photo">
+            <span class="days-eyebrow">Our days</span>
+            <div class="days-mid">
+              <span class="days-av days-av-me" aria-hidden="true"></span>
+              <div class="menu-days"><span class="num" id="menuDays">113</span></div>
+              <span class="days-av days-av-him" aria-hidden="true"></span>
+            </div>
+            <p class="days-sub"><span>♡</span> days together <span>♡</span></p>
           </div>
-          <p class="now-line" id="homeStatusLine">在房间里</p>
-          <p class="now-mood"><span>心情</span><b id="homeOrionMood">安静</b><em id="homeOrionMoodNote"></em></p>
-          <p class="now-thought" id="homeThought"></p>
-          <div class="now-facts">
-            <span>你上次说话<b id="homeLastMine">—</b></span>
-            <span>他上次回你<b id="homeLastReply">—</b></span>
+          <div class="days-foot">
+            <p class="menu-since">since 2026/01/01</p>
+            <div class="days-acts">
+              <button type="button" class="days-act" id="daysChatBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5z"/></svg>Chat</button>
+              <button type="button" class="days-act" id="pokeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V10a1.5 1.5 0 0 1 3 0v2M14 11.5a1.5 1.5 0 0 1 3 0V13M17 12.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/></svg>戳他</button>
+            </div>
           </div>
+          <p class="days-reply" id="pokeReply"></p>
         </section>
 
         <div class="home-row">
-          <section class="home-card home-today" aria-label="今天">
-            <p class="home-label">今天</p>
-            <p class="home-date" id="homeDate"></p>
-            <p class="home-stat">今天聊了 <b id="homeCount">0</b> 条</p>
+          <!-- 他的小纸条:最近说的一句 + 他此刻在干嘛 -->
+          <section class="home-card hnote-card" aria-label="他的小纸条">
+            <p class="home-label"><span id="homeStatusName">Orion's note</span></p>
+            <p class="note-text" id="homeThought"></p>
+            <p class="note-meta"><span class="status-dot" id="homeStatusDot"></span><span id="homeStatusLine">在房间里</span></p>
           </section>
-          <button class="home-card home-poke" id="pokeBtn" type="button">
-            <span class="home-label">戳一戳</span>
-            <span class="home-poke-title">戳他<svg class="poke-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></span>
-            <span class="home-poke-reply" id="pokeReply">无聊就按，他会有反应</span>
-          </button>
+          <!-- 今天 + 顺德的天气 -->
+          <section class="home-card wx-card" aria-label="今天">
+            <div class="wx-date"><b id="wxDay"></b><span><i id="wxMon"></i><i id="wxWeek"></i></span></div>
+            <div class="wx-now">
+              <span class="wx-icon" id="wxIcon" aria-hidden="true"></span>
+              <span class="wx-txt"><span class="wx-city">Shunde · 顺德</span><span class="wx-temp"><b id="wxTemp">--°</b><em id="wxText"></em></span></span>
+            </div>
+          </section>
+        </div>
+
+        <!-- 最近一条消息,点一下回到聊天 -->
+        <button type="button" class="home-card msg-strip" id="msgStrip">
+          <span class="msg-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5z"/></svg></span>
+          <span class="msg-body">
+            <span class="msg-top"><span class="home-label">Our messages</span><time id="msgTime"></time></span>
+            <span class="msg-last"><span id="msgLast">还没有消息</span><em>Continue ↗</em></span>
+          </span>
+        </button>
+
+        <!-- 旧门厅里还有脚本在写的几个字段,先留着不显示 -->
+        <div hidden>
+          <span id="homeOrionMood"></span><span id="homeOrionMoodNote"></span>
+          <span id="homeLastMine"></span><span id="homeLastReply"></span>
+          <span id="homeDate"></span><span id="homeCount"></span>
         </div>
 
       </div>
@@ -4138,7 +4235,89 @@ function refreshHome(){
   const nAi = $("#homeNameAi"), nMe = $("#homeNameMe");
   if (nAi) nAi.textContent = aiName();
   if (nMe) nMe.textContent = HUMAN_NAME;
+  refreshHomeExtras(msgs);
 }
+/* 新门厅:问候 · 时钟 · 日期天气 · 最近一条消息 */
+const HOME_PET_NAMES = ["小猫", "女儿", "宝贝"];
+function shHour(){ return +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: TZ }).format(new Date()); }
+function refreshHomeExtras(msgs){
+  const now = new Date(), h = shHour();
+  const clk = $("#homeClock"); if (clk) clk.textContent = fmtTime(now);
+  const g = $("#homeGreet");
+  if (g){
+    const pet = HOME_PET_NAMES[(+dayKey(now).replace(/-/g, "")) % HOME_PET_NAMES.length];   // 每天换一个叫法
+    const hi = h >= 5 && h < 11 ? "Morning" : h >= 11 && h < 18 ? "Hi" : h >= 18 && h < 23 ? "Evening" : "I'm here";
+    g.innerHTML = `${hi}, ${escapeHtml(pet)} <span class="heart">♡</span>`;
+  }
+  const [y, mo, d] = dayKey(now).split("-");
+  const wd = new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: TZ }).format(now);
+  const MON = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const wD = $("#wxDay"), wM = $("#wxMon"), wW = $("#wxWeek");
+  if (wD) wD.textContent = +d;
+  if (wM) wM.textContent = `${MON[+mo - 1]} ${y}`;
+  if (wW) wW.textContent = wd;
+  const last = (msgs || []).slice().reverse().find((m) => (m.text || "").trim());
+  const ml = $("#msgLast"), mt = $("#msgTime");
+  if (ml) ml.textContent = last ? (last.from === "ai" ? "" : "你：") + clip((last.text || "").replace(/\s+/g, " ").trim(), 40) : "还没有消息";
+  if (mt) mt.textContent = last ? fmtWhen(last.ts) : "";
+  loadWeather();
+}
+/* 顺德的天气:Open-Meteo(免费、不用 key、允许网页直接取),半小时取一次 */
+const WX_KEY = "companion_weather";
+const WX_URL = "https://api.open-meteo.com/v1/forecast?latitude=22.84&longitude=113.25&current=temperature_2m,weather_code,is_day&timezone=Asia%2FShanghai";
+let wxLoading = false;
+function wxDesc(code){
+  if (code === 0) return ["晴", "sun"];
+  if (code <= 2) return ["多云", "cloud-sun"];
+  if (code === 3) return ["阴", "cloud"];
+  if (code === 45 || code === 48) return ["雾", "fog"];
+  if (code >= 51 && code <= 57) return ["毛毛雨", "rain"];
+  if (code >= 61 && code <= 67) return [code >= 65 ? "大雨" : "雨", "rain"];
+  if (code >= 71 && code <= 77) return ["雪", "snow"];
+  if (code >= 80 && code <= 82) return ["阵雨", "rain"];
+  if (code >= 95) return ["雷雨", "storm"];
+  return ["", "cloud"];
+}
+const WX_SVG = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  "cloud-sun": '<path d="M8 4.5v1.2M3.8 8.6H5M5 5.6l.9.9M12.2 6.5a3.6 3.6 0 0 0-6.6 2.6"/><path d="M7 19h10a3.5 3.5 0 0 0 .4-7 5 5 0 0 0-9.6 1.2A3 3 0 0 0 7 19z"/>',
+  cloud: '<path d="M7 18h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 18z"/>',
+  fog: '<path d="M4 10h16M6 14h12M8 18h8"/>',
+  rain: '<path d="M7 14h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 14z"/><path d="M9 17l-1 3M13 17l-1 3M17 17l-1 3"/>',
+  snow: '<path d="M7 14h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 14z"/><path d="M9 18h.01M13 19h.01M17 18h.01"/>',
+  storm: '<path d="M7 14h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 14z"/><path d="M12 15l-2 4h3l-2 3"/>',
+};
+function paintWeather(w){
+  if (!w) return;
+  const [txt, ic0] = wxDesc(w.code);
+  const ic = (ic0 === "sun" && !w.day) ? "moon" : ic0;
+  const t = $("#wxTemp"), x = $("#wxText"), i = $("#wxIcon");
+  if (t) t.textContent = Math.round(w.temp) + "°";
+  if (x) x.textContent = txt;
+  if (i) i.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">${WX_SVG[ic] || WX_SVG.cloud}</svg>`;
+}
+async function loadWeather(){
+  let c = null;
+  try{ c = JSON.parse(localStorage.getItem(WX_KEY) || "null"); }catch(_){}
+  if (c) paintWeather(c);
+  if ((c && Date.now() - c.at < 30 * 60e3) || wxLoading) return;
+  wxLoading = true;
+  try{
+    const r = await fetch(WX_URL, { cache: "no-store" });
+    const j = await r.json();
+    const cur = j && j.current;
+    if (cur && typeof cur.temperature_2m === "number"){
+      const w = { temp: cur.temperature_2m, code: cur.weather_code, day: !!cur.is_day, at: Date.now() };
+      try{ localStorage.setItem(WX_KEY, JSON.stringify(w)); }catch(_){}
+      paintWeather(w);
+    }
+  }catch(_){ }
+  finally{ wxLoading = false; }
+}
+const daysChatBtn = $("#daysChatBtn"), msgStripBtn = $("#msgStrip");
+if (daysChatBtn) daysChatBtn.addEventListener("click", () => setTab("chat"));
+if (msgStripBtn) msgStripBtn.addEventListener("click", () => setTab("chat"));
 /* 从门厅发一句(心情 / 戳一戳):不打断你在输入框里没写完的话,等他真的回了,把回复显示在卡片上 */
 function sendFromHome(text, out){
   const draft = inputEl.value;
