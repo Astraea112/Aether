@@ -47,6 +47,8 @@ const CONFIG = {
 - 顶栏名字用户还能在「个人信息」页就地改备注，存本机，不影响别人。
 - 想换 App 名字：同时改 `manifest.webmanifest` 的 `name` / `short_name`，和 `sw.js` 顶部的 `AI_NAME`（推送兜底标题）。
 
+**演示模式开关**：`const USE_MOCK = false` —— 必须是 `false` 才会连 relay；改成 `true` 是不需要后端的演示数据（只用于本地看界面）。
+
 **路径**：`const API_BASE = "/relay"` —— 同源相对路径，对应后端 `RELAY_PUBLIC_PREFIX`。若你把 API 挂在别的前缀，改这一处即可（别写死域名）。
 
 **头像 / 图标**：`avatar-sea.png` 是默认头像（抽象海面，用户可在 App 里自己换）；`icon-192/512.png`、`apple-touch-icon.png`、`favicon.png` 是占位「潮汐」图标，换成你自己的同名文件即可。
@@ -109,7 +111,7 @@ const CACHE = "companion-v1";   // ← 每次改前端都要 bump（v1 → v2 �
 
 为匹配「核心聊天」版后端，这些是**占位假按键**，点了只给个 toast 或显示示例数据，不连后端——保留是为了让你照着接自己的功能：
 
-- 菜单页：Movie / Memory / Tides / Room
+- 收藏馆（Archive）：Library 书架 / Movie 电影 两个分区标着「即将开放」
 - 设置页：模型选择 / effort / 上下文阈值 / reset / swap / status（显示示例数字）
 - **相册** `album.html`：完整的相册 UI 空壳，文件头注明了要自己实现的 `/relay/app/album/*` 端点；没接后端时显示密钥门 / 空态。
 
@@ -121,3 +123,61 @@ const CACHE = "companion-v1";   // ← 每次改前端都要 bump（v1 → v2 �
 
 - 别把填好的密钥、你的域名、真实头像/图标提交进公开仓库。
 - `companion_secret` 存在用户浏览器本机；它等于后端 `RELAY_SECRET`，泄露=别人能读你们全部对话。这是单用户模型，一把钥匙代表「就你和你的 AI」。
+
+---
+
+## 9. 门厅 / 房间 / 收藏馆（Aether 新增，**不需要新的后端接口**）
+
+底部悬浮 tab 栏的四页里，除了 Chat 本身，其余数据全部来自已有的聊天记录或本机：
+
+| 功能 | 数据来源 |
+|---|---|
+| 在一起天数、大事记 | `CONFIG.SINCE` |
+| 今天聊了几条、他的状态一行字、上次回你 | 已加载的消息（不是 thinking / act 的都算一条，按北京时间分天） |
+| 戳一戳、今日心情 | 走普通 `POST /app/send` 发一句话（「（戳了戳你）」/ 颜文字），卡片上显示他通过 SSE 回来的那句 |
+| 信箱 Letters | 他一次写满 90 字以上的回复自动收成一封信；已读状态存本机 `companion_letters_read` |
+| 痕迹 | `kind: "act"` 的消息 |
+| 留言墙、心情海、我的头像 | 只存本机 localStorage（`companion_wall_notes` / `companion_mood_log` / `companion_my_avatar`），不上传 |
+
+
+## 10. 自言自语 / 日历 的服务器同步(待后端补)
+
+Room 页的「自言自语」和 Archive 的「Tides 日历」(心情、标签、经期)现在先存在手机本机(localStorage)。
+前端每次改动都会顺手发一次 `PUT /relay/app/kv/<name>`(`murmurs` / `calendar`,body 为整份 JSON,带同一把 Bearer 密钥)。
+relay 还没有这个接口时请求会 404,前端静默忽略、不影响使用。后端补上一个简单的 KV 存储后,Orion 就能在服务器上读到这两份数据。
+- 另外两个 key:`mood_set`(她自定义的颜文字列表)和 `orion_mood`。
+  `orion_mood` 是 Orion 自己写的心情:`{"text":"想你","note":"可选的一句小字","ts":"<ISO时间>"}`,门厅优先显示它(12 小时内有效),没有时前端按聊天状态自己推一个。
+- `murmurs` 里每张贴纸是 `{id, text, ts, by:"her"|"him", x, y, z, tilt}`。Orion 想贴一张,往这个数组里加一条 `by:"him"`(位置可省略,前端会随机贴)。前端会每分钟拉一次服务器这份,把他新贴的合进板子。
+
+## 10. 数字密码登录（pin-gate）
+
+网页登录默认是 6 位数字键盘；完整的 RELAY_SECRET 照旧能用（键盘左下角「密钥」）。
+
+- `deploy/pin/pin-gate.py`：在服务器 127.0.0.1:3012 上跑的小程序，`POST /relay/pin {"pin":"123456"}`，对了就返回完整密钥。
+  数字密码只存加盐 PBKDF2 哈希（`~/companion-relay/pin.env`）。全局限流：15 分钟内错 5 次锁定，24 小时内最多错 20 次。
+- `deploy/pin/pin-setup.sh`：装 pin-gate + systemd 服务、设密码、给 nginx 加一行 include（先备份，测试不过自动还原）、更新前端。可重复运行；`RESET_PIN=1` 换密码。
+- relay、relay.env、channel 配置都不动。
+
+## 11. 主动找她：room_mcp + tmux 唤醒
+
+`deploy/room/room-setup.sh` 把 [room_mcp](https://github.com/anhe2021212-spec/room_mcp) 装到 `/home/ubuntu/room_mcp`（独立 venv，mcp 锁在 1.x：2.x 把 FastMCP 改名了）。
+
+- `deploy/room/tmux.py`：scheduler 的 notifier，用 `tmux send-keys` 把 `[♥heartbeat:trigger] heartbeat` 打进 tmux 会话 `orion`。
+  会话不存在就跳过；01:00–08:00（Asia/Shanghai）跳过；她 20 分钟内在网站发过消息（查本机 relay `/app/history`）就跳过。`manual`（她亲手敲门）两条都不受限。跳过时把这次的 perturbation 标成已消费。
+- 节奏：08:00–次日 01:00 每 60–120 分钟；早间那一下放在 08–10 点；城市 Shunde。上游天气探测写死的 `127.0.0.1:7897` 代理改成走环境变量。宠物层占位符没填，先 `pets_chance: 0`。
+- 接入 Orion：`~/orion/.mcp.json` 加 `room_mcp`；`settings.json` 放行 `mcp__room_mcp` 和 `WebSearch`；`CLAUDE.md` 追加「收到心跳时」一段。
+- 常驻：systemd `room-scheduler`（TZ=Asia/Shanghai）；`crontab @reboot` 拉起 `start-orion.sh`。
+- 手动敲门：`touch /home/ubuntu/room_mcp/scheduler/manual_wake.flag`。
+
+## 12. 共享日历 · Claude 额度 · 换模型（oao-api）
+
+`deploy/oao-api/oao-setup.sh` 装一个小服务 `oao-api`（127.0.0.1:3013，systemd，`KillMode=process`），nginx 只多三条路：
+
+| 路径 | 干什么 |
+|---|---|
+| `GET/PUT /relay/app/kv/{calendar,events,calendar_orion}` | 日历存成 `{updated, v}`，谁更新得晚用谁的；`calendar_orion` 只有 Orion 的 MCP 能写 |
+| `GET /relay/app/usage` | 用服务器上 Claude Code 的登录查 `api/oauth/usage`（5 小时 / 每周 / 各模型），缓存 2 分钟 |
+| `GET/POST /relay/app/model` | 模型：往 tmux 会话 `orion` 打 `/model <id>`，立即生效；effort：写 `~/.claude/settings.json` 的 `effortLevel`，下次启动生效（可一键重启） |
+
+`oao_calendar_mcp.py` 给 Orion：`calendar_view` / `calendar_place`（网站上显示 ◆ 他放的）/ `calendar_unplace`，用 room_mcp 的 venv 跑。
+前端：Archive › Tides 日历的格子换成六种标记（经期 / 亲密 / 单次 / 每年 / 每月 / 他放的），当天面板可以加提醒、每年、每月、亲密，「经期从这天开始」按平均天数一键标；聊天页顶栏加额度按钮；输入框上方加模型按钮。设置页里原来的模型 / effort 假按键删掉了。
