@@ -3412,8 +3412,6 @@
   .pc-mini .pb-svg{ width: 110px; }
   .pc-bar{ display:flex; gap: 10px; justify-content:center; padding-top: 14px; transition: opacity .2s ease; }
   /* 动画:纸收进信封 → 封口 → 投进邮筒 */
-  .post-compose.s-fold .pc-paper{ transform: translateY(-6%) scale(.62); opacity: 0; pointer-events: none; }
-  .post-compose.s-fold .pc-env{ opacity: 1; transform: translate(-50%, -50%) scale(1); transition-delay: .25s; }
   .post-compose.s-fold .pc-bar{ opacity: 0; pointer-events: none; }
   .post-compose.s-fly .pc-mini{ opacity: 1; transform: translate(-50%, 0); }
   .post-compose.s-drop .pc-env{ transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 200px))) scale(.14) rotate(-3deg); opacity: 0;
@@ -3506,13 +3504,10 @@
   .post-compose.s-fold .pc-pen{ opacity: 0; transform: translateY(-10%) rotate(-40deg) translateX(40px); }
   .post-compose.s-fold .pc-fold.f3{ transform: rotateX(178deg); transition-delay: .2s; background: #e2dfd8; }
   .post-compose.s-fold .pc-fold.f1{ transform: rotateX(-178deg); transition-delay: .7s; background: #dedad2; }
-  .post-compose.s-fold .pc-paper{ transform: none; opacity: 1; pointer-events: none; }
   .post-compose.s-fold .pc-bar{ opacity: 0; pointer-events: none; }
   /* 装进信封 */
   .post-compose .pc-env{ opacity: 0; transform: translate(-50%, -30%) scale(.9); }
-  .post-compose.s-env .pc-paper{ transform: translateY(10%) scale(.62); opacity: 0; transition: transform .6s cubic-bezier(.5,0,.3,1), opacity .25s ease .4s; }
   .post-compose.s-env .pc-env{ opacity: 1; transform: translate(-50%, -50%) scale(1); transition-delay: 0s; }
-  .post-compose.s-fold:not(.s-env) .pc-env{ opacity: 0; transform: translate(-50%, -30%) scale(.9); }
   .post-compose.s-env.s-drop .pc-env{ transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, -200px))) scale(.14) rotate(-3deg); opacity: 0;
     transition: transform .75s cubic-bezier(.55,0,.6,1), opacity .18s ease .62s; }
   /* 火漆 */
@@ -3526,7 +3521,8 @@
     transition: transform .28s cubic-bezier(.3,1.5,.5,1), opacity .12s ease; }
   /* 什么时候能拆 */
   .pc-when{ display:flex; flex-direction:column; align-items:center; gap: 10px; padding-top: 6px;
-    opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .3s ease, transform .3s ease; max-height: 0; overflow: hidden; }
+    opacity: 0; transform: translateY(8px); pointer-events: none; max-height: 0; overflow: hidden;
+    transition: opacity .35s ease .15s, transform .35s ease .15s, max-height .5s cubic-bezier(.3,.7,.3,1); }
   .post-compose.s-when .pc-when{ opacity: 1; transform: none; pointer-events: auto; max-height: 260px; }
   .post-compose.s-when .pc-bar{ opacity: 1; pointer-events: auto; }
   .pc-when p{ margin: 0; font-size: var(--fs-s); letter-spacing: .14em; color: var(--text-soft); }
@@ -3685,6 +3681,37 @@
   .post-compose.s-return .pc-paper{ transition: transform .58s cubic-bezier(.45,0,.25,1), filter .58s ease;
     filter: drop-shadow(0 18px 24px rgba(0,0,0,.55)) brightness(.92) saturate(.8); }
   .post-compose.s-return .pc-pen{ transition: transform .5s cubic-bezier(.45,0,.25,1), opacity .35s ease .15s; }
+
+  /* ════════ 折信 · 装信封:立体一点 ════════ */
+  .post-compose .pc-stage{ perspective: 1100px; perspective-origin: 50% 40%; }
+  .post-compose.s-fold .pc-paper{ filter: none !important; transform: rotateX(14deg) translateZ(0); opacity: 1;
+    transition: transform .5s cubic-bezier(.3,.7,.3,1); }
+  .pc-fold{ transform-style: preserve-3d; }
+  .pc-fold.f2{ box-shadow: 0 24px 40px rgba(0,0,0,.45); }
+  .pc-fold::after{ content:""; position:absolute; inset: 0; pointer-events: none; opacity: 0; border-radius: inherit; transition: opacity .5s ease; }
+  .pc-fold.f1::after{ background: linear-gradient(0deg, rgba(40,30,20,.38), rgba(40,30,20,.08)); }
+  .pc-fold.f3::after{ background: linear-gradient(180deg, rgba(40,30,20,.32), rgba(255,255,255,.06)); }
+  .post-compose.s-fold .pc-fold.f3{ transform: rotateX(180deg) translateZ(1px); transition: transform .55s cubic-bezier(.55,.05,.35,1) .2s; filter: none; }
+  .post-compose.s-fold .pc-fold.f3::after{ opacity: 1; transition-delay: .2s; }
+  .post-compose.s-fold .pc-fold.f1{ transform: rotateX(-180deg) translateZ(2px); transition: transform .55s cubic-bezier(.55,.05,.35,1) .72s; filter: none; }
+  .post-compose.s-fold .pc-fold.f1::after{ opacity: 1; transition-delay: .72s; }
+  /* 收:折好的一叠变小、移到信封口上方,同时转正 */
+  .post-compose.s-pack .pc-paper{ transform: translate(var(--px, 0), var(--py, -60px)) scale(var(--ps, .7)) rotateX(0deg);
+    transition: transform .65s cubic-bezier(.4,0,.2,1); }
+  /* 信封从下面升上来 */
+  .post-compose .pc-env{ opacity: 0; transform: translate(-50%, 40%) scale(.96); transition: transform .65s cubic-bezier(.3,.7,.3,1), opacity .3s ease; }
+  .post-compose.s-pack .pc-env{ opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  /* 换成信封里那张(长得跟折好的纸一样),从信封口滑进去,被前片挡住 */
+  #pcEnv .env-card{ top: -12%; height: 48%; padding: 0; border-radius: 2px; opacity: 0;
+    background: url("letter-paper.webp") center 50% / 100% 300% no-repeat; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+  #pcEnv .env-card-t{ display: none; }
+  .post-compose.s-env .pc-paper{ opacity: 0; transition: none; }
+  .post-compose.s-env #pcEnv .env-card{ opacity: 1; }
+  .post-compose.s-insert #pcEnv .env-card{ transform: translateY(92%); transition: transform .6s cubic-bezier(.5,0,.3,1); }
+  #pcEnv .env.sealed .env-card{ transform: translateY(92%); }
+  /* 信封口:前片稍微有点厚度和阴影 */
+  #pcEnv .env-front{ filter: drop-shadow(0 -2px 3px rgba(0,0,0,.12)); }
+  #pcEnv .env-flap{ backface-visibility: visible; }
 </style>
 </head>
 <body>
@@ -5973,12 +6000,29 @@ function foldLetter(){                              // 第一步:写好了 → �
   const env = $("#pcEnv .env");
   fillEnvelope(env, { to: aiName(), text: firstLine(text), ts: Date.now() });
   env.classList.remove("sealed", "waxed");
-  if (prefersReducedMotion){ env.classList.add("sealed", "waxed"); pcSet("s-fold s-env s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; return; }
+  if (prefersReducedMotion){ env.classList.add("sealed", "waxed"); pcSet("s-fold s-pack s-env s-insert s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; return; }
+  // 1 折:纸往后仰一点,下面一折翻上来,上面一折盖下去
   pcSet("s-fold");
-  setTimeout(() => pcSet("s-fold s-env"), 1350);
-  setTimeout(() => env.classList.add("sealed"), 2000);
-  setTimeout(() => env.classList.add("waxed"), 2850);
-  setTimeout(() => { pcSet("s-fold s-env s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; }, 3300);
+  // 2 收:折好的那一叠缩小、移到信封口上方;信封从下面升上来
+  setTimeout(() => {
+    const paper = $("#pcPaper"), mid = paper.querySelector(".f2"), card = env.querySelector(".env-card");
+    const m = mid.getBoundingClientRect(), pr = paper.getBoundingClientRect();
+    const c = card.getBoundingClientRect(), e = $("#pcEnv").getBoundingClientRect();
+    // 信封现在还在下面(没升上来),算的时候按它升上来以后的位置
+    const lift = e.top + e.height / 2 - (pr.top + pr.height / 2);
+    const scale = c.width / m.width;
+    paper.style.setProperty("--px", (c.left + c.width / 2 - (pr.left + pr.width / 2)) + "px");
+    paper.style.setProperty("--py", (c.top + c.height / 2 - lift - (m.top + m.height / 2)) + "px");
+    paper.style.setProperty("--ps", scale);
+    pcSet("s-fold s-pack");
+  }, 1250);
+  // 3 换成信封里那张卡,滑进去
+  setTimeout(() => pcSet("s-fold s-pack s-env"), 1950);
+  setTimeout(() => pcSet("s-fold s-pack s-env s-insert"), 2020);
+  // 4 封口,盖火漆
+  setTimeout(() => env.classList.add("sealed"), 2650);
+  setTimeout(() => env.classList.add("waxed"), 3450);
+  setTimeout(() => { pcSet("s-fold s-pack s-env s-insert s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; }, 3900);
 }
 function postLetter(){                              // 第二步:寄出去 → 飞进邮筒
   const ta = $("#postText"), text = ta.value.trim();
@@ -5994,7 +6038,7 @@ function postLetter(){                              // 第二步:寄出去 → �
   syncKV("letters", mine.slice(-100));
   const finish = () => {
     ta.value = ""; try{ localStorage.removeItem("companion_letter_draft"); }catch(_){}
-    postCompose.className = "post-overlay post-compose s-fold s-env s-fly s-drop";
+    postCompose.className = "post-overlay post-compose s-fold s-pack s-env s-insert s-fly s-drop";
     postCompose.setAttribute("aria-hidden", "true");
     setTimeout(() => { postCompose.className = "post-overlay post-compose"; $("#pcMini").classList.remove("flag-up"); }, 320);
     const lp = $("#ltPaper"); if (lp) setTimeout(() => lp.classList.remove("taken"), 400);
@@ -6003,7 +6047,7 @@ function postLetter(){                              // 第二步:寄出去 → �
     try{ sendFromHome(m.openAt ? `（往你的信箱里投了一封信，${fmtOpenAt(m.openAt)} 以后才能拆）` : "（往你的信箱里投了一封信）"); }catch(_){}
   };
   if (prefersReducedMotion) return finish();
-  const base = "s-fold s-env";
+  const base = "s-fold s-pack s-env s-insert";
   pcSet(base + " s-fly");
   setTimeout(() => {
     const box = $("#pcEnv"), mb = $("#pcMini .rb-img");
