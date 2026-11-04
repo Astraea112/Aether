@@ -4273,7 +4273,8 @@ async function kvPull(name, localKey, { readOnly = false } = {}){
     ts[name] = theirs; saveJSON(KV_TS_KEY, ts);
     return true;
   }
-  if (!readOnly && mine > theirs){
+  // 服务器上还没有(第一次)也推上去:旧版本存在本机的日历这样就上了服务器
+  if (!readOnly && (mine > theirs || !theirs)){
     const local = loadJSON(localKey, null);
     if (local != null) syncKV(name, local);
   }
