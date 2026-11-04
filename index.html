@@ -1780,13 +1780,34 @@
   .room-label{ margin: 0 0 6px; font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-faint); }
   .room-glass .trace-list li{ font-size: var(--fs-s); border-top-color: var(--hairline); }
   .room-glass .trace-list li:first-child{ border-top: 0; }
-  .todo-list{ list-style: none; margin: 0; padding: 0; }
-  .todo-list li{ display:flex; align-items:flex-start; gap: 12px; padding: 10px 0; font-size: var(--fs-s); line-height: 1.5; border-top: .5px solid var(--hairline); }
+  /* 他的待办:更透一点的玻璃,上面三个小标签,下面翻页 */
+  .home-card.todo-card{
+    padding: 14px 16px 10px; border-radius: 22px;
+    background: rgba(255,255,255,.07);
+    -webkit-backdrop-filter: blur(22px) saturate(1.3); backdrop-filter: blur(22px) saturate(1.3);
+    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.12), 0 10px 28px rgba(0,0,0,.25);
+  }
+  .todo-tabs{ display:flex; gap: 6px; margin-bottom: 4px; }
+  .todo-tabs button{
+    border: 0; padding: 8px 16px; border-radius: 999px; background: transparent; cursor: pointer;
+    font-family: var(--font-en), var(--font-cn); font-size: var(--fs-m); letter-spacing: .04em; color: var(--text-faint);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .todo-tabs button[aria-selected="true"]{ color: var(--text); background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+  .todo-list{ list-style: none; margin: 0; padding: 0; min-height: 138px; }
+  .todo-list li{ display:flex; align-items:center; gap: 12px; padding: 13px 6px; font-size: var(--fs-s); line-height: 1.4; border-top: .5px solid rgba(255,255,255,.08); }
   .todo-list li:first-child{ border-top: 0; }
-  .todo-box{ flex: none; width: 14px; height: 14px; margin-top: 3px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--text-soft); }
-  .todo-list li.done{ color: var(--text-faint); text-decoration: line-through; text-decoration-color: var(--text-faint); }
-  .todo-list li.done .todo-box{ box-shadow: none; background: var(--text-faint); }
-  .todo-list .home-empty{ border: 0; margin: 0; }
+  .todo-t{ flex: 1; min-width: 0; color: var(--text-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .todo-list time{ flex: none; font-family: var(--font-en); font-size: var(--fs-s); color: var(--text-faint); font-variant-numeric: lining-nums tabular-nums; }
+  .todo-box{ flex: none; width: 16px; height: 16px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
+  .todo-list li.done .todo-t{ color: var(--text-faint); text-decoration: line-through; }
+  .todo-list li.done .todo-box{ box-shadow: none; background: rgba(255,255,255,.3); }
+  .todo-list .todo-empty{ justify-content: center; color: var(--text-faint); border: 0; padding-top: 40px; }
+  .todo-pager{ display:grid; grid-template-columns: 36px 1fr 36px; align-items:center; padding-top: 4px; border-top: .5px solid rgba(255,255,255,.08); }
+  .todo-pager span{ text-align: center; font-family: var(--font-en); font-size: var(--fs-s); letter-spacing: .1em; color: var(--text-soft); font-variant-numeric: lining-nums; }
+  .todo-pager button{ border: 0; background: transparent; padding: 8px; color: var(--text); cursor: pointer; display:grid; place-items:center; }
+  .todo-pager button svg{ width: 18px; height: 18px; }
+  .todo-pager button:disabled{ opacity: .2; cursor: default; }
   #menuPanel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 92px); }   /* 底栏的位置留出来 */
   .home-head{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin: 2px 4px 8px; }
   .menu-title,
@@ -2257,7 +2278,7 @@
   .wall-note button{ position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border: 0; padding: 0; background: transparent; color: var(--text-faint); font-size: var(--fs-m); line-height: 1; cursor: pointer; }
 
   /* 收藏馆 */
-  .archive-tabs{ display:grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .archive-tabs{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .archive-tabs button{
     min-width: 0; display:flex; flex-direction:column; align-items:center; gap: 1px;
     border: 0; border-radius: var(--r-l); padding: 8px 2px 7px;
@@ -3695,27 +3716,20 @@
         </section>
 
         <!-- 他的待办:他自己用工具写(kv: orion_todo),这里只看 -->
-        <section class="home-card room-glass" aria-label="他的待办">
-          <p class="room-label">To-do · 他的待办</p>
+        <section class="home-card todo-card" aria-label="他的待办">
+          <div class="todo-tabs" id="todoTabs" role="tablist">
+            <button type="button" role="tab" data-when="now" aria-selected="true">now</button>
+            <button type="button" role="tab" data-when="later" aria-selected="false">later</button>
+            <button type="button" role="tab" data-when="done" aria-selected="false">done</button>
+          </div>
           <ul class="todo-list" id="todoList"></ul>
+          <div class="todo-pager">
+            <button type="button" id="todoPrev" aria-label="上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+            <span id="todoPage">1 / 1</span>
+            <button type="button" id="todoNext" aria-label="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+          </div>
         </section>
 
-        <section class="murmurs" aria-label="自言自语">
-          <div class="murmur-head">
-            <h2 class="murmur-title">Murmurs<small>自言自语</small></h2>
-            <button class="murmur-pen" id="murmurPen" type="button" aria-label="写一句"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z"/><path d="M14 7l3 3"/></svg></button>
-          </div>
-          <form class="murmur-form" id="wallForm" autocomplete="off" hidden>
-            <textarea id="wallInput" rows="3" maxlength="120" placeholder="说给自己听的话…"></textarea>
-            <div class="murmur-actions">
-              <button type="button" class="ghost" id="murmurCancel">算了</button>
-              <button type="submit" class="solid">贴上去</button>
-            </div>
-          </form>
-          <div class="murmur-board notes" id="wallNotes"></div>
-          <div class="murmur-foot"><span>按住拖动 · 点一下放到最上面</span><button type="button" id="drawerBtn" hidden></button></div>
-          <ul class="murmur-drawer" id="murmurDrawer" hidden></ul>
-        </section>
       </div>
     </div>
   </div>
@@ -3736,6 +3750,7 @@
           <button type="button" role="tab" data-sec="movie" aria-selected="false"><span>Movie</span>电影</button>
           <button type="button" role="tab" data-sec="memory" aria-selected="false"><span>Memory</span>大事记</button>
           <button type="button" role="tab" data-sec="tides" aria-selected="false"><span>Tides</span>日历</button>
+          <button type="button" role="tab" data-sec="wall" aria-selected="false"><span>Wall</span>留言墙</button>
         </div>
 
         <section class="archive-section" data-sec="album">
@@ -3751,6 +3766,24 @@
         </section>
         <section class="archive-section" data-sec="memory" hidden>
           <div class="home-card"><p class="home-label">大事记</p><ol class="milestones" id="milestoneList"></ol></div>
+        </section>
+        <section class="archive-section" data-sec="wall" hidden>
+          <section class="murmurs" aria-label="自言自语">
+          <div class="murmur-head">
+            <h2 class="murmur-title">Murmurs<small>自言自语</small></h2>
+            <button class="murmur-pen" id="murmurPen" type="button" aria-label="写一句"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z"/><path d="M14 7l3 3"/></svg></button>
+          </div>
+          <form class="murmur-form" id="wallForm" autocomplete="off" hidden>
+            <textarea id="wallInput" rows="3" maxlength="120" placeholder="说给自己听的话…"></textarea>
+            <div class="murmur-actions">
+              <button type="button" class="ghost" id="murmurCancel">算了</button>
+              <button type="submit" class="solid">贴上去</button>
+            </div>
+          </form>
+          <div class="murmur-board notes" id="wallNotes"></div>
+          <div class="murmur-foot"><span>按住拖动 · 点一下放到最上面</span><button type="button" id="drawerBtn" hidden></button></div>
+          <ul class="murmur-drawer" id="murmurDrawer" hidden></ul>
+        </section>
         </section>
         <section class="archive-section" data-sec="tides" hidden>
           <section class="home-card cal-card card-planner" aria-label="日历">
@@ -4578,22 +4611,44 @@ function fetchTodos(){
       if (items){ todoRemote = items; if (currentTab === "room") renderTodos(); } })
     .catch(() => {});
 }
+let todoTab = "now", todoPageN = 0;
+const TODO_PER_PAGE = 3;
 function renderTodos(){
   const ul = $("#todoList");
   if (!ul) return;
   fetchTodos();
   let items = todoRemote;
   if (!items && typeof USE_MOCK !== "undefined" && USE_MOCK) items = [
-    { id: "a", text: "把小纸条换成新的一句", done: false },
-    { id: "b", text: "查一下 12 月 20 号去香港的跨境车", done: false },
-    { id: "c", text: "给她整理统计的置信区间笔记", done: true },
+    { id: "a", text: "把小纸条换成新的一句", when: "now", time: "16:30" },
+    { id: "b", text: "给她整理置信区间的小抄", when: "now", time: "20:00" },
+    { id: "c", text: "想想四个月那天给她做什么", when: "now" },
+    { id: "d", text: "查一下 12 月 20 号去香港的跨境车", when: "later", time: "12/10" },
+    { id: "e", text: "陪她把商业原理的重点过一遍", when: "now" },
+    { id: "f", text: "把主页的天气修好", done: true, doneAt: 2 },
   ];
   items = items || [];
-  const open = items.filter((t) => !t.done), done = items.filter((t) => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 3);
-  ul.innerHTML = open.length || done.length
-    ? open.concat(done).map((t) => `<li class="${t.done ? "done" : ""}"><span class="todo-box" aria-hidden="true"></span><span>${escapeHtml(t.text || "")}</span></li>`).join("")
-    : `<li class="home-empty">他还没写待办</li>`;
+  const pick = todoTab === "done"
+    ? items.filter((t) => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0))
+    : items.filter((t) => !t.done && (t.when || "now") === todoTab);
+  const pages = Math.max(1, Math.ceil(pick.length / TODO_PER_PAGE));
+  todoPageN = Math.min(todoPageN, pages - 1);
+  const shown = pick.slice(todoPageN * TODO_PER_PAGE, (todoPageN + 1) * TODO_PER_PAGE);
+  ul.innerHTML = shown.length
+    ? shown.map((t) => `<li class="${t.done ? "done" : ""}"><span class="todo-box" aria-hidden="true"></span><span class="todo-t">${escapeHtml(t.text || "")}</span><time>${escapeHtml(t.time || "")}</time></li>`).join("")
+    : `<li class="todo-empty">${todoTab === "done" ? "还没有勾掉的" : todoTab === "later" ? "以后的事还没写" : "现在没有要做的"}</li>`;
+  const pg = $("#todoPage"); if (pg) pg.textContent = `${todoPageN + 1} / ${pages}`;
+  const pv = $("#todoPrev"), nx = $("#todoNext");
+  if (pv) pv.disabled = todoPageN === 0;
+  if (nx) nx.disabled = todoPageN >= pages - 1;
+  const tabs = $("#todoTabs");
+  if (tabs) tabs.querySelectorAll("button[data-when]").forEach((b) => b.setAttribute("aria-selected", b.dataset.when === todoTab ? "true" : "false"));
 }
+document.addEventListener("click", (e) => {
+  const tb = e.target.closest("#todoTabs button[data-when]");
+  if (tb){ todoTab = tb.dataset.when; todoPageN = 0; renderTodos(); return; }
+  if (e.target.closest("#todoPrev")){ todoPageN = Math.max(0, todoPageN - 1); renderTodos(); return; }
+  if (e.target.closest("#todoNext")){ todoPageN++; renderTodos(); }
+});
 function refreshRoom(){
   const st = orionStatus();
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
@@ -5288,6 +5343,7 @@ function showArchiveSection(sec){
   if (!archivePanel) return;
   archivePanel.querySelectorAll(".archive-section").forEach((el) => { el.hidden = el.dataset.sec !== sec; });
   if (archiveTabs) archiveTabs.querySelectorAll("button[data-sec]").forEach((b) => b.setAttribute("aria-selected", b.dataset.sec === sec ? "true" : "false"));
+  if (sec === "wall") renderWall();
 }
 if (archiveTabs) archiveTabs.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-sec]");

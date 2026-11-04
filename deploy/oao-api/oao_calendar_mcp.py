@@ -218,18 +218,23 @@ def todo_list() -> str:
     items = _todos()
     if not items:
         return "待办是空的。"
-    return "\n".join(f"{'☑' if t.get('done') else '☐'} {t.get('text', '')}（id {t.get('id')}）" for t in items)
+    return "\n".join(f"{'☑' if t.get('done') else '☐'} [{t.get('when', 'now')}] {t.get('text', '')}"
+                     f"{' ' + t['time'] if t.get('time') else ''}（id {t.get('id')}）" for t in items)
 
 
 @mcp.tool()
-def todo_add(text: str) -> str:
+def todo_add(text: str, when: str = "now", time_label: str = "") -> str:
     """Add something you mean to do to your to-do list, which she can see on the room page.
-    Things you'll do for her or for yourself, short. Not tasks for her."""
+    Things you'll do for her or for yourself, short. Not tasks for her.
+    when: "now" (today / soon) or "later" (some day). time_label: optional short time
+    shown on the right, like "20:30" or "12/10"."""
     text = " ".join((text or "").split())[:80]
     if not text:
         return "text 不能是空的"
+    when = when if when in ("now", "later") else "now"
     items = _todos()
-    item = {"id": uuid.uuid4().hex[:6], "text": text, "done": False, "ts": int(time.time() * 1000)}
+    item = {"id": uuid.uuid4().hex[:6], "text": text, "done": False, "when": when,
+            "time": (time_label or "").strip()[:8], "ts": int(time.time() * 1000)}
     items.append(item)
     _save_todos(items)
     return f"记下了：☐ {text}（id {item['id']}）"
