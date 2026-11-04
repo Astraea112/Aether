@@ -9,7 +9,7 @@ WEB_DIR=/var/www/companion-web
 tmp=$(mktemp -d)
 git clone -q --depth 1 -b "$REF" https://github.com/Astraea112/Aether "$tmp/web"
 grep -q 'const USE_MOCK  = false;' "$tmp/web/index.html" || { echo "✗ 这一版 USE_MOCK 不是 false，不更新"; exit 1; }
-sudo rsync -a --delete --exclude '.git' --exclude 'deploy' --exclude '*.md' --exclude 'LICENSE' --exclude 'NOTICE' "$tmp/web/" "$WEB_DIR/"
+sudo rsync -a --delete --exclude '.git' --exclude 'deploy' --exclude 'design-refs' --exclude '*.md' --exclude 'LICENSE' --exclude 'NOTICE' "$tmp/web/" "$WEB_DIR/"
 sudo chown -R www-data:www-data "$WEB_DIR"
 v=$(git -C "$tmp/web" rev-parse --short HEAD); rm -rf "$tmp"
 code=$(curl -s -o /dev/null -w '%{http_code}' https://oao0724.com/chat/)
