@@ -3063,6 +3063,10 @@
     -webkit-mask-image: none; mask-image: none;
   }
 
+  /* 顶栏只留额度仪表;API 窗口、终端、电话、⋮ 收起来。设置改成点名字进入 */
+  #sessionBtn, #terminalBtn, #callBtn, #moreBtn{ display:none !important; }
+  .topbar .peerpill{ cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
   /* 选好的图片/文件:收在输入框里面最上面一排,右上角 × 可以拿掉 */
   .att-tray{ grid-area: tray; display:flex; gap: 8px; padding: 2px 2px 6px; overflow-x: auto; scrollbar-width: none; }
   .app.has-tray:not(.has-model) .composer .field{
@@ -3905,6 +3909,15 @@ applyRemark(localStorage.getItem(REMARK_KEY));
 /* 主题只由日夜 toggle 控制(持久化),不再实时跟随系统;首次打开的初始值由 <head> 早期脚本取一次系统值 */
 if (avatarBtn) avatarBtn.addEventListener("click", openProfile);
 if (moreBtn) moreBtn.addEventListener("click", openProfile);
+// 顶栏只留额度按钮了:点他的名字打开个人信息 / 设置(原来右上角 ⋮ 的入口)
+const peerPillEl = document.querySelector(".topbar .peerpill");
+if (peerPillEl){
+  peerPillEl.setAttribute("role", "button");
+  peerPillEl.setAttribute("tabindex", "0");
+  peerPillEl.setAttribute("aria-label", "个人信息与设置");
+  peerPillEl.addEventListener("click", openProfile);
+  peerPillEl.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openProfile(); } });
+}
 if (profileAvatarBtn) profileAvatarBtn.addEventListener("click", () => avatarInput && avatarInput.click());
 
 /* ── 我的头像:聊天里你那一侧 + 主页。缩到 256px 再存,省本地空间 ── */
