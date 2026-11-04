@@ -5001,7 +5001,7 @@ function renderScene(){
   set("#scenePlace", v.place);
   set("#sceneDoing", v.doing || "");
   const ago = Date.now() - (v.ts || 0);
-  set("#sceneWhen", ago > 6 * 3600e3 ? "还在吗？" : fmtWhen(v.ts));
+  set("#sceneWhen", ago > 6 * 3600e3 ? "还在吗？" : (v.by === "him" ? "他帮你改的 · " : "") + fmtWhen(v.ts));
   if (card) card.classList.toggle("stale", ago > 6 * 3600e3);
 }
 /* 发给他的那一段前面,要不要带上场景 */
@@ -8561,7 +8561,7 @@ function buildVirtualRows(){
       if (grouped && prevBubble.row) prevBubble.row.tail = false;
       let last = null;
       parts.forEach((seg, i) => {
-        const r = { type:"message", key:`m:${m._key}:p${i}`, message:m, part:"seg", seg, firstSeg: i === 0, lastSeg: i === parts.length - 1,
+        const r = { type:"message", key:`m:${m._key}:p${i}`, message:m, part:"seg", seg, segIndex: i, firstSeg: i === 0, lastSeg: i === parts.length - 1,
           grouped: i === 0 ? grouped : true, tail: i === parts.length - 1 };
         if (last) last.tail = false;
         rows.push(r); last = r;
@@ -8789,6 +8789,10 @@ function makeMessage(rowData){
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
+  // 他一下回好几句:第一句先出来,后面的一句一句隔一会儿再冒出来
+  if (row.classList.contains("enter-ai") && rowData.part === "seg" && rowData.segIndex){
+    bubble.style.animationDelay = Math.min(rowData.segIndex, 12) * 0.6 + "s";
+  }
   const part = rowData.part || "";
   const atts = part === "txt" ? [] : ((m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : []);
   const text = part === "att" ? "" : part === "seg" ? rowData.seg : (m.from === "human" ? stripSceneTag(m.text) : m.text);

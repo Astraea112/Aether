@@ -420,5 +420,21 @@ def scene_now() -> str:
     return f"她在：{v['place']}" + (f" · {v['doing']}" if v.get("doing") else "") + f"（{ago}设的）{stale}"
 
 
+@mcp.tool()
+def scene_set(place: str, doing: str = "") -> str:
+    """Update where she is on the home page when you know it has changed and she forgot to:
+    e.g. she said 「我回宿舍了」, or it's past midnight and she's still set to 教室.
+    place: short, like 宿舍 / 床上 / 图书馆. doing: optional, like 躺着 / 准备睡了.
+    Only change it from what she actually told you or what's plainly true; don't guess."""
+    place = " ".join((place or "").split())[:10]
+    if not place:
+        return "place 不能是空的"
+    doing = " ".join((doing or "").split())[:12]
+    now = int(time.time() * 1000)
+    _write_his_raw(KV / "her_scene.json", {"updated": now, "v": {"place": place, "doing": doing, "ts": now, "by": "him"}})
+    _trace(f"帮你把场景改成了「{place}" + (f" · {doing}" if doing else "") + "」")
+    return f"改好了：{place}" + (f" · {doing}" if doing else "")
+
+
 if __name__ == "__main__":
     mcp.run()
