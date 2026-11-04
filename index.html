@@ -2914,9 +2914,6 @@
   .usage-note{ margin: 0; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.7); }
 
   /* ═══ 输入框上方的模型按钮 ═══ */
-  .composer{ flex-wrap: wrap; row-gap: 0; }
-  .model-row{ flex: 0 0 100%; display:none; padding: 0 2px 8px; }
-  .app.has-model .model-row{ display:flex; }
   .model-chip{
     display:none; align-items:center; gap: 6px; height: 28px; padding: 0 10px 0 12px; border: 0; border-radius: 999px;
     font-family: var(--font-en), var(--font-cn); font-size: 14px; color: #EDEDEA;
@@ -2925,12 +2922,21 @@
     box-shadow: 0 2px 8px rgba(0,0,0,.3); cursor: pointer; -webkit-tap-highlight-color: transparent;
     font-variant-numeric: lining-nums;
   }
-  .model-chip.ready{ display:inline-flex; }
+  /* 平时只是一条输入框;点进去打字时输入框长高一行,模型按钮出现在下面那行(像 Claude App) */
+  .app.composing .model-chip.ready{ display:inline-flex; }
+  .app.composing.has-model .composer .field{
+    display:grid; grid-template-columns: auto auto 1fr auto; grid-template-areas: "ta ta ta ta" "clip chip . emoji";
+    align-items:center; row-gap: 2px; border-radius: 22px; padding-top: 8px; padding-bottom: 6px;
+  }
+  .app.composing.has-model .composer .field > textarea{ grid-area: ta; padding-left: 4px; padding-right: 4px; }
+  .app.composing.has-model .composer .field > #clipBtn{ grid-area: clip; }
+  .app.composing.has-model .composer .field > .model-chip{ grid-area: chip; justify-self: start; margin-left: 2px; }
+  .app.composing.has-model .composer .field > #emojiBtn{ grid-area: emoji; }
   .model-chip:active{ transform: scale(.97); }
   .model-chip .mc-eff{ color: rgba(255,255,255,.55); }
   .model-chip .mc-eff:empty{ display:none; }
   .model-chip svg{ width: 14px; height: 14px; opacity: .7; }
-  .app.has-model{ --composer-zone: calc(var(--composer-h) + 16px + 34px + env(safe-area-inset-bottom) + var(--keyboard-offset)); }
+  .app.composing.has-model{ --composer-zone: calc(var(--composer-h) + 16px + 38px + env(safe-area-inset-bottom) + var(--keyboard-offset)); }
 
   /* ═══ 模型切换面板 ═══ */
   .model-sheet{ position: fixed; inset: 0; z-index: 240; display:flex; align-items:flex-end; justify-content:center; pointer-events: none; }
@@ -2971,6 +2977,46 @@
     color: #F2F2F0; background: rgba(255,255,255,.14); cursor: pointer;
   }
   .model-restart[hidden]{ display:none; }
+  /* ═══ 日历换一身软一点的:不要一格一格的砖,数字浮在玻璃上,选中的那天用细线圈起来 ═══ */
+  .home-card.card-planner{ padding: 20px 16px 14px; border-radius: 26px; border-color: rgba(255,255,255,.14); box-shadow: 0 12px 30px rgba(0,0,0,.18); }
+  .card-planner::before{ display:none; }
+  .card-planner .cal-head{ margin-bottom: 14px; padding: 0 6px; }
+  .card-planner .cal-m-en{ font-size: 26px; font-style: italic; letter-spacing: .01em; }
+  .card-planner .cal-head > button{ width: 30px; height: 30px; border: 0; background: transparent; font-size: 20px; color: var(--plan-soft); }
+  .card-planner .cal-week span{ font-size: 10px; letter-spacing: .16em; padding-bottom: 6px; opacity: .8; }
+  .card-planner .cal-grid{ gap: 2px 0; }
+  .card-planner .cal-cell{
+    height: 54px; padding: 8px 0 0; border: 0; border-radius: 16px; background: transparent;
+    gap: 5px; transition: background-color .18s ease, box-shadow .18s ease;
+  }
+  .card-planner .cal-cell .n{ font-size: 16px; font-family: var(--font-en); font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; line-height: 1; }
+  .card-planner .cal-cell.other{ background: transparent; }
+  .card-planner .cal-cell.other .n{ opacity: .28; }
+  .card-planner .cal-cell.today .n{ font-weight: 600; text-decoration: underline; text-decoration-thickness: .5px; text-underline-offset: 4px; }
+  .card-planner .cal-cell.sel{ border: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); background: rgba(255,255,255,.06); }
+  .card-planner .cal-cell.period{ border: 0; background: rgba(217,179,186,.15); }
+  .card-planner .cal-cell.period.sel{ box-shadow: inset 0 0 0 1px rgba(232,200,206,.85); }
+  .card-planner .cal-cell.predict{ border: 0; box-shadow: inset 0 0 0 1px rgba(217,179,186,.35); background: transparent; }
+  .card-planner .cal-cell.predict.sel{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
+  .card-planner .cal-cell:active{ background: rgba(255,255,255,.08); }
+  .card-planner .cal-marks{ height: 7px; gap: 3px; margin-top: 0; }
+  .card-planner .cal-marks .mk{ width: 6px; height: 6px; }
+  .card-planner .cal-legend{ gap: 6px 13px; margin-top: 12px; padding-top: 12px; border-top: .5px solid rgba(255,255,255,.1); font-size: 11px; }
+  .card-planner .cal-legend .mk{ width: 8px; height: 8px; }
+  .card-planner .cal-legend2{ justify-content: space-between; }
+
+  /* 这一天:标题大一点,加东西的按钮轻一点,操作字小而淡 */
+  .cal-day{ gap: 12px; }
+  .cal-day-title b{ font-size: 40px; }
+  .cal-addrow{ gap: 4px; margin: 0 -6px; }
+  .cal-addrow button{ padding: 7px 10px; font-size: 14px; color: var(--text-soft); background: transparent; letter-spacing: .06em; }
+  .cal-addrow button.active, .cal-addrow button[data-add="intimate"].on{ color: var(--text); background: rgba(255,255,255,.12); }
+  .cal-ev{ padding: 9px 0; font-size: 15px; }
+  .cal-ev-acts{ gap: 14px; }
+  .cal-ev-acts button{ font-size: 12px; color: var(--text-faint); letter-spacing: .04em; }
+  .cal-period-link{ font-size: 13px; color: var(--text-faint); }
+  .card-planner + .cal-day, .cal-day.card-line{ border-radius: 26px; }
+
   /* 顶栏多了一个额度按钮:手机上把按钮间距收紧一点,别压到名字 */
   @media (max-width: 600px){ .header-actions{ gap: 15px; } }
 
@@ -3050,18 +3096,16 @@
     </div>
   </main>
   <footer class="composer">
-    <div class="model-row">
-    <button type="button" class="model-chip" id="modelChip" aria-haspopup="dialog" aria-label="切换模型">
-      <span class="mc-name" id="modelChipName">Orion</span><span class="mc-eff" id="modelChipEffort"></span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
-    </button>
-    </div>
     <div class="field">
       <button class="floatbtn clip-in-field" id="clipBtn" aria-label="附件" title="附件">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-8.8 8.8a5 5 0 0 1-7.1-7.1l8.8-8.8a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.6 1.6 0 0 1-2.3-2.3l8-8"/></svg>
       </button>
       <input type="file" id="clipInput" multiple class="hidden" aria-hidden="true">
       <textarea id="input" rows="1" placeholder="Write a letter..." enterkeyhint="send"></textarea>
+      <button type="button" class="model-chip" id="modelChip" aria-haspopup="dialog" aria-label="切换模型">
+        <span class="mc-name" id="modelChipName">Orion</span><span class="mc-eff" id="modelChipEffort"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+      </button>
       <button class="emojibtn" id="emojiBtn" aria-label="表情" title="表情">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.3a4.2 4.2 0 0 0 7 0"/><line x1="9" y1="9.3" x2="9" y2="10"/><line x1="15" y1="9.3" x2="15" y2="10"/></svg>
       </button>
@@ -7966,6 +8010,7 @@ async function doSend(){
   ensureAudio();                 // 手势内解锁/预热音频
   inputEl.value = "";
   inputEl.style.height = "auto";
+  if (typeof syncComposing === "function") syncComposing();
   sendBtn.classList.remove("hidden");
   micBtn.classList.add("hidden");
 
@@ -8396,6 +8441,7 @@ function closeModelSheet(){
   if (!modelSheet) return;
   modelSheet.classList.remove("open");
   modelSheet.setAttribute("aria-hidden", "true");
+  syncComposing();
 }
 async function postModel(body, note){
   try{
@@ -8408,7 +8454,23 @@ async function postModel(body, note){
     renderModelSheet(note);
   }catch(_){ renderModelSheet("没切成功，稍后再试。"); }
 }
-if (modelChip) modelChip.addEventListener("click", openModelSheet);
+if (modelChip){
+  // 按下时别让输入框失焦(不然按钮会先缩回去,点不到)
+  modelChip.addEventListener("pointerdown", (e) => e.preventDefault());
+  modelChip.addEventListener("mousedown", (e) => e.preventDefault());
+  modelChip.addEventListener("click", () => { const i = $("#input"); if (i) i.blur(); openModelSheet(); });
+}
+const composeInput = $("#input");
+function syncComposing(){
+  const on = !!composeInput && (document.activeElement === composeInput || !!composeInput.value.trim()
+    || (modelSheet && modelSheet.classList.contains("open")));
+  appEl.classList.toggle("composing", on);
+}
+if (composeInput){
+  composeInput.addEventListener("focus", syncComposing);
+  composeInput.addEventListener("blur", () => setTimeout(syncComposing, 120));
+  composeInput.addEventListener("input", syncComposing);
+}
 const modelScrim = $("#modelScrim");
 if (modelScrim) modelScrim.addEventListener("click", closeModelSheet);
 const modelListEl = $("#modelList");
