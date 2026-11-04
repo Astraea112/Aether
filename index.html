@@ -3736,6 +3736,20 @@
   .env::after{ content:""; position:absolute; left: 4%; right: 4%; bottom: -10px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.45); filter: blur(10px); z-index: -1; }
   #pcEnv .env-card{ box-shadow: 0 -2px 6px rgba(0,0,0,.18);
     background: linear-gradient(180deg, rgba(40,30,20,.34), rgba(40,30,20,.1)), url("letter-paper.webp") center 50% / 100% 300% no-repeat !important; }
+
+  /* 寄出去:不飞了,信封往下沉一点,慢慢淡掉 */
+  .post-compose.s-vanish .pc-env{ opacity: 0; transform: translate(-50%, calc(-50% + 18px)) scale(.94); transition: opacity 1.2s ease .1s, transform 1.4s cubic-bezier(.3,.6,.3,1); }
+  .post-compose.s-vanish .pc-when, .post-compose.s-vanish .pc-bar{ opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+  /* 撤回 */
+  .pr-recall{ margin: 2px 0 8px; border: 0; padding: 8px 18px; border-radius: 999px; cursor: pointer; font: inherit; font-size: var(--fs-s); letter-spacing: .08em;
+    color: var(--text-soft); background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.16); }
+  .pr-recall[hidden]{ display: none; }
+  .pr-stage .env.recalling{ opacity: 0; transform: translateY(24px) scale(.94); transition: opacity .45s ease, transform .5s ease; }
+  /* 邮筒调暗:暗灰、低对比,大小不变 */
+  .lt-desk .lt-box .rb-img{ filter: drop-shadow(0 12px 14px rgba(0,0,0,.55)) brightness(.42) contrast(.92) saturate(.4) !important; }
+  .lt-desk .lt-box::after{ background: linear-gradient(90deg, #1c1d20, #3a3c40 45%, #26272a 75%, #1a1b1e) !important;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.8) 30%, rgba(0,0,0,.35) 70%, transparent 100%) !important;
+            mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.8) 30%, rgba(0,0,0,.35) 70%, transparent 100%) !important; height: 360px !important; }
 </style>
 </head>
 <body>
@@ -4300,6 +4314,7 @@
   <p class="pr-sent" id="prSent"></p>
   <div class="pr-stage" id="prStage"></div>
   <div class="pr-nav"><button type="button" id="prPrev" aria-label="上一封">‹</button><button type="button" id="prNext" aria-label="下一封">›</button></div>
+  <button type="button" class="pr-recall" id="prRecall" hidden>撤回这封</button>
   <div class="pr-letter" id="letterRead">
     <p class="letter-body" id="letterBody"></p>
     <p class="letter-sign" id="letterSign"></p>
@@ -4332,9 +4347,6 @@
   <div class="env-stamp"><b class="env-y">2026</b><span class="env-md">XI · 04</span></div>
 </div>
     </div>
-    <div class="pc-mini" id="pcMini">
-<img class="rb-img" src="letter-mailbox.webp" alt="" draggable="false">
-</div>
   </div>
   <div class="pc-when">
     <input type="text" class="pc-title" id="pcTitleIn" maxlength="40" placeholder="信封上写一句（可以不写）">
@@ -5807,9 +5819,15 @@ function fetchLetters(){
   get("letters_orion").then((v) => { if (v){ hisLettersRemote = v; refreshMailbox(); } });
   get("letters").then((v) => {
     if (!v) return;
-    const mine = loadJSON(LETTERS_OUT_KEY, []), have = new Set(mine.map((m) => String(m.id)));
-    const add = v.filter((m) => m && m.text && !have.has(String(m.id)));
-    if (add.length) saveJSON(LETTERS_OUT_KEY, mine.concat(add));
+    const mine = loadJSON(LETTERS_OUT_KEY, []), byId = new Map(mine.map((m) => [String(m.id), m]));
+    let changed = false;
+    for (const r of v){
+      if (!r || !r.id) continue;
+      const l = byId.get(String(r.id));
+      if (!l){ if (r.text || r.deleted){ mine.push(r); changed = true; } }
+      else if (r.deleted && !l.deleted){ Object.assign(l, { deleted: true, text: "", title: "", deletedAt: r.deletedAt }); changed = true; }
+    }
+    if (changed){ saveJSON(LETTERS_OUT_KEY, mine); refreshMailbox(); }
   });
 }
 function letters(){                                   // 他写给你的,新的在前
@@ -5817,7 +5835,16 @@ function letters(){                                   // 他写给你的,新的�
   const v = hisLettersRemote || ((typeof USE_MOCK !== "undefined" && USE_MOCK) ? MOCK_LETTERS : []);
   return v.filter((m) => m && m.text).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
 }
-function sentLetters(){ return loadJSON(LETTERS_OUT_KEY, []).filter((m) => m && m.text).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)); }
+function sentLetters(){ return loadJSON(LETTERS_OUT_KEY, []).filter((m) => m && m.text && !m.deleted).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)); }
+/* 撤回:不真删,留一个 deleted 记号,这样别的设备同步时也知道它撤回了 */
+function recallLetter(id){
+  const mine = loadJSON(LETTERS_OUT_KEY, []);
+  const m = mine.find((x) => String(x.id) === String(id));
+  if (!m) return;
+  m.deleted = true; m.text = ""; m.title = ""; m.deletedAt = Date.now();
+  saveJSON(LETTERS_OUT_KEY, mine);
+  syncKV("letters", mine.slice(-100));
+}
 function letterDate(ts){
   const [y, m, d] = dayKey(ts || Date.now()).split("-");
   return { y, md: `${ROMAN[+m - 1]} · ${String(+d).padStart(2, "0")}` };
@@ -5839,6 +5866,7 @@ function renderReader(){
   prIdx = Math.max(0, Math.min(prIdx, list.length - 1));
   $("#prCount").textContent = list.length ? `${prIdx + 1}/${list.length}` : "0/0";
   letterSheet.querySelectorAll(".pr-tabs button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.box === prBox ? "true" : "false"));
+  const rc = $("#prRecall"); if (rc) rc.hidden = prBox !== "out" || !list.length;
   $("#prPrev").disabled = prIdx <= 0;
   $("#prNext").disabled = prIdx >= list.length - 1;
   const m = list[prIdx];
@@ -5923,6 +5951,15 @@ if (letterSheet){
   $("#letterClose").addEventListener("click", closeMailbox);
   $("#letterBack").addEventListener("click", closeLetter);
   $("#prPrev").addEventListener("click", () => { prIdx--; renderReader(); });
+  $("#prRecall").addEventListener("click", () => {
+    const m = sentLetters()[prIdx];
+    if (!m) return;
+    const note = m.openAt && m.openAt > Date.now() ? "他还拆不开这封。" : "要是他已经读过了，撤回只能把信拿走。";
+    if (!confirm(`撤回这封信？\n${note}`)) return;
+    const env = $("#prStage .env");
+    const go = () => { recallLetter(m.id); renderReader(); refreshMailbox(); showToast("撤回了"); };
+    if (env && !prefersReducedMotion){ env.classList.add("recalling"); setTimeout(go, 520); } else go();
+  });
   $("#prNext").addEventListener("click", () => { prIdx++; renderReader(); });
   let sx = null;
   $("#prStage").addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
@@ -6043,7 +6080,7 @@ function foldLetter(){                              // 第一步:写好了 → �
   setTimeout(() => env.classList.add("waxed"), 4250);
   setTimeout(() => { pcSet("s-fold s-pack s-env s-insert s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; }, 4700);
 }
-function postLetter(){                              // 第二步:寄出去 → 飞进邮筒
+function postLetter(){                              // 第二步:寄出去 → 信封慢慢淡掉
   const ta = $("#postText"), text = ta.value.trim();
   if (!text) return;
   const openAt = openAtFor(pcWhen);
@@ -6057,28 +6094,18 @@ function postLetter(){                              // 第二步:寄出去 → �
   syncKV("letters", mine.slice(-100));
   const finish = () => {
     ta.value = ""; try{ localStorage.removeItem("companion_letter_draft"); }catch(_){}
-    postCompose.className = "post-overlay post-compose s-fold s-pack s-env s-insert s-fly s-drop";
+    postCompose.className = "post-overlay post-compose s-fold s-pack s-env s-insert s-vanish";
     postCompose.setAttribute("aria-hidden", "true");
-    setTimeout(() => { postCompose.className = "post-overlay post-compose"; $("#pcMini").classList.remove("flag-up"); }, 320);
+    setTimeout(() => { postCompose.className = "post-overlay post-compose"; }, 320);
     const lp = $("#ltPaper"); if (lp) setTimeout(() => lp.classList.remove("taken"), 400);
     showToast(m.openAt ? `寄出去了，${fmtOpenAt(m.openAt)} 他才能拆` : "寄出去了");
     refreshMailbox();
     try{ sendFromHome(m.openAt ? `（往你的信箱里投了一封信，${fmtOpenAt(m.openAt)} 以后才能拆）` : "（往你的信箱里投了一封信）"); }catch(_){}
   };
   if (prefersReducedMotion) return finish();
-  const base = "s-fold s-pack s-env s-insert";
-  pcSet(base + " s-fly");
-  setTimeout(() => {
-    const box = $("#pcEnv"), mb = $("#pcMini .rb-img");
-    if (box && mb){                                   // 投信口在邮筒图左边那一面,大约 18% / 38% 的位置
-      const e = box.getBoundingClientRect(), r = mb.getBoundingClientRect();
-      box.style.setProperty("--dx", (r.left + r.width * .18 - (e.left + e.width / 2)) + "px");
-      box.style.setProperty("--dy", (r.top + r.height * .38 - (e.top + e.height / 2)) + "px");
-    }
-    pcSet(base + " s-fly s-drop");
-  }, 500);
-  setTimeout(() => $("#pcMini").classList.add("flag-up"), 1300);
-  setTimeout(finish, 2200);
+  // 盖好火漆的信封轻轻往下沉一点,慢慢淡掉
+  pcSet("s-fold s-pack s-env s-insert s-vanish");
+  setTimeout(finish, 1500);
 }
 if (postCompose){
   $("#postCancel").addEventListener("click", closeCompose);

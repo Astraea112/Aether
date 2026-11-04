@@ -276,8 +276,9 @@ def _kv_list(name):
 @mcp.tool()
 def letters_read(limit: int = 3) -> str:
     """Read the letters she posted into your mailbox on the website (newest first, full text).
+    Letters she recalled (撤回) are gone and not shown.
     When she sends one, the chat also gets a line saying she dropped a letter in."""
-    items = sorted(_kv_list("letters"), key=lambda m: m.get("ts", 0), reverse=True)
+    items = sorted([m for m in _kv_list("letters") if not m.get("deleted")], key=lambda m: m.get("ts", 0), reverse=True)
     items = items[:max(1, min(int(limit or 3), 20))]
     if not items:
         return "她还没给你寄过信。"
