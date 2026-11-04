@@ -3682,7 +3682,8 @@
   .post-compose.s-return{ background-color: rgba(10,10,12,0); -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
   .post-compose.s-return .pc-ink{ opacity: 0; transition: opacity .2s ease; }
   .post-compose.s-return .pc-bar, .post-compose.s-return .pc-when{ opacity: 0; pointer-events: none; transition: opacity .15s ease; }
-  .post-compose.s-return .pc-paper{ transition: transform .58s cubic-bezier(.45,0,.25,1); }
+  .post-compose.s-return .pc-paper{ transition: transform .58s cubic-bezier(.45,0,.25,1), filter .58s ease;
+    filter: drop-shadow(0 18px 24px rgba(0,0,0,.55)) brightness(.92) saturate(.8); }
   .post-compose.s-return .pc-pen{ transition: transform .5s cubic-bezier(.45,0,.25,1), opacity .35s ease .15s; }
 </style>
 </head>
@@ -5905,7 +5906,7 @@ function openCompose(){
     // 纸从桌上它原来的位置被拿起来,移到正中间
     paper.style.transition = "none"; pen.style.transition = "none";
     paper.style.transform = ""; const end = paper.getBoundingClientRect();
-    const sx = deskBox.width / end.width, sy = deskBox.height / end.height;
+    const sx = desk.offsetWidth / end.width, sy = desk.offsetHeight / end.height;   // 纸本身的大小,不是歪着时的外框
     const dx = deskBox.left + deskBox.width / 2 - (end.left + end.width / 2), dy = deskBox.top + deskBox.height / 2 - (end.top + end.height / 2);
     paper.style.transform = `translate(${dx}px, ${dy}px) rotate(-9deg) scale(${sx}, ${sy})`;
     pen.style.transform = `translate(${dx * .9}px, ${dy * .9}px) rotate(16deg) scale(.7)`; pen.style.opacity = "0";
@@ -5945,7 +5946,7 @@ function closeCompose(){
   const base = cur && cur !== "none" ? new DOMMatrix(cur) : new DOMMatrix();
   const w = now.width / Math.hypot(base.a, base.b), h = now.height / Math.hypot(base.c, base.d) || now.height;
   const cx = now.left + now.width / 2 - base.e, cy = now.top + now.height / 2 - base.f;
-  const sx = back.width / (paper.offsetWidth || w), sy = back.height / (paper.offsetHeight || h);
+  const sx = desk.offsetWidth / (paper.offsetWidth || w), sy = desk.offsetHeight / (paper.offsetHeight || h);
   const dx = back.left + back.width / 2 - cx, dy = back.top + back.height / 2 - cy;
   postCompose.className = "post-overlay post-compose open s-return";
   paper.style.transform = `translate(${dx}px, ${dy}px) rotate(-9deg) scale(${sx}, ${sy})`;
