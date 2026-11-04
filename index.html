@@ -249,12 +249,12 @@
   /* ── ORION 杂志化结构覆盖(仅深色主题作用域) ──
      原则:星空是世界,缎带只做相框——装饰只出现在包裹内容的边缘,不漂浮在空间里。 */
 
-  /* ── 饱满磨砂:Orion 是浅一点的白雾(.24),你是深一点的烟灰雾,同一种玻璃同一个色调,blur 10px;无边框,一层轻投影让泡泡微微浮起。
+  /* ── 饱满磨砂:你是浅一点的白雾(.24),Orion 是深一点的烟灰雾,同一种玻璃同一个色调,blur 10px;无边框,一层轻投影让泡泡微微浮起。
      圆角 20px,单行短消息就是胶囊;内边距收紧、气泡贴着文字。只靠填充亮度区分双方。 ── */
   [data-theme="harbor"] .row.ai .bubble,
-  [data-theme="harbor"] .msg-menu-clone.clone-ai{ --g-fill: rgba(255,255,255,.24); --b-ink: var(--ink); }
+  [data-theme="harbor"] .msg-menu-clone.clone-ai{ --g-fill: rgba(92,92,98,.42); --b-ink: var(--ink); }
   [data-theme="harbor"] .row.human .bubble,
-  [data-theme="harbor"] .msg-menu-clone.clone-human{ --g-fill: rgba(92,92,98,.42); --b-ink: var(--ink); }
+  [data-theme="harbor"] .msg-menu-clone.clone-human{ --g-fill: rgba(255,255,255,.24); --b-ink: var(--ink); }
   :root[data-theme="harbor"] .row .bubble,
   :root[data-theme="harbor"] .msg-menu-clone{
     border: 0;
