@@ -3758,6 +3758,9 @@
   .model-chip{ box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
     background: rgba(255,255,255,.1) !important; }
   #emojiBtn{ display: none !important; }
+
+  /* 一行一个气泡:中间那几个不带时间,挨得近一点 */
+  .bubble.no-meta{ padding-bottom: var(--bubble-pad-y, 8px); }
 </style>
 </head>
 <body>
@@ -8363,12 +8366,32 @@ function buildVirtualRows(){
       prevBubble = { from:m.from, ts:t, row:trow };
       return;
     }
+    const parts = bubbleParts(m);
+    if (parts.length > 1){                          // 一行一个气泡,像微信那样一句一句
+      if (grouped && prevBubble.row) prevBubble.row.tail = false;
+      let last = null;
+      parts.forEach((seg, i) => {
+        const r = { type:"message", key:`m:${m._key}:p${i}`, message:m, part:"seg", seg, firstSeg: i === 0, lastSeg: i === parts.length - 1,
+          grouped: i === 0 ? grouped : true, tail: i === parts.length - 1 };
+        if (last) last.tail = false;
+        rows.push(r); last = r;
+      });
+      prevBubble = { from:m.from, ts:t, row:last };
+      return;
+    }
     const row = { type:"message", key:`m:${m._key}`, message:m, grouped, tail:true };
     if (grouped && prevBubble.row) prevBubble.row.tail = false;
     rows.push(row);
     prevBubble = { from:m.from, ts:t, row };
   });
   return rows;
+}
+/* 一条消息按换行拆成几个气泡;有代码块的、只有一行的不拆 */
+function bubbleParts(m){
+  const t = String(m.text || "");
+  if (!t || t.indexOf("\n") < 0 || t.indexOf("```") >= 0) return [t];
+  const lines = t.split(/\n+/).map((x) => x.trim()).filter(Boolean);
+  return lines.length > 1 && lines.length <= 40 ? lines : [t];
 }
 // 内容感知估高:按气泡内宽估文本折行 + 附件高度,首屏估值贴近真实高度→measureVisibleRows
 // 纠偏量骤降(上滑进未测行时 restoreAnchor 的 scrollTop 补偿从 ~2000px 级降到 ~50px)。
@@ -8411,7 +8434,7 @@ function estimatedHeight(row){
   const atts = row.part === "txt" ? [] : ((m && m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : []);
   let h = (row.grouped ? 8 : 22) + 30;                        // 行间距 + 气泡纵向 padding + meta 行
   for (const a of atts) h += a.kind === "image" ? estImageHeight(a) : 56;
-  h += estTextHeight(row.part === "att" ? "" : (m && m.text));
+  h += estTextHeight(row.part === "att" ? "" : row.part === "seg" ? row.seg : (m && m.text));
   return Math.max(h, DEFAULT_ROW_HEIGHT);
 }
 function rebuildPrefixSums(){
@@ -8570,7 +8593,7 @@ function makeMessage(rowData){
   if (freshKeys.has(m._key)){                       // 只对刚发/刚收到的那条播一次入场动画
     const cls = m.from === "human" ? "enter-human" : "enter-ai";
     row.classList.add(cls);
-    freshKeys.delete(m._key);
+    if (rowData.part !== "seg" || rowData.lastSeg) freshKeys.delete(m._key);
     row.addEventListener("animationend", () => row.classList.remove(cls), { once:true });
   }
 
@@ -8578,7 +8601,7 @@ function makeMessage(rowData){
   bubble.className = "bubble";
   const part = rowData.part || "";
   const atts = part === "txt" ? [] : ((m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : []);
-  const text = part === "att" ? "" : m.text;
+  const text = part === "att" ? "" : part === "seg" ? rowData.seg : m.text;
   let _inner = "";
   if (atts.length) _inner += renderAttachments(atts);
   if (text) _inner += `<span class="txt">${renderText(text)}</span>`;
@@ -8587,7 +8610,8 @@ function makeMessage(rowData){
   if (atts.length){ bubble.classList.add("has-att"); if (!text) bubble.classList.add("att-only"); }
   if (part === "att") row.classList.add("att-part");
   const metaEl = bubble.querySelector(".meta");
-  if (m.status === "sending") metaEl.innerHTML = `<span>${fmtTime(m.ts)}</span>` + sendingTickHtml();
+  if (part === "seg" && !rowData.lastSeg){ metaEl.remove(); bubble.classList.add("no-meta"); }
+  else if (m.status === "sending") metaEl.innerHTML = `<span>${fmtTime(m.ts)}</span>` + sendingTickHtml();
   else if (m.status === "failed"){
     metaEl.innerHTML = `<span class="fail">未送达 · 重试</span>`;
     const fail = metaEl.querySelector(".fail");
@@ -8600,7 +8624,7 @@ function makeMessage(rowData){
   }else fillMeta(metaEl, m.ts, m.from === "human");
   row.appendChild(bubble);
   // reaction chips — AI poke (one-way: AI → you), rendered only under your own bubbles; not under the AI's
-  const reactions = (part !== "att" && m.from === "human" && m.meta && m.meta.reactions && typeof m.meta.reactions === "object") ? m.meta.reactions : null;
+  const reactions = (part !== "att" && !(part === "seg" && !rowData.lastSeg) && m.from === "human" && m.meta && m.meta.reactions && typeof m.meta.reactions === "object") ? m.meta.reactions : null;
   const rxList = reactions ? Object.keys(reactions).map((who) => reactions[who]).filter(Boolean) : [];
   if (rxList.length){
     row.classList.add("has-reactions");
@@ -9429,6 +9453,7 @@ async function doSend(){
   const text = inputEl.value.trim();
   if (!text && !stagedAtts.length) return;
   if (stagedAtts.length){
+    flushSendBatch();
     triggerSendPress(); ensureAudio();
     inputEl.value = ""; inputEl.style.height = "auto";
     if (typeof syncComposing === "function") syncComposing();
@@ -9455,17 +9480,55 @@ async function doSend(){
   rememberPendingOutgoing(tempKey, text, optimisticTs);
   scheduleRender({ stickToBottom:true });
 
+  queueSend(tempKey, text, optimistic);
+}
+/* 连发:每条先显示出来,停手几秒(或者还在打下一句就再等等)以后,攒的几条合成一条一起发给他。
+   合成的一条按换行显示,所以看起来还是一句一个气泡。 */
+const BATCH_IDLE_MS = 3500, BATCH_MAX_MS = 20000;
+let sendBatch = null;
+function queueSend(tempKey, text, optimistic){
+  if (!sendBatch) sendBatch = { items: [], first: Date.now(), timer: null };
+  sendBatch.items.push({ tempKey, text, optimistic });
+  armBatch();
+}
+function armBatch(){
+  if (!sendBatch) return;
+  clearTimeout(sendBatch.timer);
+  sendBatch.timer = setTimeout(() => {
+    if (!sendBatch) return;
+    const typing = inputEl.value.trim() && Date.now() - sendBatch.first < BATCH_MAX_MS;
+    if (typing) return armBatch();                 // 她还在打下一句,再等一会儿
+    flushSendBatch();
+  }, BATCH_IDLE_MS);
+}
+async function flushSendBatch(){
+  const b = sendBatch;
+  if (!b || !b.items.length) return;
+  sendBatch = null;
+  clearTimeout(b.timer);
+  const head = b.items[0], text = b.items.map((x) => x.text).join("\n");
+  const headMsg = messageByKey.get(msgKey(head.tempKey));
+  // 后面几条并进第一条(显示不变:一行一个气泡);认领回声也按合起来的整段来认
+  for (const it of b.items.slice(1)){ dropPendingOutgoing(it.tempKey); removeMessage(msgKey(it.tempKey)); }
+  if (headMsg){ headMsg.text = text; }
+  dropPendingOutgoing(head.tempKey);
+  rememberPendingOutgoing(head.tempKey, text, Date.now());
+  scheduleRender({ stickToBottom:true });
+  const optimistic = { ...head.optimistic, text };
   try{
     const { id } = await apiSend(text);
     const key = msgKey(id);
-    confirmOptimistic(tempKey, key);
-    dropPendingOutgoing(tempKey);
+    confirmOptimistic(head.tempKey, key);
+    dropPendingOutgoing(head.tempKey);
   }catch(err){
-    dropPendingOutgoing(tempKey);
+    dropPendingOutgoing(head.tempKey);
     if (String(err.message) === "401") return;
     setMessage({ ...optimistic, status:"failed" });
   }
 }
+// 切走或者关掉页面时,攒着的马上发出去
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushSendBatch(); });
+window.addEventListener("pagehide", () => flushSendBatch());
 
 /* ════════════ 附件发送 ════════════ */
 const ATT_MAX = 10 * 1024 * 1024;
