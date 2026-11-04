@@ -157,3 +157,14 @@ relay 还没有这个接口时请求会 404,前端静默忽略、不影响使用
   数字密码只存加盐 PBKDF2 哈希（`~/companion-relay/pin.env`）。全局限流：15 分钟内错 5 次锁定，24 小时内最多错 20 次。
 - `deploy/pin/pin-setup.sh`：装 pin-gate + systemd 服务、设密码、给 nginx 加一行 include（先备份，测试不过自动还原）、更新前端。可重复运行；`RESET_PIN=1` 换密码。
 - relay、relay.env、channel 配置都不动。
+
+## 11. 主动找她：room_mcp + tmux 唤醒
+
+`deploy/room/room-setup.sh` 把 [room_mcp](https://github.com/anhe2021212-spec/room_mcp) 装到 `/home/ubuntu/room_mcp`（独立 venv，mcp 锁在 1.x：2.x 把 FastMCP 改名了）。
+
+- `deploy/room/tmux.py`：scheduler 的 notifier，用 `tmux send-keys` 把 `[♥heartbeat:trigger] heartbeat` 打进 tmux 会话 `orion`。
+  会话不存在就跳过；01:00–08:00（Asia/Shanghai）跳过；她 20 分钟内在网站发过消息（查本机 relay `/app/history`）就跳过。`manual`（她亲手敲门）两条都不受限。跳过时把这次的 perturbation 标成已消费。
+- 节奏：08:00–次日 01:00 每 60–120 分钟；早间那一下放在 08–10 点；城市 Shunde。上游天气探测写死的 `127.0.0.1:7897` 代理改成走环境变量。宠物层占位符没填，先 `pets_chance: 0`。
+- 接入 Orion：`~/orion/.mcp.json` 加 `room_mcp`；`settings.json` 放行 `mcp__room_mcp` 和 `WebSearch`；`CLAUDE.md` 追加「收到心跳时」一段。
+- 常驻：systemd `room-scheduler`（TZ=Asia/Shanghai）；`crontab @reboot` 拉起 `start-orion.sh`。
+- 手动敲门：`touch /home/ubuntu/room_mcp/scheduler/manual_wake.flag`。
