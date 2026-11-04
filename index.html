@@ -3645,6 +3645,27 @@
   .post-compose.s-fold .pc-fold.f1, .post-compose.s-fold .pc-fold.f3{ filter: brightness(.93); }
   .post-compose .pc-ink textarea{ background: repeating-linear-gradient(transparent 0 31px, rgba(60,50,40,.08) 31px 32px); }
   .pr-letter{ background: url("letter-paper.webp") center / 100% 100% no-repeat; box-shadow: none; border-radius: 0; filter: drop-shadow(0 20px 40px rgba(0,0,0,.5)); }
+
+  /* 信箱页中间:左边近处是纸和笔,右边远一点是邮筒(她最早画的那样) */
+  .lt-desk{ height: 290px; margin-top: 18px; }
+  .lt-desk .lt-paper{ position: absolute; left: 2%; bottom: 0; width: 40%; border: 0; padding: 0; background: transparent; cursor: pointer; z-index: 2; -webkit-tap-highlight-color: transparent; }
+  .lp-sheet{ display:block; width: 100%; height: auto; transform: rotate(-6deg); filter: drop-shadow(0 18px 24px rgba(0,0,0,.55)) brightness(.92) saturate(.8); transition: transform .3s ease; }
+  .lp-pen{ position: absolute; width: 30%; right: 2%; top: 10%; transform: rotate(22deg); filter: drop-shadow(0 10px 12px rgba(0,0,0,.55)); transition: transform .3s ease; }
+  .lt-paper:active .lp-sheet{ transform: rotate(-6deg) translateY(-3px); }
+  .lt-paper:hover .lp-pen{ transform: rotate(18deg) translateY(-4px); }
+  .lt-desk .lt-box{ left: auto; right: 0; top: 0; width: 44%; transform: none; z-index: 1; }
+  .lt-desk .lt-box:active{ transform: scale(.985); }
+  .lt-desk .lt-box .rb-img{ filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)) brightness(.8) saturate(.75); }
+  .lt-desk .lt-box::after{ content:""; position:absolute; left: 12%; right: 8%; top: 56%; height: 12px; border-radius: 50%; background: rgba(0,0,0,.5); filter: blur(6px); z-index: -1; }
+  .lt-cap{ display:flex; flex-direction:column; align-items:center; gap: 2px; margin-top: 12px; text-align: center; }
+  .lt-cap em{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-s); color: var(--text); }
+  .lt-cap small{ font-family: var(--font-en), var(--font-cn); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
+  .lt-paper .lt-cap{ margin-top: 18px; }
+  .lt-meta{ display:flex; justify-content:space-between; gap: 12px; margin-top: 6px; padding-top: 12px; border-top: .5px solid var(--hairline); }
+  .lt-meta p{ margin: 0; display:flex; flex-direction:column; gap: 1px; }
+  .lt-meta p:last-child{ text-align: right; align-items: flex-end; }
+  .lt-meta em{ font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-s); }
+  .lt-meta small{ font-family: var(--font-en), var(--font-cn); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint); }
 </style>
 </head>
 <body>
@@ -4094,16 +4115,21 @@
             </div>
             <p class="lt-sub">Some things deserve paper, and a little waiting.</p>
 
-            <div class="lt-stage">
-              <button type="button" class="lt-note lt-tl" data-act="write"><i></i><em>the slot</em><small>drop yours in</small></button>
-              <p class="lt-note lt-tr"><i></i><em id="ltUnopened">nothing new</em><small id="ltFlag">flag down</small></p>
-              <p class="lt-note lt-bl"><i></i><em id="ltLast">—</em><small>last post · cst</small></p>
-              <p class="lt-note lt-br"><i></i><em id="ltWaiting">quiet</em><small id="ltWaitingSub">nothing sealed yet</small></p>
+            <div class="lt-stage lt-desk">
+              <button type="button" class="lt-paper" id="ltPaper" aria-label="写一封信">
+                <img class="lp-sheet" src="letter-paper.webp" alt="" draggable="false">
+                <img class="lp-pen" src="letter-pen.webp" alt="" draggable="false">
+                <span class="lt-cap"><em>write to him</em><small>tap the paper</small></span>
+              </button>
               <button type="button" class="lt-box post-box" id="mailboxBtn" aria-label="打开信箱">
                 <img class="rb-img" src="letter-mailbox.webp" alt="" draggable="false">
-                <span class="rb-env" aria-hidden="true"><img src="letter-envelope.webp" alt="" draggable="false"><span class="rb-env-seal"><svg class="env-seal" viewBox="0 0 60 60" aria-hidden="true"><path class="ws-blob" d="M30 3C38 2 45 6 49 10C55 15 58 22 57 30C58 38 54 45 49 50C43 55 37 58 30 57C22 58 15 55 10 49C5 44 2 37 3 30C2 22 6 15 11 10C16 5 23 2 30 3Z"/><circle class="ws-ring" cx="30" cy="30" r="19"/><g class="ws-stars"><circle cx="23" cy="34" r="2.2"/><circle cx="30" cy="30" r="2.4"/><circle cx="37" cy="26" r="2.2"/><circle cx="21" cy="19" r="1.5"/><circle cx="40" cy="41" r="1.5"/></g></svg></span></span>
                 <span class="post-badge" id="mailboxBadge" hidden></span>
+                <span class="lt-cap"><em id="ltUnopened">nothing new</em><small id="ltFlag">all opened</small></span>
               </button>
+            </div>
+            <div class="lt-meta">
+              <p><em id="ltLast">—</em><small>last post · cst</small></p>
+              <p><em id="ltWaiting">quiet</em><small id="ltWaitingSub">nothing sealed</small></p>
             </div>
             <p class="lt-tap" id="mailboxLine">tap the box to take it out</p>
 
@@ -5998,8 +6024,8 @@ if (ltNewest) ltNewest.addEventListener("click", () => {
   openMailbox("in");
   setTimeout(() => openLetter(id), 350);
 });
-const ltSlot = document.querySelector(".lt-tl");
-if (ltSlot) ltSlot.addEventListener("click", () => openCompose());
+const ltPaper = $("#ltPaper");
+if (ltPaper) ltPaper.addEventListener("click", () => openCompose());
 const mailboxBtn = $("#mailboxBtn");
 if (mailboxBtn) mailboxBtn.addEventListener("click", () => openMailbox());
 const mailOpenBtn = $("#mailOpenBtn"), mailWriteBtn = $("#mailWriteBtn");
