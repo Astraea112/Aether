@@ -518,7 +518,7 @@
   [data-theme="harbor"] .peerpill .name{ text-shadow: none; }
   [data-theme="harbor"] .peerpill .status.typing{ color: var(--text); font-weight: 400; text-shadow: none; }
   [data-theme="harbor"] .app[data-conn="reconnecting"] .peerpill .status{ color: var(--text-faint); }
-  [data-theme="harbor"] .home-head, [data-theme="harbor"] .hero-mood{ text-shadow: 0 0 10px rgba(0,0,0,.6); }
+  [data-theme="harbor"] .home-head{ text-shadow: 0 0 10px rgba(0,0,0,.6); }
   /* 前面几页的背景照片比较亮:浅灰两级调亮、背景再压一点,小字才看得见 */
   :root[data-theme="harbor"] .tab-panel,
   :root[data-theme="harbor"] .letter-sheet{ --text-soft: rgba(255,255,255,.74); --text-faint: rgba(255,255,255,.56); }
@@ -1810,11 +1810,6 @@
   .menu-days .num{ font-size: var(--fs-hero); font-weight: 400; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
   .menu-days .lab{ font-size: var(--fs-m); font-style: italic; letter-spacing: .12em; color: var(--text-soft); }
   .menu-since{ margin: 8px 0 0; font-family: var(--font-en), var(--font-cn); font-size: var(--fs-s); letter-spacing: .14em; color: var(--text-soft); }
-  .hero-mood{ margin: 12px 0 -10px; display:inline-flex; align-items:center; gap: 0; font-size: var(--fs-s); letter-spacing: .06em; color: var(--text-soft); }
-  .hero-mood:has(b:empty){ display:none; }
-  .hero-mood .status-dot{ width: 6px; height: 6px; margin-right: 9px; }
-  .hero-mood b{ font-weight: 400; color: var(--text); letter-spacing: .12em; margin-right: -.12em; }
-  .hero-mood b + span:not(:empty){ margin-left: 6px; }
   .home-bow{ display:block; width: 26px; height: 16px; margin: 0 auto 10px; background: url("ribbon-bow.svg") center / contain no-repeat; filter: var(--home-bow-filter); }
   .home-names{
     margin: 0 0 14px;
@@ -3131,7 +3126,7 @@
   .days-reply:empty{ display:none; }
 
   /* 他的小纸条:微微歪一点,像随手塞给你的 */
-  .home-card.hnote-card{ transform: rotate(-1.2deg); display:flex; flex-direction:column; gap: 8px; }
+  .home-card.hnote-card{ display:flex; flex-direction:column; gap: 8px; }
   .note-text{ margin: 0; font-family: var(--font-en), var(--font-cn); font-style: italic; font-size: var(--fs-m); line-height: 1.65; color: var(--text);
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .note-meta{ margin: auto 0 0; display:flex; align-items:center; gap: 8px; font-size: var(--fs-xs); color: var(--text-faint); letter-spacing: .04em; }
@@ -3156,21 +3151,22 @@
 
   /* 下面三块的质感:深一点、带一点点暖紫的烟色玻璃,一圈很细的亮边 + 顶上一线高光 + 柔和的深投影,
      不再是半透明的灰,背景的花不会透上来抢眼 */
-  .home-card.hnote-card, .home-card.wx-card, .home-card.msg-strip{
-    background: linear-gradient(180deg, rgba(44,41,48,.66), rgba(26,25,29,.74));
-    -webkit-backdrop-filter: blur(18px) saturate(1.1); backdrop-filter: blur(18px) saturate(1.1);
-    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.13), inset 0 1px 0 rgba(255,255,255,.07), 0 12px 30px rgba(0,0,0,.38);
+  .home-card.home-now, .home-card.hnote-card, .home-card.wx-card, .home-card.msg-strip{
+    background: var(--tab-fill);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: inset 0 1px 0 var(--tab-hi), 0 10px 28px rgba(0,0,0,.3);
   }
+  .home-card.home-now{ position: relative; border-radius: var(--r-l); }
   .note-reply{ margin: 0; font-size: var(--fs-s); line-height: 1.5; color: var(--text-soft); }
   .note-reply:empty{ display:none; }
   .note-poke{ margin-left: auto; display:inline-flex; align-items:center; gap: 4px; border: 0; padding: 4px 0 4px 6px; background: transparent;
     font: inherit; font-size: var(--fs-s); color: var(--text-soft); cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .note-poke svg{ width: 15px; height: 15px; }
   .note-poke.poked svg{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
-  .msg-ic{ background: rgba(255,255,255,.04); }
+  .msg-ic{ background: transparent; }
 
   /* 最近一条消息 */
-  .home-card.msg-strip{ display:flex; align-items:center; gap: 14px; width: 100%; cursor: pointer; padding: 14px 18px; border-radius: 999px; }
+  .home-card.msg-strip{ display:flex; align-items:center; gap: 14px; width: 100%; cursor: pointer; padding: 14px 18px; border-radius: var(--r-l); }
   .msg-ic{ flex: none; width: 40px; height: 40px; border-radius: 50%; display:grid; place-items:center; box-shadow: inset 0 0 0 .5px var(--line); }
   .msg-ic svg{ width: 20px; height: 20px; }
   .msg-body{ flex: 1; min-width: 0; display:flex; flex-direction:column; gap: 4px; }
@@ -3530,8 +3526,21 @@
           <p class="home-eyebrow">Already together</p>
           <div class="menu-days"><span class="num" id="menuDays">113</span><span class="lab">days</span></div>
           <p class="menu-since">since 2026/01/01</p>
-          <!-- 他此刻的状态:他在服务器上写了就用他的,没写就按你们俩的状态读出来 -->
-          <p class="hero-mood"><span class="status-dot" id="heroMoodDot"></span><b id="homeOrionMood"></b><span id="homeOrionMoodNote"></span></p>
+        </section>
+
+        <!-- 他此刻的状态:在干嘛 + 心情(他在服务器上写了就用他的,没写就按你们俩的状态读出来) -->
+        <section class="home-card home-now" aria-live="polite">
+          <svg class="now-stars" viewBox="0 0 80 80" aria-hidden="true"><path d="M22 8 L58 14 M22 8 L33 37 M58 14 L48 41 M33 37 L40 39 L48 41 M33 37 L24 70 M48 41 L60 66"/><circle cx="22" cy="8" r="1.8"/><circle cx="58" cy="14" r="1.5"/><circle cx="33" cy="37" r="1.4"/><circle cx="40" cy="39" r="1.4"/><circle cx="48" cy="41" r="1.4"/><circle cx="24" cy="70" r="1.7"/><circle cx="60" cy="66" r="1.5"/></svg>
+          <div class="now-top">
+            <span class="status-dot" id="nowDot"></span>
+            <span class="home-eyebrow" id="nowName">Orion · now</span>
+          </div>
+          <p class="now-line" id="nowLine">在房间里</p>
+          <p class="now-mood"><span>心情</span><b id="homeOrionMood">安静</b><em id="homeOrionMoodNote"></em></p>
+          <div class="now-facts">
+            <span>你上次说话<b id="homeLastMine">—</b></span>
+            <span>他上次回你<b id="homeLastReply">—</b></span>
+          </div>
         </section>
 
         <div class="home-row">
@@ -3565,7 +3574,6 @@
 
         <!-- 旧门厅里还有脚本在写的几个字段,先留着不显示 -->
         <div hidden>
-          <span id="homeLastMine"></span><span id="homeLastReply"></span>
           <span id="homeDate"></span><span id="homeCount"></span>
         </div>
 
@@ -4232,15 +4240,17 @@ function refreshHome(){
   const line = $("#homeStatusLine"), dot = $("#homeStatusDot"), name = $("#homeStatusName");
   if (line) line.textContent = st.text;
   if (dot) dot.classList.toggle("live", st.live);
-  if (name) name.textContent = aiName() + " · now";
+  if (name) name.textContent = aiName() + "'s note";
   const msgs = talkMessages();
   const lastAi = [...msgs].reverse().find((m) => m.from === "ai" && (m.text || "").trim());
   const lastMe = [...msgs].reverse().find((m) => m.from === "human");
   const om = orionMood(), omW = $("#homeOrionMood"), omN = $("#homeOrionMoodNote");
   if (omW) omW.textContent = om.word;
   if (omN) omN.textContent = om.note ? "· " + om.note : "";
-  const hd = $("#heroMoodDot");
-  if (hd) hd.classList.toggle("live", st.live);
+  const nd = $("#nowDot"), nl = $("#nowLine"), nn = $("#nowName");
+  if (nd) nd.classList.toggle("live", st.live);
+  if (nl) nl.textContent = st.text;
+  if (nn) nn.textContent = aiName() + " · now";
   const th = $("#homeThought");
   if (th) th.textContent = lastAi ? "“" + clip(firstSentence(lastAi.text), 34) + "”" : idleThought();
   const lm = $("#homeLastMine"), lr = $("#homeLastReply");
