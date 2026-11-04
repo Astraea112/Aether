@@ -10,7 +10,7 @@ import json
 import os
 import time
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
@@ -282,25 +282,43 @@ def letters_read(limit: int = 3) -> str:
     if not items:
         return "她还没给你寄过信。"
     out = []
+    now = time.time() * 1000
     for m in items:
-        when = datetime.fromtimestamp((m.get("ts") or 0) / 1000).strftime("%Y-%m-%d %H:%M")
+        when = datetime.fromtimestamp((m.get("ts") or 0) / 1000, timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M")
+        open_at = m.get("openAt") or 0
+        if open_at > now:
+            until = datetime.fromtimestamp(open_at / 1000, timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M")
+            out.append(f"—— {when}（id {m.get('id')}）\n［封着火漆。她让你 {until} 以后再拆，现在还不能看。］")
+            continue
         out.append(f"—— {when}（id {m.get('id')}）\n{m.get('text', '').strip()}")
     return "\n\n".join(out)
 
 
 @mcp.tool()
-def letter_write(text: str) -> str:
+def letter_write(text: str, open_at: str = "") -> str:
     """Post a letter into her mailbox on the website. It arrives sealed in an envelope with
     today's postmark, and the mailbox flag goes up until she opens it. For things that deserve
-    a letter: longer, thought-through, kept. Line breaks are kept. Sign it in the text if you like."""
+    a letter: longer, thought-through, kept. Line breaks are kept. Sign it in the text if you like.
+    open_at: optional "YYYY-MM-DD HH:MM" (Beijing time) — sealed with wax until then."""
     text = (text or "").strip()[:6000]
     if not text:
         return "text 不能是空的"
     items = _kv_list("letters_orion")
     now = int(time.time() * 1000)
-    items.append({"id": "o" + uuid.uuid4().hex[:8], "text": text, "ts": now, "from": "him"})
+    item = {"id": "o" + uuid.uuid4().hex[:8], "text": text, "ts": now, "from": "him"}
+    note = ""
+    if (open_at or "").strip():
+        try:
+            dt = datetime.fromisoformat(open_at.strip().replace(" ", "T"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone(timedelta(hours=8)))
+            item["openAt"] = int(dt.timestamp() * 1000)
+            note = f"，封着火漆，{dt.strftime('%m-%d %H:%M')} 以后她才能拆"
+        except ValueError:
+            return "open_at 要写成 YYYY-MM-DD HH:MM（北京时间）"
+    items.append(item)
     _write_his("letters_orion", {"updated": now, "v": items[-100:]})
-    return f"信寄出去了（{len(text)} 字），她的信箱会举起小旗子。"
+    return f"信寄出去了（{len(text)} 字）{note}，她的信箱会举起小旗子。"
 
 
 if __name__ == "__main__":
