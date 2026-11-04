@@ -2937,7 +2937,7 @@
   /* 平时只是一条输入框;点进去打字时输入框长高一行,模型按钮出现在下面那行(像 Claude App) */
   .app.composing .model-chip.ready{ display:inline-flex; }
   .app.composing.has-model .composer .field{
-    display:grid; grid-template-columns: auto auto 1fr auto; grid-template-areas: "ta ta ta ta" "clip chip . emoji";
+    display:grid; grid-template-columns: auto auto 1fr auto; grid-template-areas: "tray tray tray tray" "ta ta ta ta" "clip chip . emoji";
     align-items:center; row-gap: 2px; border-radius: var(--r-l); padding-top: 8px; padding-bottom: 6px;
   }
   .app.composing.has-model .composer .field > textarea{ grid-area: ta; padding-left: 4px; padding-right: 4px; }
@@ -3063,9 +3063,15 @@
     -webkit-mask-image: none; mask-image: none;
   }
 
-  /* 选好的图片/文件:输入框上方一排小方块,右上角 × 可以拿掉 */
-  .composer{ flex-wrap: wrap; row-gap: 0; }
-  .att-tray{ flex: 0 0 100%; display:flex; gap: 8px; padding: 0 2px 8px; overflow-x: auto; scrollbar-width: none; }
+  /* 选好的图片/文件:收在输入框里面最上面一排,右上角 × 可以拿掉 */
+  .att-tray{ grid-area: tray; display:flex; gap: 8px; padding: 2px 2px 6px; overflow-x: auto; scrollbar-width: none; }
+  .app.has-tray:not(.has-model) .composer .field{
+    display:grid; grid-template-columns: auto 1fr auto; grid-template-areas: "tray tray tray" "clip ta emoji";
+    align-items:center; row-gap: 2px; border-radius: 22px; padding-top: 8px;
+  }
+  .app.has-tray:not(.has-model) .composer .field > textarea{ grid-area: ta; }
+  .app.has-tray:not(.has-model) .composer .field > #clipBtn{ grid-area: clip; }
+  .app.has-tray:not(.has-model) .composer .field > #emojiBtn{ grid-area: emoji; }
   .att-tray[hidden]{ display:none; }
   .att-tray::-webkit-scrollbar{ display:none; }
   .att-chip{ position: relative; flex: none; width: 58px; height: 58px; border-radius: var(--r-s); overflow: hidden;
@@ -3075,6 +3081,7 @@
   .att-fname{ font-size: var(--fs-xs); color: var(--text-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .att-x{ position:absolute; top: 3px; right: 3px; width: 20px; height: 20px; border: 0; border-radius: 50%; padding: 0;
     background: rgba(0,0,0,.55); color: #fff; font-size: 14px; line-height: 20px; cursor: pointer; }
+  .row.att-part .bubble .meta{ display:none !important; }
   .app.has-tray{ --composer-zone: calc(var(--composer-h) + 16px + 66px + env(safe-area-inset-bottom) + var(--keyboard-offset)); }
   .app.has-tray.composing.has-model{ --composer-zone: calc(var(--composer-h) + 16px + 104px + env(safe-area-inset-bottom) + var(--keyboard-offset)); }
 
@@ -3162,8 +3169,8 @@
     </div>
   </main>
   <footer class="composer">
-    <div class="att-tray" id="attTray" hidden></div>
     <div class="field">
+      <div class="att-tray" id="attTray" hidden></div>
       <button class="floatbtn clip-in-field" id="clipBtn" aria-label="附件" title="附件">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-8.8 8.8a5 5 0 0 1-7.1-7.1l8.8-8.8a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.6 1.6 0 0 1-2.3-2.3l8-8"/></svg>
       </button>
@@ -7020,6 +7027,15 @@ function buildVirtualRows(){
     }
     const t = tsMs(m);
     const grouped = !!(prevBubble && prevBubble.from === m.from && Number.isFinite(t) && Number.isFinite(prevBubble.ts) && (t - prevBubble.ts < GROUP_GAP));
+    // 带图又带字的一条:图片单独成一张完整的图,字另起一个气泡紧跟在下面
+    const hasAtt = !!(m.meta && Array.isArray(m.meta.attachments) && m.meta.attachments.length);
+    if (hasAtt && m.text){
+      rows.push({ type:"message", key:`m:${m._key}:att`, message:m, part:"att", grouped, tail:false });
+      const trow = { type:"message", key:`m:${m._key}`, message:m, part:"txt", grouped:true, tail:true };
+      rows.push(trow);
+      prevBubble = { from:m.from, ts:t, row:trow };
+      return;
+    }
     const row = { type:"message", key:`m:${m._key}`, message:m, grouped, tail:true };
     if (grouped && prevBubble.row) prevBubble.row.tail = false;
     rows.push(row);
@@ -7065,10 +7081,10 @@ function estimatedHeight(row){
   if (row.type === "thinking") return DEFAULT_THINK_HEIGHT;
   if (row.type === "act") return DEFAULT_ACT_HEIGHT;
   const m = row.message;
-  const atts = (m && m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : [];
+  const atts = row.part === "txt" ? [] : ((m && m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : []);
   let h = (row.grouped ? 8 : 22) + 30;                        // 行间距 + 气泡纵向 padding + meta 行
   for (const a of atts) h += a.kind === "image" ? estImageHeight(a) : 56;
-  h += estTextHeight(m && m.text);
+  h += estTextHeight(row.part === "att" ? "" : (m && m.text));
   return Math.max(h, DEFAULT_ROW_HEIGHT);
 }
 function rebuildPrefixSums(){
@@ -7233,13 +7249,16 @@ function makeMessage(rowData){
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  const atts = (m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : [];
+  const part = rowData.part || "";
+  const atts = part === "txt" ? [] : ((m.meta && Array.isArray(m.meta.attachments)) ? m.meta.attachments : []);
+  const text = part === "att" ? "" : m.text;
   let _inner = "";
   if (atts.length) _inner += renderAttachments(atts);
-  if (m.text) _inner += `<span class="txt">${renderText(m.text)}</span>`;
+  if (text) _inner += `<span class="txt">${renderText(text)}</span>`;
   _inner += `<span class="meta"></span>`;
   bubble.innerHTML = _inner;
-  if (atts.length){ bubble.classList.add("has-att"); if (!m.text) bubble.classList.add("att-only"); }
+  if (atts.length){ bubble.classList.add("has-att"); if (!text) bubble.classList.add("att-only"); }
+  if (part === "att") row.classList.add("att-part");
   const metaEl = bubble.querySelector(".meta");
   if (m.status === "sending") metaEl.innerHTML = `<span>${fmtTime(m.ts)}</span>` + sendingTickHtml();
   else if (m.status === "failed"){
@@ -7254,7 +7273,7 @@ function makeMessage(rowData){
   }else fillMeta(metaEl, m.ts, m.from === "human");
   row.appendChild(bubble);
   // reaction chips — AI poke (one-way: AI → you), rendered only under your own bubbles; not under the AI's
-  const reactions = (m.from === "human" && m.meta && m.meta.reactions && typeof m.meta.reactions === "object") ? m.meta.reactions : null;
+  const reactions = (part !== "att" && m.from === "human" && m.meta && m.meta.reactions && typeof m.meta.reactions === "object") ? m.meta.reactions : null;
   const rxList = reactions ? Object.keys(reactions).map((who) => reactions[who]).filter(Boolean) : [];
   if (rxList.length){
     row.classList.add("has-reactions");
