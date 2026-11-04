@@ -3048,7 +3048,7 @@
   /* 时间戳:还是最小那一档,但更淡 */
   :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{ opacity: .45; letter-spacing: .05em; }
   :root[data-theme="harbor"] .row .bubble.has-att .meta{ opacity: .6; }
-  /* 分隔线:就是一根很淡的细线,日期夹在中间,两头渐隐 */
+  /* 分隔线:就是一根很淡的灰色细线,日期夹在中间 */
   :root[data-theme="harbor"] .scroll .day,
   :root[data-theme="harbor"] .scroll .new-divider{
     display: flex; align-items: center; gap: 12px;
@@ -3059,12 +3059,9 @@
   :root[data-theme="harbor"] .scroll .day::before, :root[data-theme="harbor"] .scroll .day::after,
   :root[data-theme="harbor"] .scroll .new-divider::before, :root[data-theme="harbor"] .scroll .new-divider::after{
     content: ""; display: block; position: static; flex: 1; height: .5px; width: auto;
-    box-shadow: 0 0 3px rgba(0,0,0,.45);   /* 落在亮一点的雾上也看得见 */
-    background: rgba(255,255,255,.5); opacity: 1;
+    background: rgba(138,136,133,.4); opacity: 1;
     -webkit-mask-image: none; mask-image: none;
   }
-  :root[data-theme="harbor"] .scroll .day::before, :root[data-theme="harbor"] .scroll .new-divider::before{ background: linear-gradient(90deg, transparent, rgba(255,255,255,.5)); }
-  :root[data-theme="harbor"] .scroll .day::after, :root[data-theme="harbor"] .scroll .new-divider::after{ background: linear-gradient(270deg, transparent, rgba(255,255,255,.5)); }
 
   /* 顶栏多了一个额度按钮:手机上把按钮间距收紧一点,别压到名字 */
   @media (max-width: 600px){
