@@ -3067,6 +3067,20 @@
   #sessionBtn, #terminalBtn, #callBtn{ display:none !important; }
   .topbar .peerpill{ cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
+  /* 门厅下面两块:跟上面「Orion · now」同一块磨砂玻璃,同样的小标题、同样高 */
+  .home-row{ align-items: stretch; }
+  .home-row .home-card{ display:flex; flex-direction:column; gap: 8px; min-height: 132px; padding: 18px 18px 16px; transform: none; }
+  .home-row .home-label{
+    font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs);
+    letter-spacing: .24em; text-transform: uppercase; color: var(--text-faint);
+  }
+  .home-row .home-date{ margin: 4px 0 0; font-size: var(--fs-l); letter-spacing: .03em; }
+  .home-row .home-stat{ margin-top: auto; }
+  .home-poke-title{ display:flex; align-items:center; gap: 6px; margin-top: 4px; letter-spacing: .03em; }
+  .poke-arrow{ width: 16px; height: 16px; opacity: .6; transition: transform .2s ease; }
+  .home-poke:active .poke-arrow{ transform: translateX(3px); }
+  .home-row .home-poke-reply{ margin-top: auto; color: var(--text-soft); }
+
   /* 选好的图片/文件:收在输入框里面最上面一排,右上角 × 可以拿掉 */
   .att-tray{ grid-area: tray; display:flex; gap: 8px; padding: 2px 2px 6px; overflow-x: auto; scrollbar-width: none; }
   .app.has-tray:not(.has-model) .composer .field{
@@ -3434,16 +3448,15 @@
         </section>
 
         <div class="home-row">
-          <section class="home-card home-today card-line" aria-label="今天">
+          <section class="home-card home-today" aria-label="今天">
             <p class="home-label">今天</p>
             <p class="home-date" id="homeDate"></p>
             <p class="home-stat">今天聊了 <b id="homeCount">0</b> 条</p>
           </section>
-          <button class="home-card home-poke card-paper" id="pokeBtn" type="button">
+          <button class="home-card home-poke" id="pokeBtn" type="button">
             <span class="home-label">戳一戳</span>
-            <span class="home-poke-title">👉 戳他</span>
+            <span class="home-poke-title">戳他<svg class="poke-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></span>
             <span class="home-poke-reply" id="pokeReply">无聊就按，他会有反应</span>
-            <span class="paper-cap">— un petit coup</span>
           </button>
         </div>
 
