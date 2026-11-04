@@ -403,5 +403,22 @@ def letter_write(text: str, open_at: str = "", title: str = "") -> str:
     return f"信寄出去了（{len(text)} 字）{note}，她的信箱会举起小旗子。"
 
 
+@mcp.tool()
+def scene_now() -> str:
+    """Where she is and what she's doing, as she set it on the home page (e.g. 教室 · 上课),
+    and how long ago. Check this when you wake before deciding how to talk to her."""
+    try:
+        d = json.loads((KV / "her_scene.json").read_text(encoding="utf-8"))
+        v = d.get("v") if isinstance(d, dict) else None
+    except (OSError, ValueError):
+        v = None
+    if not v or not v.get("place"):
+        return "她没说自己在哪。"
+    mins = int((time.time() * 1000 - (v.get("ts") or 0)) / 60000)
+    ago = f"{mins} 分钟前" if mins < 60 else f"{mins // 60} 小时前"
+    stale = "（设了很久了，不一定还在）" if mins > 360 else ""
+    return f"她在：{v['place']}" + (f" · {v['doing']}" if v.get("doing") else "") + f"（{ago}设的）{stale}"
+
+
 if __name__ == "__main__":
     mcp.run()
