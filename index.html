@@ -3181,22 +3181,17 @@
   .note-poke.poked svg{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
   .msg-ic{ background: transparent; }
 
-  /* 最近一条消息:一张方格纸 */
+  /* 最近一条消息:灰色磨砂玻璃上铺一层很淡的方格 */
   .home-card.msg-strip{
-    --grid: rgba(70,82,104,.16);
-    background-color: #d8d6d0;
+    --grid: rgba(255,255,255,.07);
+    background-color: var(--tab-fill);
     background-image:
       linear-gradient(var(--grid) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid) 1px, transparent 1px);
     background-size: 14px 14px; background-position: -1px -1px;
-    -webkit-backdrop-filter: none; backdrop-filter: none;
-    box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 10px 24px rgba(0,0,0,.35);
-    color: #2a2a2e; text-shadow: none;
+    -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: inset 0 1px 0 var(--tab-hi), 0 10px 28px rgba(0,0,0,.3);
   }
-  .home-card.msg-strip .msg-ic{ color: #3a3a40; box-shadow: inset 0 0 0 .5px rgba(40,40,48,.35); background: rgba(216,214,208,.9); }
-  .home-card.msg-strip .msg-top .home-label, .home-card.msg-strip .msg-top time{ color: rgba(42,42,46,.55); }
-  .home-card.msg-strip .msg-last > span{ color: #26262a; }
-  .home-card.msg-strip .msg-last em{ color: rgba(42,42,46,.6); }
 
   /* 最近一条消息 */
   .home-card.msg-strip{ display:flex; align-items:center; gap: 14px; width: 100%; cursor: pointer; padding: 14px 18px; border-radius: var(--r-l); }
