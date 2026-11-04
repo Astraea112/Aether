@@ -4268,17 +4268,51 @@ async function kvPull(name, localKey, { readOnly = false } = {}){
   }catch(_){ return false; }
   const ts = loadJSON(KV_TS_KEY, {}), mine = ts[name] || 0;
   const theirs = d && typeof d === "object" && "v" in d ? (+d.updated || 0) : 0;
+  const local = loadJSON(localKey, null);
+  const hasLocal = !readOnly && kvHasContent(name, local);
+  // 这台设备第一次同步、本机又记过东西:跟服务器上的合在一起,谁的都不丢
+  if (!mine && theirs && hasLocal){
+    const merged = kvMerge(name, d.v, local);
+    saveJSON(localKey, merged);
+    syncKV(name, merged);
+    return true;
+  }
   if (theirs > mine){
     saveJSON(localKey, d.v);
     ts[name] = theirs; saveJSON(KV_TS_KEY, ts);
     return true;
   }
-  // 服务器上还没有(第一次)也推上去:旧版本存在本机的日历这样就上了服务器
-  if (!readOnly && (mine > theirs || !theirs)){
-    const local = loadJSON(localKey, null);
-    if (local != null) syncKV(name, local);
-  }
+  // 服务器上还没有(第一次):本机有内容才推上去,空的不推,免得盖掉别的设备
+  if (hasLocal && (mine > theirs || !theirs)) syncKV(name, local);
   return false;
+}
+function kvHasContent(name, v){
+  if (!v || typeof v !== "object") return false;
+  if (name === "calendar") return Object.keys(v).length > 0;
+  if (name === "events") return !!((v.items || []).length || (v.intimate || []).length || (v.hidden || []).length);
+  if (name === "mood_set") return Array.isArray(v) && v.length && v.join("|") !== DEFAULT_MOODS.join("|");
+  return true;
+}
+function kvMerge(name, srv, loc){
+  const uniq = (a, b) => [...new Set([...(a || []), ...(b || [])])];
+  if (name === "calendar"){
+    const out = { ...(srv || {}) };
+    for (const [k, d] of Object.entries(loc || {})){
+      const o = out[k] || { tags: [], moods: [] };
+      out[k] = { tags: uniq(o.tags, d.tags), moods: uniq(o.moods, d.moods) };
+    }
+    return out;
+  }
+  if (name === "events"){
+    const s0 = srv || {}, l0 = loc || {};
+    const items = [...(s0.items || [])];
+    for (const it of (l0.items || [])) if (!items.some((x) => x.id === it.id)) items.push(it);
+    const od = { ...(s0.orionDone || {}) };
+    for (const [id, ds] of Object.entries(l0.orionDone || {})) od[id] = uniq(od[id], ds);
+    return { items, intimate: uniq(s0.intimate, l0.intimate).sort(), hidden: uniq(s0.hidden, l0.hidden), orionDone: od };
+  }
+  if (name === "mood_set") return uniq(srv, loc);
+  return srv;
 }
 let kvPulling = null;
 function pullCalendarKV(){
