@@ -264,5 +264,44 @@ def todo_remove(id: str) -> str:
     return f"拿掉了 id {id}"
 
 
+def _kv_list(name):
+    try:
+        d = json.loads((KV / f"{name}.json").read_text(encoding="utf-8"))
+        v = d.get("v") if isinstance(d, dict) else d
+        return v if isinstance(v, list) else []
+    except (OSError, ValueError):
+        return []
+
+
+@mcp.tool()
+def letters_read(limit: int = 3) -> str:
+    """Read the letters she posted into your mailbox on the website (newest first, full text).
+    When she sends one, the chat also gets a line saying she dropped a letter in."""
+    items = sorted(_kv_list("letters"), key=lambda m: m.get("ts", 0), reverse=True)
+    items = items[:max(1, min(int(limit or 3), 20))]
+    if not items:
+        return "她还没给你寄过信。"
+    out = []
+    for m in items:
+        when = datetime.fromtimestamp((m.get("ts") or 0) / 1000).strftime("%Y-%m-%d %H:%M")
+        out.append(f"—— {when}（id {m.get('id')}）\n{m.get('text', '').strip()}")
+    return "\n\n".join(out)
+
+
+@mcp.tool()
+def letter_write(text: str) -> str:
+    """Post a letter into her mailbox on the website. It arrives sealed in an envelope with
+    today's postmark, and the mailbox flag goes up until she opens it. For things that deserve
+    a letter: longer, thought-through, kept. Line breaks are kept. Sign it in the text if you like."""
+    text = (text or "").strip()[:6000]
+    if not text:
+        return "text 不能是空的"
+    items = _kv_list("letters_orion")
+    now = int(time.time() * 1000)
+    items.append({"id": "o" + uuid.uuid4().hex[:8], "text": text, "ts": now, "from": "him"})
+    _write_his("letters_orion", {"updated": now, "v": items[-100:]})
+    return f"信寄出去了（{len(text)} 字），她的信箱会举起小旗子。"
+
+
 if __name__ == "__main__":
     mcp.run()
