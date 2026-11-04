@@ -3135,6 +3135,20 @@
   .note-meta #homeStatusLine{ flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .note-poke{ flex: none; white-space: nowrap; }
 
+  /* 下一个日子 */
+  .home-card.next-card{ display:flex; flex-direction:column; gap: 4px; }
+  .next-card .home-label{ font-family: var(--font-en), var(--font-cn); font-size: var(--fs-xs); letter-spacing: .22em; text-transform: uppercase; color: var(--text-faint); }
+  .next-num{ margin: 4px 0 0; display:flex; align-items:baseline; gap: 6px; }
+  .next-num b{ font-family: var(--font-en), var(--font-cn); font-weight: 400; font-size: var(--fs-xl); line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+  .next-num span{ font-family: var(--font-en); font-style: italic; font-size: var(--fs-s); color: var(--text-soft); }
+  .next-title{ margin: auto 0 0; font-size: var(--fs-m); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .next-date{ margin: 0; font-size: var(--fs-xs); letter-spacing: .06em; color: var(--text-faint); }
+  .now-facts{ align-items: center; flex-wrap: wrap; gap: 6px 14px; }
+  .now-facts span{ white-space: nowrap; }
+  .now-facts b{ margin-left: 4px; font-size: var(--fs-s); }
+  .now-facts .note-poke{ margin-left: auto; }
+  .home-now .note-reply{ margin: -2px 0 0; }
+
   /* 今天 + 天气 */
   .home-card.wx-card{ display:flex; flex-direction:column; justify-content:space-between; gap: 10px; }
   .wx-date{ display:flex; align-items:center; gap: 10px; }
@@ -3151,7 +3165,7 @@
 
   /* 下面三块的质感:深一点、带一点点暖紫的烟色玻璃,一圈很细的亮边 + 顶上一线高光 + 柔和的深投影,
      不再是半透明的灰,背景的花不会透上来抢眼 */
-  .home-card.home-now, .home-card.hnote-card, .home-card.wx-card, .home-card.msg-strip{
+  .home-card.home-now, .home-card.next-card, .home-card.wx-card, .home-card.msg-strip{
     background: var(--tab-fill);
     -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
     box-shadow: inset 0 1px 0 var(--tab-hi), 0 10px 28px rgba(0,0,0,.3);
@@ -3537,21 +3551,21 @@
           </div>
           <p class="now-line" id="nowLine">在房间里</p>
           <p class="now-mood"><span>心情</span><b id="homeOrionMood">安静</b><em id="homeOrionMoodNote"></em></p>
+          <p class="note-reply" id="pokeReply"></p>
           <div class="now-facts">
             <span>你上次说话<b id="homeLastMine">—</b></span>
             <span>他上次回你<b id="homeLastReply">—</b></span>
+            <button type="button" class="note-poke" id="pokeBtn" aria-label="戳他一下"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V10a1.5 1.5 0 0 1 3 0v2M14 11.5a1.5 1.5 0 0 1 3 0V13M17 12.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/></svg>戳他</button>
           </div>
         </section>
 
         <div class="home-row">
-          <!-- 他的小纸条:最近说的一句 + 他此刻在干嘛 -->
-          <section class="home-card hnote-card" aria-label="他的小纸条">
-            <p class="home-label"><span id="homeStatusName">Orion's note</span></p>
-            <p class="note-text" id="homeThought"></p>
-            <p class="note-reply" id="pokeReply"></p>
-            <p class="note-meta"><span class="status-dot" id="homeStatusDot"></span><span id="homeStatusLine">在房间里</span>
-              <button type="button" class="note-poke" id="pokeBtn" aria-label="戳他一下"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V10a1.5 1.5 0 0 1 3 0v2M14 11.5a1.5 1.5 0 0 1 3 0V13M17 12.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/></svg>戳他</button>
-            </p>
+          <!-- 下一个日子:日历里最近的一件事倒数;没有就倒数到下一个 24 号(在一起满几个月) -->
+          <section class="home-card next-card" aria-label="下一个日子">
+            <p class="home-label">Next</p>
+            <p class="next-num"><b id="nextDays">--</b><span id="nextUnit">days</span></p>
+            <p class="next-title" id="nextTitle"></p>
+            <p class="next-date" id="nextDate"></p>
           </section>
           <!-- 今天 + 顺德的天气 -->
           <section class="home-card wx-card" aria-label="今天">
@@ -4237,10 +4251,6 @@ function refreshHome(){
   const countEl = $("#homeCount");
   if (countEl) countEl.textContent = talkMessages().filter((m) => isToday(m.ts)).length;
   const st = orionStatus();
-  const line = $("#homeStatusLine"), dot = $("#homeStatusDot"), name = $("#homeStatusName");
-  if (line) line.textContent = st.text;
-  if (dot) dot.classList.toggle("live", st.live);
-  if (name) name.textContent = aiName() + "'s note";
   const msgs = talkMessages();
   const lastAi = [...msgs].reverse().find((m) => m.from === "ai" && (m.text || "").trim());
   const lastMe = [...msgs].reverse().find((m) => m.from === "human");
@@ -4251,8 +4261,7 @@ function refreshHome(){
   if (nd) nd.classList.toggle("live", st.live);
   if (nl) nl.textContent = st.text;
   if (nn) nn.textContent = aiName() + " · now";
-  const th = $("#homeThought");
-  if (th) th.textContent = lastAi ? "“" + clip(firstSentence(lastAi.text), 34) + "”" : idleThought();
+  refreshNextDay();
   const lm = $("#homeLastMine"), lr = $("#homeLastReply");
   if (lm) lm.textContent = lastMe ? fmtWhen(lastMe.ts) : "—";
   if (lr) lr.textContent = lastAi ? fmtWhen(lastAi.ts) : "—";
@@ -4260,6 +4269,36 @@ function refreshHome(){
   if (nAi) nAi.textContent = aiName();
   if (nMe) nMe.textContent = HUMAN_NAME;
   refreshHomeExtras(msgs);
+}
+/* 下一个日子:日历里(你放的 + 他放的)往后 180 天内最近的一件事;没有就倒数到下一个在一起满月的日子 */
+function nextDay(){
+  const today = dayKey(Date.now());
+  const ev = evAll(), hidden = new Set(ev.hidden);
+  const items = ev.items.concat(orionItems().filter((it) => !hidden.has(it.id)));
+  for (let n = 0; n <= 180; n++){
+    const k = addDays(today, n);
+    const hit = items.find((it) => it.title && evOccurs(it, k));
+    if (hit) return { n, k, title: hit.title };
+  }
+  if (!TOGETHER_START) return null;
+  const sd = TOGETHER_START.getDate();
+  for (let n = 0; n <= 31; n++){
+    const k = addDays(today, n), [y, m, d] = k.split("-").map(Number);
+    if (d !== sd) continue;
+    const months = (y - TOGETHER_START.getFullYear()) * 12 + (m - 1 - TOGETHER_START.getMonth());
+    if (months > 0) return { n, k, title: months % 12 === 0 ? `在一起 ${months / 12} 周年` : `在一起 ${months} 个月` };
+  }
+  return null;
+}
+function refreshNextDay(){
+  const nx = nextDay(), num = $("#nextDays"), unit = $("#nextUnit"), t = $("#nextTitle"), dt = $("#nextDate");
+  if (!num) return;
+  if (!nx){ num.textContent = "—"; unit.textContent = ""; t.textContent = "日历里还空着"; dt.textContent = ""; return; }
+  num.textContent = nx.n === 0 ? "今天" : nx.n;
+  unit.textContent = nx.n === 0 ? "" : nx.n === 1 ? "day" : "days";
+  t.textContent = nx.title;
+  const [, m, d] = nx.k.split("-");
+  dt.textContent = `${+m}月${+d}日`;
 }
 /* 新门厅:问候 · 时钟 · 日期天气 · 最近一条消息 */
 const HOME_PET_NAMES = ["小猫", "女儿", "宝贝"];
