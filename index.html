@@ -3714,6 +3714,28 @@
   /* 信封口:前片稍微有点厚度和阴影 */
   #pcEnv .env-front{ filter: drop-shadow(0 -2px 3px rgba(0,0,0,.12)); }
   #pcEnv .env-flap{ backface-visibility: visible; }
+
+  /* ════════ 抬起来再放进去 · 信封立体一点 ════════ */
+  .post-compose.s-lift .pc-paper{ transform: translateY(-70px) scale(.9) rotateX(0deg); transition: transform .5s cubic-bezier(.3,.7,.3,1); }
+  .post-compose.s-pack .pc-paper{ transform: translate(var(--px, 0), var(--py, -80px)) scale(var(--ps, .7)); transition: transform .65s cubic-bezier(.45,0,.25,1); }
+  .post-compose .pc-env{ transform: translate(-50%, 60%) scale(.96); }
+  .post-compose.s-pack .pc-env{ transition: transform .7s cubic-bezier(.25,.8,.3,1), opacity .35s ease; }
+  .post-compose.s-insert #pcEnv .env-card{ transform: translateY(105%); transition: transform .7s cubic-bezier(.45,0,.3,1); }
+  #pcEnv .env.sealed .env-card{ transform: translateY(105%); }
+  /* 信封:有一点往后仰、口里是暗的、背面有折痕、封口有明暗 */
+  #pcEnv .env{ transform: rotateX(8deg); transform-style: preserve-3d; }
+  .env-back{ background: linear-gradient(180deg, #b9b09e 0%, #cfc6b4 30%, #dcd4c3 70%) !important; }
+  .env-front{
+    background:
+      linear-gradient(to top right, transparent calc(50% - .6px), rgba(80,70,55,.16) 50%, transparent calc(50% + .6px)) left bottom / 50% 46% no-repeat,
+      linear-gradient(to top left, transparent calc(50% - .6px), rgba(80,70,55,.16) 50%, transparent calc(50% + .6px)) right bottom / 50% 46% no-repeat,
+      linear-gradient(180deg, #ece6d9 0%, #e5ddcd 60%, #d9d0bf 100%) !important;
+  }
+  .env-flap{ background: linear-gradient(180deg, #e8e1d2 0%, #d8cfbd 100%) !important; }
+  .env.sealed .env-flap{ background: linear-gradient(180deg, #e9e2d4 0%, #ddd5c4 70%, #cfc6b3 100%) !important; }
+  .env::after{ content:""; position:absolute; left: 4%; right: 4%; bottom: -10px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.45); filter: blur(10px); z-index: -1; }
+  #pcEnv .env-card{ box-shadow: 0 -2px 6px rgba(0,0,0,.18);
+    background: linear-gradient(180deg, rgba(40,30,20,.34), rgba(40,30,20,.1)), url("letter-paper.webp") center 50% / 100% 300% no-repeat !important; }
 </style>
 </head>
 <body>
@@ -5930,6 +5952,7 @@ function openCompose(){
   $("#postFromName").textContent = HUMAN_NAME;
   $("#postSend").textContent = "写好了";
   const env = $("#pcEnv .env"); env.classList.remove("sealed", "waxed");
+  const ec = env.querySelector(".env-card"); if (ec){ ec.style.height = ""; ec.style.top = ""; }
   try{ const d = localStorage.getItem("companion_letter_draft"); if (d && !$("#postText").value) $("#postText").value = d; }catch(_){}
   if (deskBox && deskBox.width && !prefersReducedMotion){
     // 纸从桌上它原来的位置被拿起来,移到正中间
@@ -5996,26 +6019,29 @@ function foldLetter(){                              // 第一步:写好了 → �
   if (prefersReducedMotion){ env.classList.add("sealed", "waxed"); pcSet("s-fold s-pack s-env s-insert s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; return; }
   // 1 折:纸往后仰一点,下面一折翻上来,上面一折盖下去
   pcSet("s-fold");
-  // 2 收:折好的那一叠缩小、移到信封口上方;信封从下面升上来
+  // 2 抬:折好的一叠先转正、往上抬起来
+  setTimeout(() => pcSet("s-fold s-lift"), 1450);
+  // 3 收:信封从下面升上来停在它下面,纸移到信封口正上方(跟信封里那张一样大)
   setTimeout(() => {
-    const paper = $("#pcPaper"), mid = paper.querySelector(".f2"), card = env.querySelector(".env-card");
-    const m = mid.getBoundingClientRect(), pr = paper.getBoundingClientRect();
-    const c = card.getBoundingClientRect(), e = $("#pcEnv").getBoundingClientRect();
-    // 信封现在还在下面(没升上来),算的时候按它升上来以后的位置
-    const lift = e.top + e.height / 2 - (pr.top + pr.height / 2);
-    const scale = c.width / m.width;
-    paper.style.setProperty("--px", (c.left + c.width / 2 - (pr.left + pr.width / 2)) + "px");
-    paper.style.setProperty("--py", (c.top + c.height / 2 - lift - (m.top + m.height / 2)) + "px");
+    const paper = $("#pcPaper"), card = env.querySelector(".env-card"), box = $("#pcEnv");
+    const third = paper.offsetHeight / 3, scale = card.offsetWidth / paper.offsetWidth;
+    card.style.height = (third * scale) + "px";
+    card.style.top = (-third * scale * .92) + "px";            // 卡在信封口上面,几乎整张露出来
+    // 信封升上来以后,它的中心就是舞台中心(= 纸的中心)
+    const envH = box.offsetHeight;
+    const cardCenterY = -envH / 2 + (-third * scale * .92) + third * scale / 2;
+    paper.style.setProperty("--px", "0px");
+    paper.style.setProperty("--py", cardCenterY + "px");
     paper.style.setProperty("--ps", scale);
     pcSet("s-fold s-pack");
-  }, 1450);
-  // 3 换成信封里那张卡,滑进去
-  setTimeout(() => pcSet("s-fold s-pack s-env"), 2150);
-  setTimeout(() => pcSet("s-fold s-pack s-env s-insert"), 2220);
-  // 4 封口,盖火漆
-  setTimeout(() => env.classList.add("sealed"), 2850);
-  setTimeout(() => env.classList.add("waxed"), 3650);
-  setTimeout(() => { pcSet("s-fold s-pack s-env s-insert s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; }, 4100);
+  }, 1950);
+  // 4 换成信封里那张(位置、大小一样),往下滑进去
+  setTimeout(() => pcSet("s-fold s-pack s-env"), 2650);
+  setTimeout(() => pcSet("s-fold s-pack s-env s-insert"), 2700);
+  // 5 封口,盖火漆
+  setTimeout(() => env.classList.add("sealed"), 3450);
+  setTimeout(() => env.classList.add("waxed"), 4250);
+  setTimeout(() => { pcSet("s-fold s-pack s-env s-insert s-when"); pcEnvReady = true; $("#postSend").textContent = "寄出去"; }, 4700);
 }
 function postLetter(){                              // 第二步:寄出去 → 飞进邮筒
   const ta = $("#postText"), text = ta.value.trim();
