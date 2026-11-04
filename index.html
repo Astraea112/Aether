@@ -10245,8 +10245,8 @@ if (modelChip){
 }
 const composeInput = $("#input");
 function syncComposing(){
-  const on = !!composeInput && (document.activeElement === composeInput || !!composeInput.value.trim()
-    || (typeof stagedAtts !== "undefined" && stagedAtts.length > 0)
+  // 只在正在打字(输入框有焦点)或者模型面板开着时才显示模型按钮;键盘收起来就跟着收,打了一半的字留着
+  const on = !!composeInput && (document.activeElement === composeInput
     || (modelSheet && modelSheet.classList.contains("open")));
   appEl.classList.toggle("composing", on);
 }
