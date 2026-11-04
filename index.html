@@ -4588,10 +4588,15 @@ let murmurPulled = 0;
 function pullMurmurs(){                     // 服务器上那份(含他写的)合进来;接口还没有时什么都不做
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - murmurPulled < 60e3) return;
   murmurPulled = Date.now();
-  fetch(`${API_BASE}/app/kv/murmurs`, { headers: authHeaders() })
+  // 两份:murmurs 是网页同步的那份({updated, v:[…]}),murmurs_orion 是他自己的那一格(他用工具贴的)
+  const get = (name) => fetch(`${API_BASE}/app/kv/${name}`, { headers: authHeaders() })
     .then((r) => r.ok ? r.json() : null)
+    .then((d) => Array.isArray(d) ? d : (d && Array.isArray(d.v) ? d.v : []))
+    .catch(() => []);
+  Promise.all([get("murmurs"), get("murmurs_orion")])
+    .then(([a, b]) => a.concat(b))
     .then((remote) => {
-      if (!Array.isArray(remote)) return;
+      if (!remote.length) return;
       const local = murmurNotes(), have = new Map(local.map((n) => [String(n.id), n]));
       let added = 0, z = Math.max(0, ...local.map((n) => n.z || 0));
       for (const r of remote){

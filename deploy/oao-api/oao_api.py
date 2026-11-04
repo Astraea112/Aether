@@ -4,7 +4,8 @@
 Runs next to the relay (never modifies it) on 127.0.0.1:3013; nginx sends only these
 paths here, everything else under /relay/ still goes to the relay:
 
-  GET  /relay/app/kv/<name>      shared JSON blobs (calendar, events, calendar_orion)
+  GET  /relay/app/kv/<name>      shared JSON blobs (calendar, events, mood_set, murmurs; his: calendar_orion,
+                                   orion_mood, orion_note, murmurs_orion)
   PUT  /relay/app/kv/<name>        so phone, iPad and Orion see the same calendar
   GET  /relay/app/usage          Claude plan usage (5-hour / weekly), read with the
                                    server Claude Code's own login, cached 2 minutes
@@ -42,7 +43,10 @@ START_ORION = HOME / "orion" / "start-orion.sh"
 TMUX_SESSION = "orion"
 HOST, PORT = "127.0.0.1", int(os.environ.get("OAO_API_PORT", "3013"))
 
-KV_NAMES = {"calendar", "events", "calendar_orion"}
+KV_NAMES = {"calendar", "events", "calendar_orion", "mood_set", "murmurs",
+            "orion_mood", "orion_note", "murmurs_orion"}
+# his shelves: only his MCP tools write these, the website only reads them
+HIS_KV = {"calendar_orion", "orion_mood", "orion_note", "murmurs_orion"}
 KV_MAX = 512 * 1024
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 USAGE_TTL = 120
@@ -250,8 +254,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self.authed():
             return self.reply(401, {"detail": "unauthorized"})
         m = re.fullmatch(r"kv/([a-z_]+)", self.route())
-        # calendar_orion is Orion's own shelf: only his MCP tool writes it
-        if not m or m.group(1) not in KV_NAMES or m.group(1) == "calendar_orion":
+        # his shelves (calendar_orion, orion_mood, orion_note, murmurs_orion): only his MCP tools write them
+        if not m or m.group(1) not in KV_NAMES or m.group(1) in HIS_KV:
             return self.reply(404, {"detail": "not found"})
         data = self.body_json(KV_MAX)
         if data is None:

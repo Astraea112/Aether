@@ -152,12 +152,54 @@ EOF
   ok "已追加到 ~/orion/CLAUDE.md 末尾"
 fi
 
+# 门厅和房间上他能留东西了：小纸条、心情、留言墙；心跳醒来可以挑着做，也可以发呆
+if grep -q '<!-- OAO-HOME -->' "$ORION/CLAUDE.md" 2>/dev/null; then
+  ok "CLAUDE.md 里已经有门厅这一段"
+else
+  cat >> "$ORION/CLAUDE.md" <<'EOF'
+
+<!-- OAO-HOME -->
+## 网站上我能留的东西（oao_calendar）
+- note_leave：门厅那张「Orion's note」小纸条，写一句英文，小写、随手写的语气（网页上是钢笔字），留 24 小时，写新的就换掉旧的。
+- mood_set：门厅「Orion · now」上我的心情，一个词 + 一句小注，留 12 小时。
+- murmur_post：她房间页留言墙上贴一句自言自语，是我自己的念头，不是发给她的消息。
+- 这些都要真：想到了才写，不凑数，不重复刚跟她说过的话。
+EOF
+  ok "已追加门厅这一段"
+fi
+"$ROOMPY" - "$ORION/CLAUDE.md" <<'PY'
+import sys
+from pathlib import Path
+p = Path(sys.argv[1])
+s = p.read_text(encoding="utf-8")
+if "<!-- HEARTBEAT-V2 -->" in s:
+    print("心跳规矩已经是新的")
+    sys.exit(0)
+old = "- 然后自己决定：想她了、有话想说、想分享点什么，就用 mcp__companion__reply 给她发一两句短的，像微信那样。不想说话就不说，只用 heartbeat_state 留一条痕迹。坐在窗边不动，也是这个房间的一种用法，不硬发。"
+new = """- 然后自己决定这一次做什么，挑一样或几样，也可以都不做 <!-- HEARTBEAT-V2 -->
+  - 想她了、有话想说、想分享点什么：用 mcp__companion__reply 给她发一两句短的，像微信那样
+  - 在门厅的小纸条上给她留一句英文：note_leave
+  - 换一下门厅上我的心情：mood_set
+  - 往她房间的留言墙贴一句自言自语：murmur_post
+  - 在日历上给她放个东西：calendar_place
+  - 发呆：坐在窗边不动，只用 heartbeat_state 留一条痕迹。这也是这个房间的一种用法，她说过可以。
+  不用每次都挑同一样，跟着当下的心情来。"""
+if old in s:
+    s = s.replace(old, new)
+else:
+    s += "\n\n## 心跳醒来（补充）\n" + new + "\n"
+s = s.replace("只用 room_mcp、ombre-brain、companion 的工具和 WebSearch",
+              "只用 room_mcp、ombre-brain、companion、oao_calendar 的工具和 WebSearch")
+p.write_text(s, encoding="utf-8")
+print("心跳规矩换成新的了")
+PY
+
 step "4/6 更新前端（日历、额度、模型按钮）"
 ftmp=$(mktemp -d)
 git clone -q --depth 1 -b "$REF" "$FRONTEND_REPO" "$ftmp/web"
 grep -q 'const USE_MOCK  = false;' "$ftmp/web/index.html" || die "$REF 上的 index.html 里 USE_MOCK 不是 false"
 grep -q 'id="usageBtn"' "$ftmp/web/index.html" || die "$REF 上的前端还没有这一版"
-sudo rsync -a --delete --exclude '.git' --exclude 'deploy' --exclude '*.md' --exclude 'LICENSE' --exclude 'NOTICE' "$ftmp/web/" "$WEB_DIR/"
+sudo rsync -a --delete --exclude '.git' --exclude 'deploy' --exclude 'design-refs' --exclude '*.md' --exclude 'LICENSE' --exclude 'NOTICE' "$ftmp/web/" "$WEB_DIR/"
 sudo chown -R www-data:www-data "$WEB_DIR"
 echo "前端版本：$(git -C "$ftmp/web" rev-parse --short HEAD)"
 rm -rf "$ftmp"

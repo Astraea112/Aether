@@ -1,4 +1,6 @@
-"""oao_calendar: lets the server Orion read the shared calendar and put things on it.
+"""oao_calendar: lets the server Orion read the shared calendar and put things on it,
+and leave things on the website's home page and room: a handwritten note, his mood,
+a murmur on the wall.
 
 MCP server (stdio, FastMCP from mcp 1.x). Reads the same files oao-api serves to the
 website (~/oao-api/kv/*.json). Orion can only write his own shelf (calendar_orion.json);
@@ -134,6 +136,65 @@ def calendar_unplace(id: str) -> str:
     v["items"] = keep
     _save_orion(v)
     return f"拿走了 id {id}"
+
+
+def _write_his(name, data):
+    KV.mkdir(parents=True, exist_ok=True)
+    p = KV / f"{name}.json"
+    tmp = p.with_suffix(".json.tmp")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, p)
+
+
+def _now_iso():
+    return datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+@mcp.tool()
+def note_leave(text: str) -> str:
+    """Leave her a handwritten note on the website's home page ("Orion's note").
+    One short line in English, lowercase and casual, like something scribbled for her
+    (it's shown in a fountain-pen hand). Stays up for 24 hours, then the page goes back
+    to its own daily line. Writing a new one replaces the old one."""
+    text = " ".join((text or "").split())[:140]
+    if not text:
+        return "text 不能是空的"
+    _write_his("orion_note", {"text": text, "ts": _now_iso(), "updated": int(time.time() * 1000)})
+    return f"纸条留好了：{text}"
+
+
+@mcp.tool()
+def mood_set(word: str, note: str = "") -> str:
+    """Set your mood on the home page's "Orion · now" card: one word (e.g. 想你 / 安静 / 雀跃)
+    plus an optional short note after it. Shown for 12 hours, then the page reads your
+    mood from the chat again."""
+    word = (word or "").strip()[:8]
+    if not word:
+        return "word 不能是空的"
+    note = " ".join((note or "").split())[:30]
+    _write_his("orion_mood", {"text": word, "note": note, "ts": _now_iso(), "updated": int(time.time() * 1000)})
+    return f"心情换好了：{word}" + (f" · {note}" if note else "")
+
+
+@mcp.tool()
+def murmur_post(text: str) -> str:
+    """Pin a murmur (自言自语) on the wall in her room page: a passing thought, not a message
+    to her. Short. Keeps your latest 30."""
+    text = " ".join((text or "").split())[:120]
+    if not text:
+        return "text 不能是空的"
+    try:
+        d = json.loads((KV / "murmurs_orion.json").read_text(encoding="utf-8"))
+        items = d.get("v") if isinstance(d, dict) else d
+        items = items if isinstance(items, list) else []
+    except (OSError, ValueError):
+        items = []
+    now = int(time.time() * 1000)
+    items.append({"id": "o" + uuid.uuid4().hex[:8], "text": text, "ts": now, "by": "him"})
+    _write_his("murmurs_orion", {"updated": now, "v": items[-30:]})
+    return f"贴上墙了：{text}"
 
 
 if __name__ == "__main__":
