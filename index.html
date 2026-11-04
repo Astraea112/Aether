@@ -3146,8 +3146,10 @@
   .now-facts{ align-items: center; flex-wrap: wrap; gap: 6px 14px; }
   .now-facts span{ white-space: nowrap; }
   .now-facts b{ margin-left: 4px; font-size: var(--fs-s); }
-  .now-facts .note-poke{ margin-left: auto; }
-  .home-now .note-reply{ margin: -2px 0 0; }
+
+  .home-card.home-poke{ display:flex; flex-direction:column; gap: 8px; text-align: left; color: var(--text); font: inherit; border: 0; }
+  .home-poke .home-label{ font-size: var(--fs-s); letter-spacing: .12em; color: var(--text-soft); }
+  .home-poke .home-poke-title{ display:flex; align-items:center; gap: 6px; margin-top: auto; font-size: var(--fs-l); }
 
   /* 今天 + 天气 */
   .home-card.wx-card{ display:flex; flex-direction:column; justify-content:space-between; gap: 10px; }
@@ -3165,7 +3167,7 @@
 
   /* 下面三块的质感:深一点、带一点点暖紫的烟色玻璃,一圈很细的亮边 + 顶上一线高光 + 柔和的深投影,
      不再是半透明的灰,背景的花不会透上来抢眼 */
-  .home-card.home-now, .home-card.next-card, .home-card.wx-card, .home-card.msg-strip{
+  .home-card.home-now, .home-card.wx-card, .home-card.home-poke{
     background: var(--tab-fill);
     -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
     box-shadow: inset 0 1px 0 var(--tab-hi), 0 10px 28px rgba(0,0,0,.3);
@@ -3178,6 +3180,23 @@
   .note-poke svg{ width: 15px; height: 15px; }
   .note-poke.poked svg{ animation: pokeWiggle .45s cubic-bezier(.34,1.56,.5,1); }
   .msg-ic{ background: transparent; }
+
+  /* 最近一条消息:一张方格纸 */
+  .home-card.msg-strip{
+    --grid: rgba(70,82,104,.16);
+    background-color: #d8d6d0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 14px 14px; background-position: -1px -1px;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 10px 24px rgba(0,0,0,.35);
+    color: #2a2a2e; text-shadow: none;
+  }
+  .home-card.msg-strip .msg-ic{ color: #3a3a40; box-shadow: inset 0 0 0 .5px rgba(40,40,48,.35); background: rgba(216,214,208,.9); }
+  .home-card.msg-strip .msg-top .home-label, .home-card.msg-strip .msg-top time{ color: rgba(42,42,46,.55); }
+  .home-card.msg-strip .msg-last > span{ color: #26262a; }
+  .home-card.msg-strip .msg-last em{ color: rgba(42,42,46,.6); }
 
   /* 最近一条消息 */
   .home-card.msg-strip{ display:flex; align-items:center; gap: 14px; width: 100%; cursor: pointer; padding: 14px 18px; border-radius: var(--r-l); }
@@ -3551,22 +3570,13 @@
           </div>
           <p class="now-line" id="nowLine">在房间里</p>
           <p class="now-mood"><span>心情</span><b id="homeOrionMood">安静</b><em id="homeOrionMoodNote"></em></p>
-          <p class="note-reply" id="pokeReply"></p>
           <div class="now-facts">
             <span>你上次说话<b id="homeLastMine">—</b></span>
             <span>他上次回你<b id="homeLastReply">—</b></span>
-            <button type="button" class="note-poke" id="pokeBtn" aria-label="戳他一下"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V10a1.5 1.5 0 0 1 3 0v2M14 11.5a1.5 1.5 0 0 1 3 0V13M17 12.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/></svg>戳他</button>
           </div>
         </section>
 
         <div class="home-row">
-          <!-- 下一个日子:日历里最近的一件事倒数;没有就倒数到下一个 24 号(在一起满几个月) -->
-          <section class="home-card next-card" aria-label="下一个日子">
-            <p class="home-label">Next</p>
-            <p class="next-num"><b id="nextDays">--</b><span id="nextUnit">days</span></p>
-            <p class="next-title" id="nextTitle"></p>
-            <p class="next-date" id="nextDate"></p>
-          </section>
           <!-- 今天 + 顺德的天气 -->
           <section class="home-card wx-card" aria-label="今天">
             <div class="wx-date"><b id="wxDay"></b><span><i id="wxMon"></i><i id="wxWeek"></i></span></div>
@@ -3575,6 +3585,12 @@
               <span class="wx-txt"><span class="wx-city">Shunde · 顺德</span><span class="wx-temp"><b id="wxTemp">--°</b><em id="wxText"></em></span></span>
             </div>
           </section>
+          <!-- 戳一戳:按一下他会回你一句 -->
+          <button type="button" class="home-card home-poke" id="pokeBtn">
+            <span class="home-label">戳一戳</span>
+            <span class="home-poke-title">戳他<svg class="poke-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></span>
+            <span class="home-poke-reply" id="pokeReply">无聊就按，他会有反应</span>
+          </button>
         </div>
 
         <!-- 最近一条消息,点一下回到聊天 -->
