@@ -1764,6 +1764,8 @@
 
   /* ── Home(主页):照片背景上的一组磨砂卡片 ── */
   .home{ display:flex; flex-direction:column; gap: 12px; width:100%; max-width: 560px; margin: 0 auto; }
+  #menuPanel .home{ margin-top: auto; margin-bottom: auto; }
+  #menuPanel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 92px); }   /* 底栏的位置留出来 */
   .home-head{ display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin: 2px 4px 8px; }
   .menu-title,
   .page-title{
@@ -3578,11 +3580,6 @@
   <div class="menu-page">
     <div class="menu-scroll">
       <div class="home">
-        <header class="home-head">
-          <h1 class="menu-title">Aether</h1>
-          <div class="menu-private">PRIVATE<br>SPACE</div>
-        </header>
-
         <section class="home-card home-hero card-bare" aria-label="在一起的天数">
           <p class="home-names"><span id="homeNameAi">Orion</span> &amp; <span id="homeNameMe">Astraea</span></p>
           <p class="home-eyebrow">Already together</p>
@@ -4189,7 +4186,7 @@ function setTab(tab){
   if (tabbar) tabbar.querySelectorAll(".tab").forEach((b) => {
     if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
-  if (tab === "home"){ refreshDays(); refreshHome(); }
+  if (tab === "home"){ refreshDays(); refreshHome(); setTimeout(fitHome, 420); }
   else if (tab === "room") refreshRoom();
   else if (tab === "archive"){ refreshArchive(); pullCalendarKV(); }
 }
@@ -4306,6 +4303,7 @@ function refreshHome(){
   if (nl) nl.textContent = st.text;
   if (nn) nn.textContent = aiName() + " · now";
   refreshNextDay();
+  fitHomeSoon();
   const lm = $("#homeLastMine"), lr = $("#homeLastReply");
   if (lm) lm.textContent = lastMe ? fmtWhen(lastMe.ts) : "—";
   if (lr) lr.textContent = lastAi ? fmtWhen(lastAi.ts) : "—";
@@ -4314,6 +4312,21 @@ function refreshHome(){
   if (nMe) nMe.textContent = HUMAN_NAME;
   refreshHomeExtras(msgs);
 }
+/* 门厅一屏放下:不滚动,整页按同一个比例缩小(zoom),直到最下面一张卡在底栏上面露全 */
+function fitHome(){
+  const home = document.querySelector("#menuPanel .home");
+  if (!home || currentTab !== "home") return;
+  home.style.zoom = "";
+  const sc = home.parentElement, cs = getComputedStyle(sc);
+  const avail = sc.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const h = home.scrollHeight;
+  const z = Math.max(.6, Math.min(1, avail / h));
+  if (z < .995) home.style.zoom = z.toFixed(3);
+}
+let fitTimer = null;
+function fitHomeSoon(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHome, 60); }
+window.addEventListener("resize", fitHomeSoon);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHomeSoon);
 /* 下一个日子:日历里(你放的 + 他放的)往后 180 天内最近的一件事;没有就倒数到下一个在一起满月的日子 */
 function nextDay(){
   const today = dayKey(Date.now());
