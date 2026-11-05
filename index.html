@@ -4029,65 +4029,8 @@
         <div class="push-hint" id="pushHint"></div>
       </section>
 
-      <!-- AI body routing -->
-      <section class="settings-card">
-        <div class="settings-label">联系 Claude <i class="info-i" title="Desktop＝Claude Code channel；API＝服务器上的 OpenAI-compatible loop。同一时刻只让一个身体接消息，避免双答。">i</i></div>
-        <div class="segmented" id="brainSeg" role="group" aria-label="联系方式">
-          <button type="button" data-val="desktop">Desktop</button>
-          <button type="button" data-val="loop">API</button>
-        </div>
-        <div class="push-hint" id="brainHint"></div>
-      </section>
-
-      <!-- API loop · 模型链 -->
-      <section class="settings-card loop-card">
-        <div class="settings-label">API · 模型 <i class="info-i" title="OpenAI-compatible 端点。第一行是主模型，后面是兜底链：主模型 401/403/429/5xx 时自动往下切。key 只在保存时上传，回显永远打码。">i</i></div>
-        <div class="loop-rows" id="loopChainRows"></div>
-        <div class="loop-actions">
-          <button type="button" class="loop-btn" id="loopChainAdd">+ 添加一行</button>
-          <button type="button" class="loop-btn primary" id="loopChainSave">保存</button>
-          <button type="button" class="loop-btn" id="loopChainTest">保存并测试</button>
-        </div>
-        <div class="push-hint" id="loopChainHint"></div>
-      </section>
-
-      <!-- API loop · 上文 / 工具步数 -->
-      <section class="settings-card loop-card">
-        <div class="settings-label">API · 上文与工具 <i class="info-i" title="上文条数：每条消息喂给模型的同窗口历史条数。历史图片：其中最近几张图重新发像素（其余只留文件名）。工具步数：一条消息里最多连续调用工具的轮数。看图：关掉则图片只以文件名出现。">i</i></div>
-        <div class="loop-grid">
-          <label class="loop-field"><span>上文条数</span><input id="loopHistoryN" type="number" min="0" max="200" inputmode="numeric"></label>
-          <label class="loop-field"><span>历史图片</span><input id="loopHistoryImages" type="number" min="0" max="20" inputmode="numeric"></label>
-          <label class="loop-field"><span>工具步数</span><input id="loopToolSteps" type="number" min="0" max="50" inputmode="numeric"></label>
-          <label class="loop-field"><span>看图</span><select id="loopVision"><option value="auto">自动</option><option value="on">开</option><option value="off">关</option></select></label>
-        </div>
-        <div class="loop-actions"><button type="button" class="loop-btn primary" id="loopContextSave">保存</button></div>
-        <div class="push-hint" id="loopContextHint"></div>
-      </section>
-
-      <!-- API loop · 人格设定 -->
-      <section class="settings-card loop-card">
-        <div class="settings-label">API · 人格设定 <i class="info-i" title="模型的 system prompt。保存即生效，下一条消息就用新的；直接改服务器上的文件也会被热加载，不用重启。">i</i></div>
-        <textarea id="loopPersona" class="loop-textarea" rows="8" spellcheck="false" placeholder="写给模型的人设……"></textarea>
-        <div class="loop-actions"><button type="button" class="loop-btn primary" id="loopPersonaSave">保存并热加载</button></div>
-        <div class="push-hint" id="loopPersonaHint"></div>
-      </section>
-
-      <!-- API loop · MCP -->
-      <section class="settings-card loop-card">
-        <div class="settings-label">API · MCP 工具 <i class="info-i" title="连上的 MCP server 的工具会作为 function calling 交给模型，多步调用自动循环。stdio：服务器上的本机命令；http：streamable-http 地址。">i</i></div>
-        <div class="loop-rows" id="loopMcpList"></div>
-        <div class="loop-grid loop-mcp-form">
-          <label class="loop-field"><span>名字</span><input id="loopMcpName" type="text" placeholder="demo" autocapitalize="off" autocomplete="off"></label>
-          <label class="loop-field"><span>类型</span><select id="loopMcpTransport"><option value="stdio">stdio</option><option value="http">http</option></select></label>
-          <label class="loop-field loop-mcp-stdio wide"><span>命令</span><input id="loopMcpCommand" type="text" placeholder="python3" autocapitalize="off" autocomplete="off"></label>
-          <label class="loop-field loop-mcp-stdio wide"><span>参数（空格分隔）</span><input id="loopMcpArgs" type="text" placeholder="mcp_demo_server.py" autocapitalize="off" autocomplete="off"></label>
-          <label class="loop-field loop-mcp-stdio wide"><span>env（JSON，可空）</span><input id="loopMcpEnv" type="text" placeholder='{"API_KEY":"..."}' autocapitalize="off" autocomplete="off"></label>
-          <label class="loop-field loop-mcp-http wide hidden"><span>URL</span><input id="loopMcpUrl" type="url" placeholder="https://host/mcp" autocapitalize="off" autocomplete="off"></label>
-          <label class="loop-field loop-mcp-http wide hidden"><span>headers（JSON，可空）</span><input id="loopMcpHeaders" type="text" placeholder='{"Authorization":"Bearer ..."}' autocapitalize="off" autocomplete="off"></label>
-        </div>
-        <div class="loop-actions"><button type="button" class="loop-btn primary" id="loopMcpAdd">添加 / 更新并连接</button></div>
-        <div class="push-hint" id="loopMcpHint"></div>
-      </section>
+      <!-- 「联系 Claude（Desktop/API 切换）」和 API loop 的四块设置都拿掉了:现在只用服务器上的 Claude Code。
+           对应的脚本都会先看元素在不在,不在就跳过 -->
 
       <!-- 上下文阈值（占位 · 假按键）-->
       <section class="settings-card">
@@ -9194,8 +9137,25 @@ function scheduleRender({ stickToBottom = false, preserveAnchor = false, anchorO
     scheduleRender._stick = false;
     scheduleRender._anchor = null;
     renderVirtualList({ stickToBottom: stick, anchor: savedAnchor });
+    placeRefreshSoon();                             // 聊天记录变了:门厅/房间上的「上次说话」跟着变
   });
 }
+/* 门厅、房间上那些跟聊天有关的字(上次说话、他上次回你、今天聊了几条):
+   聊天记录一变就重算(攒 400ms),另外每分钟刷一次,让「刚刚」慢慢变成「5 分钟前」 */
+let placeRefreshTimer = null;
+function placeRefreshSoon(){
+  if (currentTab !== "home" && currentTab !== "room") return;
+  clearTimeout(placeRefreshTimer);
+  placeRefreshTimer = setTimeout(refreshCurrentPlace, 400);
+}
+function refreshCurrentPlace(){
+  try{
+    if (currentTab === "home") refreshHome();
+    else if (currentTab === "room") refreshRoom();
+  }catch(_){}
+}
+setInterval(() => { if (!document.hidden) refreshCurrentPlace(); }, 60e3);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshCurrentPlace(); });
 
 const PENDING_OUTGOING_TTL = 2 * 60e3;
 const pendingOutgoing = [];
