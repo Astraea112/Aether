@@ -3816,6 +3816,25 @@
   .scroll{ padding-bottom: calc(var(--composer-zone) + var(--composer-lift)) !important; }
   /* 纸被屏幕左边切掉一截:用 clip-path 切,不用 overflow(overflow-x:hidden 会把这块变成一个自己的滚动区,手指放在上面整页就划不动了) */
   .lt-desk{ overflow: visible !important; clip-path: inset(-400px 0 -600px 0); }
+
+  /* 消息提示横幅 */
+  .in-banner{
+    position: fixed; z-index: 260; left: 50%; top: calc(env(safe-area-inset-top) + 8px);
+    width: min(calc(100% - 20px), 460px); transform: translate(-50%, calc(-100% - 30px));
+    display:flex; align-items:center; gap: 12px; padding: 12px 14px; border: 0; border-radius: 20px; text-align: left; cursor: pointer;
+    font: inherit; color: var(--text);
+    background: rgba(38,38,42,.82); -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4);
+    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.14), 0 14px 34px rgba(0,0,0,.45);
+    transition: transform .42s cubic-bezier(.3,1.25,.5,1); -webkit-tap-highlight-color: transparent;
+  }
+  .in-banner.show{ transform: translate(-50%, 0); }
+  .ib-ava{ flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--avatar-default) center / cover no-repeat; filter: grayscale(1); }
+  .ib-body{ flex: 1; min-width: 0; display:flex; flex-direction:column; gap: 3px; }
+  .ib-top{ display:flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .ib-top b{ font-family: var(--font-en), var(--font-cn); font-size: var(--fs-l); font-weight: 500; font-style: italic; line-height: 1.1; }
+  .ib-top time{ font-size: var(--fs-xs); color: var(--text-faint); }
+  .ib-text{ font-size: var(--fs-s); line-height: 1.45; color: var(--text-soft);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 </style>
 </head>
 <body>
@@ -4451,6 +4470,12 @@
   </div>
 </div>
 
+<!-- ── 在别的页面时,他发来消息:顶上滑下来一条提示,点一下去聊天 ── -->
+<button type="button" class="in-banner" id="inBanner" aria-hidden="true" tabindex="-1">
+  <span class="ib-ava" aria-hidden="true"></span>
+  <span class="ib-body"><span class="ib-top"><b id="ibName">Orion</b><time>现在</time></span><span class="ib-text" id="ibText"></span></span>
+</button>
+
 <!-- ── 悬浮胶囊 tab 栏 ── -->
 <nav class="tabbar" id="tabbar" aria-label="主导航">
   <button class="tab" type="button" data-tab="home" aria-label="门厅">
@@ -4994,6 +5019,30 @@ function fitHomeSoon(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHome, 6
 window.addEventListener("resize", fitHomeSoon);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHomeSoon);
 
+/* 消息提示横幅 */
+let ibTimer = null, ibY = null;
+function showInBanner(m){
+  const el = $("#inBanner");
+  if (!el) return;
+  const lines = String(m.text || "").split(/\n+/).map((x) => x.trim()).filter(Boolean);
+  $("#ibName").textContent = aiName();
+  $("#ibText").textContent = lines.join(" ") || "发来一条消息";
+  el.classList.add("show"); el.setAttribute("aria-hidden", "false");
+  clearTimeout(ibTimer); ibTimer = setTimeout(hideInBanner, 5500);
+}
+function hideInBanner(){ const el = $("#inBanner"); if (!el) return; el.classList.remove("show"); el.setAttribute("aria-hidden", "true"); clearTimeout(ibTimer); }
+(() => {
+  const el = $("#inBanner");
+  if (!el) return;
+  el.addEventListener("click", () => { hideInBanner(); setTab("chat"); });
+  el.addEventListener("touchstart", (e) => { ibY = e.touches[0].clientY; clearTimeout(ibTimer); }, { passive: true });
+  el.addEventListener("touchmove", (e) => { if (ibY == null) return; const dy = e.touches[0].clientY - ibY; if (dy < 0) el.style.transform = `translate(-50%, ${dy}px)`; }, { passive: true });
+  el.addEventListener("touchend", (e) => {
+    if (ibY == null) return;
+    const dy = (e.changedTouches[0] || {}).clientY - ibY; ibY = null; el.style.transform = "";
+    if (dy < -30){ e.preventDefault(); hideInBanner(); } else ibTimer = setTimeout(hideInBanner, 3500);
+  });
+})();
 /* 她在网站上做了事:告诉服务器,服务器攒十几秒以后把他叫醒(不在聊天里发消息) */
 function notifySite(text){
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || !text) return;
@@ -9357,6 +9406,7 @@ function onMessage(m){
   if (stick && m.kind !== "thinking" && m.kind !== "act") freshKeys.add(key);          // 在底部时新消息弹入
   if (m.from === "ai" && m.kind !== "thinking" && m.kind !== "act"){               // act 是环境信息:不响铃、不在通话里朗读
     playReceiveSound();
+    if (currentTab !== "chat" && !document.hidden) showInBanner(m);              // 在别的页面:顶上滑下来一条提示
     if (window.VoiceCall && window.VoiceCall.isOpen()) window.VoiceCall.speak(m.text || "");
   }
   setMessage({ ...m, status:"sent" }, { render:false });
