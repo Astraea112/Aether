@@ -3093,7 +3093,7 @@
     -webkit-backdrop-filter: blur(1.2px) saturate(.9); backdrop-filter: blur(1.2px) saturate(.9);   /* 百合清楚一点,只留一点点柔 */
   }
   /* 时间戳:还是最小那一档,但更淡 */
-  :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{ opacity: .45; letter-spacing: .05em; }
+  :root[data-theme="harbor"] .row .bubble:not(.has-att) .meta{ opacity: .82; letter-spacing: .05em; }
   :root[data-theme="harbor"] .row .bubble.has-att .meta{ opacity: .6; }
   /* 分隔线:就是一根很淡的灰色细线,日期夹在中间 */
   :root[data-theme="harbor"] .scroll .day,
@@ -3806,6 +3806,15 @@
     .bubble .meta{ font-size: 10px !important; }
     .act-label, .think-caption{ font-size: 12px !important; }
   }
+
+  /* 时间线更清楚一点 */
+  :root[data-theme="harbor"] .scroll .day{ color: rgba(235,233,228,.78); }
+  :root[data-theme="harbor"] .scroll .day::before, :root[data-theme="harbor"] .scroll .day::after{ background: rgba(200,198,194,.5); }
+  /* 打字框整体往上抬一点 */
+  :root{ --composer-lift: 12px; }
+  .composer{ padding-bottom: calc(clamp(10px, 1.6vw, 18px) + var(--composer-lift) + env(safe-area-inset-bottom)) !important; }
+  .scroll{ padding-bottom: calc(var(--composer-zone) + var(--composer-lift)) !important; }
+  .lt-desk{ overflow-x: hidden; overflow-x: clip; }
 </style>
 </head>
 <body>
@@ -8534,13 +8543,15 @@ function renderMessage(m, opts = {}){
 
 // 时间分隔只在"隔了很久又说话"的时候出现:跟上一条消息差 3 小时以上(或者整段对话的第一条)
 const TIME_GAP_MS = 3 * 60 * 60 * 1000;
+const PROACTIVE_GAP_MS = 15 * 60 * 1000;     // 他隔了一阵自己找你(心跳醒来那种):前面也放一条时间线,跟上面的聊天分开
 function buildVirtualRows(){
   const rows = [];
   let lastTs = null;
   let prevBubble = null;
   sortedMessages().forEach((m) => {
     const at = new Date(m.ts).getTime();
-    if (lastTs == null || (isFinite(at) && at - lastTs >= TIME_GAP_MS)){
+    const gap = isFinite(at) && lastTs != null ? at - lastTs : 0;
+    if (lastTs == null || gap >= TIME_GAP_MS || (m.from !== "human" && gap >= PROACTIVE_GAP_MS)){
       rows.push({ type:"day", key:`day:${dayKey(m.ts)}:${m._key}`, text:fmtDay(m.ts) });
       prevBubble = null;
     }
@@ -9050,7 +9061,9 @@ function scheduleMeasure(reStick){
   });
 }
 // 把 scrollTop 直接钉到底(下一帧)。前提:调用前窗口已贴底(domEnd===n,最新行已物化),否则会落进 bottomSpacer 空白。
+let fingerDown = false;
 function jumpToBottom(){
+  if (fingerDown) return;                         // 手指按着在滑:别把她拽回最底下
   requestAnimationFrame(() => {
     if (smoothStick && scrollEl.scrollTo){ smoothStick = false; scrollEl.scrollTo({ top: scrollEl.scrollHeight, behavior: "smooth" }); }
     else scrollEl.scrollTop = scrollEl.scrollHeight;
@@ -10356,6 +10369,22 @@ if (window.visualViewport){
 if ("serviceWorker" in navigator){
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
+
+/* iPhone:滚动区已经顶到最上/最下时,再划一下会被页面的回弹吃掉,列表卡一下划不动。
+   按下去的那一刻把它往里挪 1px,手势就一直归列表自己。 */
+function nudgeScroller(el){
+  if (!el || el.scrollHeight <= el.clientHeight + 2) return;
+  if (el.scrollTop <= 0) el.scrollTop = 1;
+  else if (el.scrollTop + el.clientHeight >= el.scrollHeight) el.scrollTop = el.scrollHeight - el.clientHeight - 1;
+}
+document.addEventListener("touchstart", (e) => {
+  const sc = e.target.closest && e.target.closest(".scroll, .menu-scroll, .pr-letter, .scene-panel");
+  if (sc && sc.classList.contains("scroll")) fingerDown = true;
+  nudgeScroller(sc);
+}, { passive: true, capture: true });
+const releaseFinger = () => { if (fingerDown){ fingerDown = false; } };
+document.addEventListener("touchend", releaseFinger, { passive: true, capture: true });
+document.addEventListener("touchcancel", releaseFinger, { passive: true, capture: true });
 
 init();
 </script>
