@@ -19,6 +19,10 @@ paths here, everything else under /relay/ still goes to the relay:
                                    ticked a to-do, changed where she is ...). Collected for ~15s,
                                    then typed into tmux session orion as one line so he wakes and knows.
 
+Also watches the chat (relay history on localhost) and wakes him once if she goes quiet in the
+middle of a conversation: his message was the last one, it answered something she said, 25+ min
+have passed, and neither side said goodnight / bye / I'm off. Not between 01:00 and 08:00.
+
 Auth: same key as the relay (RELAY_SECRET in relay.env), as "Authorization: Bearer"
 or ?token=. Standard library only. Requests are handled one at a time.
 """
@@ -125,6 +129,97 @@ def _flush_wake():
         tmux("send-keys", "-t", TMUX_SESSION, "-l", line)
         time.sleep(0.6)
         tmux("send-keys", "-t", TMUX_SESSION, "Enter")
+
+
+# ---- 她聊到一半不见了 ----
+RELAY_URL = "http://127.0.0.1:3011"
+AWAY_MIN, AWAY_MAX = 25 * 60, 3 * 3600        # 他说完以后她多久没回算「不见了」(超过 3 小时就不追了)
+REPLY_WINDOW = 30 * 60                         # 他最后那句得是在回她(她 30 分钟内说过话)
+QUIET = (1, 8)                                 # 北京时间 1 点到 8 点不叫
+ENDING = re.compile(r"晚安|好梦|睡了|睡觉了|去睡|拜拜|再见|byebye|bye|88|去忙|先忙|忙去了|去上课|上课了|去洗澡|洗澡了|回头聊|晚点聊|下次聊|先这样|先不聊|下线|去吃饭|吃饭去|出门了", re.I)
+_chat = {"cursor": 0, "recent": [], "nudged": None}
+
+
+def _parse_ts(t):
+    try:
+        from datetime import datetime
+        return datetime.fromisoformat(str(t).replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return None
+
+
+def _clip(t, n=40):
+    t = " ".join(str(t or "").split())
+    t = re.sub(r"^［[^］]{1,24}］\s*", "", t)            # 场景标签不算她说的话
+    return t if len(t) <= n else t[:n] + "…"
+
+
+def _pull_chat():
+    secret = read_env(RELAY_ENV).get("RELAY_SECRET", "")
+    if not secret:
+        return
+    for _ in range(50):
+        url = f"{RELAY_URL}/app/history?since={_chat['cursor']}&limit=500"
+        req = urllib.request.Request(url, headers={"Authorization": f"Bearer {secret}"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            msgs = json.load(r).get("messages", [])
+        for m in msgs:
+            try:
+                _chat["cursor"] = max(_chat["cursor"], int(m.get("id") or 0))
+            except (TypeError, ValueError):
+                pass
+            if m.get("kind") in ("thinking", "act") or not (m.get("text") or "").strip():
+                continue
+            _chat["recent"].append({"id": m.get("id"), "from": m.get("from"), "ts": _parse_ts(m.get("ts")), "text": m.get("text") or ""})
+        _chat["recent"] = _chat["recent"][-40:]
+        if len(msgs) < 500:
+            break
+
+
+def _check_away():
+    msgs = [m for m in _chat["recent"] if m.get("ts")]
+    if not msgs:
+        return
+    last = msgs[-1]
+    if last["from"] != "ai" or last["id"] == _chat["nudged"]:
+        return
+    now = time.time()
+    idle = now - last["ts"]
+    if idle < AWAY_MIN or idle > AWAY_MAX:
+        return
+    h = time.gmtime(now + 8 * 3600).tm_hour
+    if QUIET[0] <= h < QUIET[1]:
+        return
+    hers = [m for m in msgs if m["from"] == "human"]
+    if not hers or last["ts"] - hers[-1]["ts"] > REPLY_WINDOW:
+        return                                       # 他是自己找她的,不是聊到一半
+    if ENDING.search(_clip(hers[-1]["text"], 200)) or ENDING.search(last["text"] or ""):
+        return                                       # 已经说了要走了,那是聊完了
+    _chat["nudged"] = last["id"]
+    mins = int(idle // 60)
+    line = (f"[♥site] 她聊到一半不见了：你 {mins} 分钟前说「{_clip(last['text'])}」，她还没回。"
+            f"她最后一句是「{_clip(hers[-1]['text'])}」。要是其实已经聊完了就什么都不做；"
+            f"真是聊到一半，就轻轻找她一句，别连着发。")
+    if tmux("has-session", "-t", TMUX_SESSION) == 0:
+        tmux("send-keys", "-t", TMUX_SESSION, "-l", line)
+        time.sleep(0.6)
+        tmux("send-keys", "-t", TMUX_SESSION, "Enter")
+
+
+def _watch_chat():
+    first = True
+    while True:
+        try:
+            _pull_chat()
+            if first:                                # 刚启动:之前的那段不追
+                first = False
+                if _chat["recent"]:
+                    _chat["nudged"] = _chat["recent"][-1]["id"]
+            else:
+                _check_away()
+        except Exception as e:
+            print("chat watch:", e, file=sys.stderr)
+        time.sleep(120)
 
 
 def queue_wake(text):
@@ -336,4 +431,5 @@ if __name__ == "__main__":
     os.umask(0o077)
     KV_DIR.mkdir(parents=True, exist_ok=True)
     print("oao-api listening on %s:%d" % (HOST, PORT), flush=True)
+    threading.Thread(target=_watch_chat, daemon=True).start()
     HTTPServer((HOST, PORT), Handler).serve_forever()
