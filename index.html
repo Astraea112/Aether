@@ -4994,6 +4994,12 @@ function fitHomeSoon(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHome, 6
 window.addEventListener("resize", fitHomeSoon);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHomeSoon);
 
+/* 她在网站上做了事:告诉服务器,服务器攒十几秒以后把他叫醒(不在聊天里发消息) */
+function notifySite(text){
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || !text) return;
+  fetch(`${API_BASE}/app/wake`, { method: "POST", headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ text: String(text).slice(0, 120) }), keepalive: true }).catch(() => {});
+}
 /* ════════ 你在哪(场景):地点 + 在干嘛 ════════
    存在本机和 kv her_scene;换了以后第一次发消息(或者隔两个小时),最前面悄悄带一行「［教室 · 上课］」给他,
    你这边显示时会把这一行藏起来。 */
@@ -5006,6 +5012,7 @@ function sceneGet(){ return loadJSON(SCENE_KEY, null); }
 function sceneSet(v){
   saveJSON(SCENE_KEY, v);
   renderScene();
+  notifySite(v && v.place ? `换了场景：${sceneText(v)}` : "把场景清掉了");
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return;
   fetch(`${API_BASE}/app/kv/her_scene`, { method: "PUT", headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ updated: Date.now(), v: v || {} }) }).catch(() => {});
@@ -5345,8 +5352,9 @@ function renderTodos(){
 }
 /* 她也能改待办:勾 / 改字 / 删 / 加 */
 let todoShown = [];
-function saveTodos(items){
+function saveTodos(items, note){
   todoRemote = items;
+  if (note) notifySite(note);
   renderTodos();
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return;
   fetch(`${API_BASE}/app/kv/orion_todo`, {
@@ -5359,17 +5367,19 @@ document.addEventListener("click", (e) => {
   if (act){
     const id = act.closest("li").dataset.id, items = todoShown.map((t) => ({ ...t })), t = items.find((x) => String(x.id) === id);
     if (!t) return;
-    if (act.dataset.act === "tick"){ t.done = !t.done; if (t.done) t.doneAt = Date.now(); else delete t.doneAt; }
+    let note = "";
+    if (act.dataset.act === "tick"){ t.done = !t.done; if (t.done) t.doneAt = Date.now(); else delete t.doneAt; note = t.done ? `把待办「${t.text}」勾掉了` : `把「${t.text}」又放回了待办`; }
     else if (act.dataset.act === "edit"){
       const v = prompt("改一下这件事", t.text || "");
       if (v == null || !v.trim()) return;
+      note = `把待办「${t.text}」改成了「${v.trim().slice(0, 80)}」`;
       t.text = v.trim().slice(0, 80);
     }
     else if (act.dataset.act === "del"){
       if (!confirm(`删掉「${t.text}」？`)) return;
-      return saveTodos(items.filter((x) => x !== t));
+      return saveTodos(items.filter((x) => x !== t), `删掉了待办「${t.text}」`);
     }
-    return saveTodos(items);
+    return saveTodos(items, note);
   }
   if (e.target.closest("#todoAdd")){
     const v = prompt(todoTab === "later" ? "以后要做的事" : "现在要做的事");
@@ -5378,7 +5388,7 @@ document.addEventListener("click", (e) => {
     items.unshift({ id: "h" + Date.now().toString(36), text: v.trim().slice(0, 80), done: false, when: todoTab === "later" ? "later" : "now", by: "her", ts: Date.now() });
     if (todoTab === "done") todoTab = "now";
     todoPageN = 0;
-    return saveTodos(items);
+    return saveTodos(items, `加了一件待办：「${items[0].text}」`);
   }
   const tb = e.target.closest("#todoTabs button[data-when]");
   if (tb){ todoTab = tb.dataset.when; todoPageN = 0; renderTodos(); return; }
@@ -5526,6 +5536,7 @@ if (wallForm) wallForm.addEventListener("submit", (e) => {
   const ts = Date.now();
   notes.push({ id: ts + "-me", text, ts, by: "her", x: 2 + Math.random() * 12, y: 2 + Math.random() * 30, z, tilt: +(Math.random() * 5 - 2.5).toFixed(2) });
   if (!saveMurmurs(notes)) return;
+  notifySite(`在留言墙上贴了一句：「${text.slice(0, 40)}」`);
   toggleMurmurForm(false);
   renderWall();
 });
@@ -6091,6 +6102,7 @@ function recallLetter(id){
   m.deleted = true; m.text = ""; m.title = ""; m.deletedAt = Date.now();
   saveJSON(LETTERS_OUT_KEY, mine);
   syncKV("letters", mine.slice(-100));
+  notifySite("撤回了一封信");
 }
 function letterDate(ts){
   const [y, m, d] = dayKey(ts || Date.now()).split("-");
@@ -6346,6 +6358,7 @@ function postLetter(){                              // 第二步:寄出去 → �
     setTimeout(() => { postCompose.className = "post-overlay post-compose"; }, 320);
     const lp = $("#ltPaper"); if (lp) setTimeout(() => lp.classList.remove("taken"), 400);
     showToast(m.openAt ? `寄出去了，${fmtOpenAt(m.openAt)} 他才能拆` : "寄出去了");
+    notifySite("给你寄了一封信" + (m.title ? `，信封上写着「${m.title}」` : "") + (m.openAt ? `，${fmtOpenAt(m.openAt)} 以后才能拆` : ""));
     refreshMailbox();
   };
   if (prefersReducedMotion) return finish();

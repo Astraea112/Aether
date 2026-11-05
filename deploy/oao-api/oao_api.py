@@ -15,6 +15,9 @@ paths here, everything else under /relay/ still goes to the relay:
                                    effort -> ~/.claude/settings.json effortLevel
                                              (Claude Code reads it when it starts)
                                    restart -> kill + start-orion.sh
+  POST /relay/app/wake           {"text": "..."} something she just did on the site (sent a letter,
+                                   ticked a to-do, changed where she is ...). Collected for ~15s,
+                                   then typed into tmux session orion as one line so he wakes and knows.
 
 Auth: same key as the relay (RELAY_SECRET in relay.env), as "Authorization: Bearer"
 or ?token=. Standard library only. Requests are handled one at a time.
@@ -25,6 +28,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -89,6 +93,52 @@ def write_json(path, data, mode=0o600):
     with os.fdopen(fd, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     os.replace(tmp, path)
+
+
+# ---- 她在网站上做了事:攒一小会儿,一起把他叫醒 ----
+WAKE_DELAY = 15
+_wake_lock = threading.Lock()
+_wake_items = []
+_wake_timer = None
+
+
+def _flush_wake():
+    global _wake_timer
+    with _wake_lock:
+        items, _wake_items[:] = list(_wake_items), []
+        _wake_timer = None
+    if not items:
+        return
+    # 同一件事只说一次,最多说 6 件
+    seen, uniq = set(), []
+    for t in items:
+        if t not in seen:
+            seen.add(t)
+            uniq.append(t)
+    line = "[♥site] 她刚在网站上：" + "；".join(uniq[-6:])
+    log = read_json(KV_DIR / "site_events.json", {}) or {}
+    ev = log.get("v") if isinstance(log, dict) and isinstance(log.get("v"), list) else []
+    now = int(time.time() * 1000)
+    ev.extend({"ts": now, "text": t} for t in uniq)
+    write_json(KV_DIR / "site_events.json", {"updated": now, "v": ev[-80:]})
+    if tmux("has-session", "-t", TMUX_SESSION) == 0:
+        tmux("send-keys", "-t", TMUX_SESSION, "-l", line)
+        time.sleep(0.6)
+        tmux("send-keys", "-t", TMUX_SESSION, "Enter")
+
+
+def queue_wake(text):
+    global _wake_timer
+    text = " ".join(str(text or "").split())[:120]
+    if not text:
+        return False
+    with _wake_lock:
+        _wake_items.append(text)
+        if _wake_timer is None:
+            _wake_timer = threading.Timer(WAKE_DELAY, _flush_wake)
+            _wake_timer.daemon = True
+            _wake_timer.start()
+    return True
 
 
 def tmux(*args):
@@ -268,6 +318,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.authed():
             return self.reply(401, {"detail": "unauthorized"})
+        if self.route() == "wake":
+            body = self.body_json(2048)
+            if not isinstance(body, dict) or not queue_wake(body.get("text")):
+                return self.reply(400, {"detail": "bad body"})
+            return self.reply(200, {"ok": True})
         if self.route() != "model":
             return self.reply(404, {"detail": "not found"})
         body = self.body_json(4096)
