@@ -5004,20 +5004,34 @@ const SCENE_TAG_RE = /^［[^［］\n]{1,24}］\n?/;
 let sceneFetched = 0;
 function sceneGet(){ return loadJSON(SCENE_KEY, null); }
 function sceneSet(v){
-  saveJSON(SCENE_KEY, v);
+  saveJSON(SCENE_KEY, v || { ts: Date.now() });      // 清掉也留个时间,别的设备才知道这是更新的
   renderScene();
   notifySite(v && v.place ? `换了场景：${sceneText(v)}` : "把场景清掉了");
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return;
   fetch(`${API_BASE}/app/kv/her_scene`, { method: "PUT", headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify({ updated: Date.now(), v: v || {} }) }).catch(() => {});
+    body: JSON.stringify({ updated: Date.now(), v: v || { ts: Date.now() } }) }).catch(() => {});
+}
+/* 发消息前用服务器上最新的场景(别的设备改过、或者他帮她改过);最多等 2.5 秒,等不到就用本机的 */
+async function sceneLatest(){
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return;
+  const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 2500);
+  try{
+    const r = await fetch(`${API_BASE}/app/kv/her_scene`, { headers: authHeaders(), cache: "no-store", signal: ctrl.signal });
+    if (!r.ok) return;
+    const d = await r.json(), v = d && d.v, mine = sceneGet();
+    const theirs = (v && v.ts) || (d && d.updated) || 0;
+    if (theirs > ((mine && mine.ts) || 0)){ saveJSON(SCENE_KEY, v && v.place ? v : { ts: theirs }); renderScene(); }
+    sceneFetched = Date.now();
+  }catch(_){}
+  finally{ clearTimeout(t); }
 }
 function sceneFetch(){
   if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - sceneFetched < 60e3) return;
   sceneFetched = Date.now();
   fetch(`${API_BASE}/app/kv/her_scene`, { headers: authHeaders(), cache: "no-store" })
     .then((r) => r.ok ? r.json() : null)
-    .then((d) => { const v = d && d.v; const mine = sceneGet();
-      if (v && v.ts && (!mine || (mine.ts || 0) < v.ts)){ saveJSON(SCENE_KEY, v.place ? v : null); renderScene(); } })
+    .then((d) => { const v = d && d.v, mine = sceneGet(), theirs = (v && v.ts) || (d && d.updated) || 0;
+      if (theirs > ((mine && mine.ts) || 0)){ saveJSON(SCENE_KEY, v && v.place ? v : { ts: theirs }); renderScene(); } })
     .catch(() => {});
 }
 function sceneText(v){ return v && v.place ? v.place + (v.doing ? " · " + v.doing : "") : ""; }
@@ -9796,6 +9810,7 @@ async function flushSendBatch(){
   if (!b || !b.items.length) return;
   sendBatch = null;
   clearTimeout(b.timer);
+  if (!document.hidden) await sceneLatest();        // 切走/关页面时急着发,不等
   const head = b.items[0], tag = sceneTagFor();
   const text = (tag ? tag + "\n" : "") + b.items.map((x) => x.text).join("\n");
   const headMsg = messageByKey.get(msgKey(head.tempKey));
