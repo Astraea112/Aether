@@ -3824,10 +3824,12 @@
     display:flex; align-items:center; gap: 12px; padding: 12px 14px; border: 0; border-radius: 20px; text-align: left; cursor: pointer;
     font: inherit; color: var(--text);
     background: rgba(38,38,42,.82); -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4);
-    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.14), 0 14px 34px rgba(0,0,0,.45);
+    box-shadow: 0 14px 34px rgba(0,0,0,.45); outline: none; -webkit-appearance: none; appearance: none;
     transition: transform .42s cubic-bezier(.3,1.25,.5,1); -webkit-tap-highlight-color: transparent;
   }
   .in-banner.show{ transform: translate(-50%, 0); }
+  .in-banner:focus, .in-banner:focus-visible{ outline: none !important; }
+  .in-banner .ib-ava{ box-shadow: none; border: 0; }
   .ib-ava{ flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--avatar-default) center / cover no-repeat; filter: grayscale(1); }
   .ib-body{ flex: 1; min-width: 0; display:flex; flex-direction:column; gap: 3px; }
   .ib-top{ display:flex; align-items: baseline; justify-content: space-between; gap: 8px; }
