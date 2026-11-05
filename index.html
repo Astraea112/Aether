@@ -1756,7 +1756,7 @@
   .menu-scroll{
     position: relative; z-index: 1;
     flex: 1 1 auto; overflow-y: auto;
-    -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+    overscroll-behavior: contain;
     display: flex; flex-direction: column;
     padding: calc(env(safe-area-inset-top) + 18px) max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 24px) max(16px, env(safe-area-inset-left));
   }
@@ -2026,7 +2026,7 @@
     border: 3px solid var(--sticker-edge); border-radius: var(--r-l);
     box-shadow: 0 5px 12px rgba(0,0,0,.28), 0 1px 2px rgba(0,0,0,.18);
     font-family: var(--font-cn); font-size: var(--fs-m); line-height: 1.65; overflow-wrap: anywhere;
-    transform: rotate(var(--tilt, 0deg)); touch-action: none; -webkit-user-select: none; user-select: none; cursor: grab;
+    transform: rotate(var(--tilt, 0deg)); touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: grab;
     transition: box-shadow .15s ease, transform .15s ease;
   }
   .sticker::after{          /* 翘起来的一个角 */
@@ -2139,7 +2139,7 @@
     background-image: repeating-linear-gradient(transparent 0 23px, var(--note-rule) 23px 24px);
     background-position: 0 24px;
     border-radius: var(--r-s); box-shadow: 0 6px 16px rgba(0,0,0,.22), 0 1px 2px rgba(0,0,0,.12);
-    transform: rotate(var(--tilt, 0deg)); touch-action: none; -webkit-user-select: none; user-select: none; cursor: grab;
+    transform: rotate(var(--tilt, 0deg)); touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: grab;
     transition: box-shadow .15s ease, transform .15s ease;
   }
   .note-card.him{ background-color: var(--note-him); }
@@ -3814,7 +3814,8 @@
   :root{ --composer-lift: 12px; }
   .composer{ padding-bottom: calc(clamp(10px, 1.6vw, 18px) + var(--composer-lift) + env(safe-area-inset-bottom)) !important; }
   .scroll{ padding-bottom: calc(var(--composer-zone) + var(--composer-lift)) !important; }
-  .lt-desk{ overflow-x: hidden; overflow-x: clip; }
+  /* 纸被屏幕左边切掉一截:用 clip-path 切,不用 overflow(overflow-x:hidden 会把这块变成一个自己的滚动区,手指放在上面整页就划不动了) */
+  .lt-desk{ overflow: visible !important; clip-path: inset(-400px 0 -600px 0); }
 </style>
 </head>
 <body>
@@ -4824,7 +4825,13 @@ let currentTab = "chat", lastPlaceTab = "home", tabBooted = false;
 function showPanel(el){
   clearTimeout(panelTimers.get(el));
   el.classList.remove("hidden");
-  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("open")));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.classList.add("open");
+    // iPhone:从 display:none 刚显示出来的滚动区,有时不接手指,要等别的东西刷新一下才能滑。
+    // 显示出来以后把它的滚动关一下再打开,逼它重新建好滚动层。
+    const sc = el.querySelector(".menu-scroll");
+    if (sc){ sc.style.overflowY = "hidden"; void sc.offsetHeight; requestAnimationFrame(() => { sc.style.overflowY = ""; }); }
+  }));
 }
 function hidePanel(el){
   if (el.classList.contains("hidden")) return;
@@ -5539,12 +5546,27 @@ if (wallBoard){
     el.classList.add("lift", "sel");
     const bw = wallBoard.clientWidth, bh = wallBoard.clientHeight;
     murmurDragging = true;
-    drag = { el, notes, n, sx: e.clientX, sy: e.clientY, ox: el.offsetLeft, oy: el.offsetTop, bw, bh, moved: false };
-    el.setPointerCapture(e.pointerId);
+    // 手指:按住一小会儿才拿起来;一按就滑的话是在滚页面,不抢
+    const touch = e.pointerType === "touch";
+    drag = { el, notes, n, sx: e.clientX, sy: e.clientY, ox: el.offsetLeft, oy: el.offsetTop, bw, bh, moved: false, armed: !touch, pid: e.pointerId };
+    if (touch){
+      el.classList.remove("lift");
+      drag.timer = setTimeout(() => {
+        if (!drag || drag.el !== el) return;
+        drag.armed = true; el.classList.add("lift");
+        try{ el.setPointerCapture(drag.pid); }catch(_){}
+        try{ if (navigator.vibrate) navigator.vibrate(8); }catch(_){}
+      }, 260);
+    } else el.setPointerCapture(e.pointerId);
   });
+  wallBoard.addEventListener("touchmove", (e) => { if (drag && drag.armed) e.preventDefault(); }, { passive: false });
   wallBoard.addEventListener("pointermove", (e) => {
     if (!drag) return;
     const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (!drag.armed){                                 // 还没拿起来就动了:是在滑页面,放手
+      if (Math.hypot(dx, dy) > 8){ clearTimeout(drag.timer); drag.el.classList.remove("lift"); drag = null; murmurDragging = false; }
+      return;
+    }
     if (!drag.moved && Math.hypot(dx, dy) < 4) return;
     drag.moved = true;
     const w = drag.el.offsetWidth, h = drag.el.offsetHeight;
@@ -5553,8 +5575,10 @@ if (wallBoard){
     drag.el.style.left = (x / drag.bw * 100) + "%";
     drag.el.style.top = (y / drag.bh * 100) + "%";
   });
-  const end = () => {
+  const end = (e) => {
     if (!drag) return;
+    clearTimeout(drag.timer);
+    if (e && e.type === "pointercancel" && !drag.armed){ drag.el.classList.remove("lift"); drag = null; murmurDragging = false; return; }
     drag.el.classList.remove("lift");
     if (drag.moved){
       drag.n.x = +parseFloat(drag.el.style.left).toFixed(2);
