@@ -4793,13 +4793,54 @@ function applyWall(url){
     try{
       var topCol = sampleImageBand(img, 0, Math.max(1, Math.floor(img.height*0.12)));
       var botCol = sampleImageBand(img, Math.floor(img.height*0.88), Math.max(1, Math.floor(img.height*0.12)));
-      setThemeColor(topCol);
       de.style.setProperty("background-color", botCol, "important");
       bd.style.setProperty("background-color", botCol, "important");
     }catch(e){}
   };
   img.src = url;
+  syncStatusBar();
 }
+/* 顶上状态栏的颜色:取当前这一页屏幕最上面真正看得到的那一截墙纸(cover 裁掉的部分不算),
+   再叠上这一页的暗/亮罩子,这样状态栏和页面接得上,不会多出一条黑边 */
+const barCache = {};
+function wallTopColor(url, scrimTop, done){
+  const key = url + "|" + innerWidth + "x" + innerHeight + "|" + scrimTop;
+  if (barCache[key]) return done(barCache[key]);
+  const img = new Image();
+  img.onload = () => {
+    try{
+      const sc = Math.max(innerWidth / img.width, innerHeight / img.height);
+      const y0 = Math.max(0, (img.height * sc - innerHeight) / 2 / sc);
+      const band = Math.max(2, 60 / sc);
+      const c = document.createElement("canvas"); c.width = 1; c.height = 1;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(img, 0, y0, img.width, band, 0, 0, 1, 1);
+      if (scrimTop){ ctx.fillStyle = scrimTop; ctx.fillRect(0, 0, 1, 1); }
+      const d = ctx.getImageData(0, 0, 1, 1).data;
+      done(barCache[key] = `rgb(${d[0]},${d[1]},${d[2]})`);
+    }catch(e){}
+  };
+  img.src = url;
+}
+function syncStatusBar(){
+  const tab = document.documentElement.getAttribute("data-tab") || "chat";
+  if (tab === "archive" && document.querySelector("#archivePanel.ld-on")){ setThemeColor("#0e0e10"); return; }
+  const cs = getComputedStyle(document.documentElement);
+  let url = "", scrimTop = "";
+  if (tab === "chat") url = currentWall();
+  else {
+    const m = /url\(["']?([^"')]+)["']?\)/.exec(cs.getPropertyValue("--menu-wall-default"));
+    url = m ? m[1] : "";
+    const sm = /rgba?\([^)]*\)/.exec(cs.getPropertyValue("--scrim"));
+    scrimTop = sm ? sm[0] : "";
+  }
+  if (!url) return;
+  wallTopColor(url, scrimTop, (col) => {
+    if ((document.documentElement.getAttribute("data-tab") || "chat") === tab) setThemeColor(col);
+  });
+}
+window.addEventListener("resize", () => { clearTimeout(syncStatusBar._t); syncStatusBar._t = setTimeout(syncStatusBar, 200); });
+
 function applyAvatar(url){
   // 写 CSS 变量 → 顶栏头像、聊天每条消息旁的头像、空状态/登录 orb、profile 大头像一起换
   const val = url ? `url("${url}")` : 'url("avatar-sea.png")';
@@ -4947,6 +4988,7 @@ function setTab(tab){
   currentTab = tab;
   if (tab !== "chat") lastPlaceTab = tab;
   document.documentElement.setAttribute("data-tab", tab);
+  syncStatusBar();
   for (const [name, el] of Object.entries(TAB_PANELS)){
     if (!el) continue;
     if (name === tab) showPanel(el); else hidePanel(el);
@@ -6729,6 +6771,7 @@ function showArchiveSection(sec){
   if (sec === "wall") renderWall();
   if (sec === "laudanum"){ ldPull(); ldPaint(); }
   archivePanel.classList.toggle("ld-on", sec === "laudanum");
+  syncStatusBar();
 }
 if (archiveTabs) archiveTabs.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-sec]");
