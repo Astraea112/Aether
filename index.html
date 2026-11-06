@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script>/* 已经登录过:开机时先别露出数字密码那一页,等页面准备好直接进 */try{if(localStorage.getItem("companion_secret"))document.documentElement.classList.add("booting")}catch(e){}</script>
-<style>html.booting #login{visibility:hidden!important}html.booting body::after{content:"Aether";position:fixed;inset:0;display:grid;place-items:center;font:italic 300 30px/1 Georgia,serif;letter-spacing:.06em;color:rgba(236,232,224,.35)}html,body{background:#0b0b0c;color-scheme:dark}html[data-theme="light"],html[data-theme="light"] body{background:#f4f2ee;color-scheme:light}</style>
+<style>html.booting #login{visibility:hidden!important}html.booting body::after{content:"";position:fixed;inset:0;z-index:9999;background:#0e0e10}html,body{background:#0b0b0c;color-scheme:dark}html[data-theme="light"],html[data-theme="light"] body{background:#f4f2ee;color-scheme:light}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Aether</title>
 
@@ -3852,7 +3852,7 @@
   #plumIntro .pi-art img{position:absolute;inset:0;width:100%;display:block;opacity:0;filter:blur(2px)}
   #plumIntro.go .pi-art img{animation:piRise 1.4s ease-out forwards}
   @keyframes piRise{to{opacity:1;filter:none}}
-  #plumIntro .pi-word{position:absolute;left:0;right:0;top:53vh;text-align:center;z-index:4;color:#f2efe8;
+  #plumIntro .pi-word{position:absolute;left:0;right:0;top:46vh;text-align:center;z-index:4;color:#f2efe8;
     font:italic 400 46px/1 "Cormorant Garamond",Georgia,serif;letter-spacing:.04em;text-shadow:0 0 6px rgba(0,0,0,.8);opacity:0}
   #plumFall{position:fixed;inset:0;pointer-events:none;z-index:10001}
   #plumFall img{position:absolute;left:0;top:0;transform-origin:50% 30%}
@@ -10355,6 +10355,7 @@ function paintPin(){
 function showLogin(msg){
   document.documentElement.classList.remove("booting");
   plumShown = false;
+  { const b = $("#plumIntro"); if (b && b.classList.contains("on")){ plumTimers.forEach(clearTimeout); clearInterval(plumLoop); b.classList.remove("on","go"); } }
   appEl.classList.add("hidden");
   loginEl.classList.remove("hidden");
   $("#secretInput").value = "";
@@ -10506,6 +10507,7 @@ function startChat(initialMsgs, { connect = true, fromCache = false } = {}){
 
 async function init(){
   if (!secret){ showLogin(); return; }
+  if (!plumShown){ plumShown = true; playPlumIntro(); }
   await loadSessions();
   loadBrain();
   let showedCache = false;
