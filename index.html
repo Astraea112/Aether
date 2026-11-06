@@ -2242,12 +2242,11 @@
   .cal-add input::placeholder{ color: var(--text-faint); font-style: italic; }
   .cal-add button{ flex:none; border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: var(--fs-s); color: var(--bg); background: var(--text); cursor: pointer; }
 
-  /* 门厅/房间/收藏馆底下垫一层同样的墙纸:两页交替淡入淡出时,聊天页不会从中间透出来(以前看着像闪一下) */
-  .tab-backdrop{ position: fixed; inset: 0; z-index: 189; pointer-events: none; opacity: 1; transition: opacity .24s ease;
-    background-color: var(--bg); background-image: var(--menu-wall-default); background-size: cover; background-position: center; }
-  :root[data-tab="chat"] .tab-backdrop, :root:not([data-tab]) .tab-backdrop{ opacity: 0; }
   /* ── 页面切换:门厅 / 房间 / 收藏馆 是盖在聊天上的面板,淡入淡出 ── */
   .tab-panel{ transform: none; transition: opacity .24s ease; }
+  .tab-panel.instant{ transition: none; }
+  .tab-panel.instant.open .menu-scroll{ animation: tabIn .26s ease both; }
+  @keyframes tabIn{ from{ opacity: .35; } to{ opacity: 1; } }
   .tab-panel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 114px); }
 
   /* 房间 */
@@ -3857,8 +3856,8 @@
   @keyframes piRise{to{opacity:1;filter:none}}
   #plumIntro .pi-word{position:absolute;left:0;right:0;top:44vh;text-align:center;z-index:4;color:#f2efe8;
     font:italic 400 46px/1 "Cormorant Garamond",Georgia,serif;letter-spacing:.04em;text-shadow:0 0 6px rgba(0,0,0,.8);opacity:0}
-  #plumFall{position:fixed;inset:0;pointer-events:none;z-index:10001}
-  #plumFall img{position:absolute;left:0;top:0;transform-origin:50% 30%}
+  #plumFall{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:10001}
+  #plumFall img{position:absolute;left:0;top:0;transform-origin:50% 30%;pointer-events:none}
   /* ════════ Laudanum · 鸦片酊 ════════ */
   #archivePanel.ld-on .menu-page{
     background-color:#0e0e10;
@@ -3924,11 +3923,11 @@
   /* 诗 */
   .ld-poem{ position: fixed; inset: 0; z-index: 250; display:flex; align-items:center; justify-content:center; padding: 40px 34px; background: rgba(8,8,10,.94); opacity: 0; pointer-events: none; transition: opacity .8s ease; }
   .ld-poem.show{ opacity: 1; pointer-events: auto; }
-  .ld-pm{ width: min(100%, 320px); text-align: center; }
+  .ld-pm{ width: min(100%, 360px); text-align: center; }
   .ld-pm-en, .ld-pm-cn{ display:flex; flex-direction:column; align-items:center; }
-  .ld-pm-en span{ font-family: "EB Garamond", Georgia, serif; font-size: 15.5px; line-height: 1.7; color: #d9d4cb; }
-  .ld-pm-cn{ margin-top: 14px; } .ld-pm-cn span{ font-family: var(--font-cn); font-size: 11px; line-height: 1.8; color: #6e6a63; letter-spacing: .08em; }
-  .ld-pm-by{ margin: 16px 0 0; font-family: "EB Garamond", Georgia, serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #57534d; }
+  .ld-pm-en span{ font-family: "EB Garamond", Georgia, serif; font-size: 20px; line-height: 1.65; color: #ddd8cf; }
+  .ld-pm-cn{ margin-top: 18px; } .ld-pm-cn span{ font-family: var(--font-cn); font-size: 14px; line-height: 1.8; color: #8a857d; letter-spacing: .06em; }
+  .ld-pm-by{ margin: 20px 0 0; font-family: "EB Garamond", Georgia, serif; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: #6c6760; }
   .ld-pm-en span, .ld-pm-cn span, .ld-pm-by{ opacity: 0; }
   .ld-poem.show .ld-pm-en span, .ld-poem.show .ld-pm-cn span, .ld-poem.show .ld-pm-by{ animation: ldLine 1.3s ease forwards; animation-delay: calc(var(--i) * .55s + .2s); }
   @keyframes ldLine{ to{ opacity: 1; } }
@@ -4180,7 +4179,6 @@
 </div>
 
 <!-- ── Menu (hub / 主菜单页 · 聊天页左箭头进入) ── -->
-<div class="tab-backdrop" aria-hidden="true"></div>
 <div class="menu-panel tab-panel hidden" id="menuPanel" role="dialog" aria-modal="true" aria-label="主菜单">
   <div class="menu-page">
     <div class="menu-scroll">
@@ -4985,13 +4983,29 @@ function hidePanel(el){
 }
 function setTab(tab){
   if (tab !== "chat" && !TAB_PANELS[tab]) tab = "home";
+  const prevTab = currentTab;
   currentTab = tab;
   if (tab !== "chat") lastPlaceTab = tab;
   document.documentElement.setAttribute("data-tab", tab);
   syncStatusBar();
+  /* 门厅/房间/收藏馆之间切:墙纸一样,新页直接出现、只淡入内容,旧页马上收掉;
+     不再两页一起半透明(以前底下的聊天墙纸会透出来,像闪一下) */
+  const swap = tab !== "chat" && prevTab !== tab && !!TAB_PANELS[prevTab];
   for (const [name, el] of Object.entries(TAB_PANELS)){
     if (!el) continue;
-    if (name === tab) showPanel(el); else hidePanel(el);
+    if (name === tab){
+      if (swap){ el.classList.add("instant"); clearTimeout(el._instT); el._instT = setTimeout(() => el.classList.remove("instant"), 400); }
+      showPanel(el);
+    }
+    else if (swap && name === prevTab && !el.classList.contains("hidden")){
+      clearTimeout(panelTimers.get(el));
+      panelTimers.set(el, setTimeout(() => {
+        if (currentTab === name) return;
+        el.classList.add("instant"); el.classList.remove("open"); el.classList.add("hidden");
+        setTimeout(() => el.classList.remove("instant"), 30);
+      }, 70));
+    }
+    else hidePanel(el);
   }
   if (tabbar) tabbar.querySelectorAll(".tab").forEach((b) => {
     if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
@@ -10562,6 +10576,7 @@ function startChat(initialMsgs, { connect = true, fromCache = false } = {}){
   refreshContextStatus();
   loadModelState();
   pullCalendarKV();
+  if (!startChat._warm){ startChat._warm = true; setTimeout(() => { try{ refreshRoom(); }catch(e){} }, 2500); }
 }
 
 async function init(){
