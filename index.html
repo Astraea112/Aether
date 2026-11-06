@@ -2245,8 +2245,6 @@
   /* ── 页面切换:门厅 / 房间 / 收藏馆 是盖在聊天上的面板,淡入淡出 ── */
   .tab-panel{ transform: none; transition: opacity .24s ease; }
   .tab-panel.instant{ transition: none; }
-  .tab-panel.instant.open .menu-scroll{ animation: tabIn .26s ease both; }
-  @keyframes tabIn{ from{ opacity: .35; } to{ opacity: 1; } }
   .tab-panel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 114px); }
 
   /* 房间 */
@@ -4988,22 +4986,24 @@ function setTab(tab){
   if (tab !== "chat") lastPlaceTab = tab;
   document.documentElement.setAttribute("data-tab", tab);
   syncStatusBar();
-  /* 门厅/房间/收藏馆之间切:墙纸一样,新页直接出现、只淡入内容,旧页马上收掉;
-     不再两页一起半透明(以前底下的聊天墙纸会透出来,像闪一下) */
+  /* 门厅/房间/收藏馆之间切:直接换页,同一帧里新页打开、旧页收起,没有淡入淡出也没有半透明的中间状态
+     (以前两页一起半透明会透出底下的聊天墙纸,看着像闪一下) */
   const swap = tab !== "chat" && prevTab !== tab && !!TAB_PANELS[prevTab];
   for (const [name, el] of Object.entries(TAB_PANELS)){
     if (!el) continue;
     if (name === tab){
-      if (swap){ el.classList.add("instant"); clearTimeout(el._instT); el._instT = setTimeout(() => el.classList.remove("instant"), 400); }
-      showPanel(el);
+      if (swap){
+        clearTimeout(panelTimers.get(el));
+        el.classList.add("instant"); el.classList.remove("hidden"); el.classList.add("open");
+        const sc = el.querySelector(".menu-scroll");
+        if (sc){ sc.style.overflowY = "hidden"; void sc.offsetHeight; requestAnimationFrame(() => { sc.style.overflowY = ""; }); }
+        requestAnimationFrame(() => el.classList.remove("instant"));
+      } else showPanel(el);
     }
-    else if (swap && name === prevTab && !el.classList.contains("hidden")){
+    else if (swap && name === prevTab){
       clearTimeout(panelTimers.get(el));
-      panelTimers.set(el, setTimeout(() => {
-        if (currentTab === name) return;
-        el.classList.add("instant"); el.classList.remove("open"); el.classList.add("hidden");
-        setTimeout(() => el.classList.remove("instant"), 30);
-      }, 70));
+      el.classList.add("instant"); el.classList.remove("open"); el.classList.add("hidden");
+      requestAnimationFrame(() => el.classList.remove("instant"));
     }
     else hidePanel(el);
   }
