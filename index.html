@@ -3251,8 +3251,7 @@
   .hnote-pen{ width: 20px; height: 20px; color: var(--text-soft); }
   .hnote-text{
     font-family: "La Belle Aurore", "Caveat", var(--font-cn); font-size: calc(var(--fs-l) * 1.15); line-height: 1.35; letter-spacing: .01em; color: var(--text);
-    padding: 0 2px; text-align: left;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    padding: 0 2px .18em; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere;
   }
   .hnote-foot{ display:flex; align-items:center; justify-content:space-between; font-size: var(--fs-xs); color: var(--text-faint); letter-spacing: .04em; }
   .hnote-foot i{ font-style: normal; }
@@ -3843,7 +3842,7 @@
 
 
   /* ════════ 白梅开场:进主页前先看一枝梅,点一下才进去 ════════ */
-  #plumIntro{position:fixed;inset:0;z-index:10000;background:#0e0e10;overflow:hidden;display:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  #plumIntro{position:fixed;inset:calc(-1 * env(safe-area-inset-top, 0px)) 0 calc(-1 * env(safe-area-inset-bottom, 0px));z-index:10000;background:#0e0e10;overflow:hidden;display:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
   #plumIntro.on{display:block}
   #plumIntro::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
     background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.55))}
@@ -4756,7 +4755,9 @@ function currentTheme(){
 }
 function currentWall(){ return WALLS[currentTheme()] || WALLS.light; }
 
+var plumThemeHold = null;   /* 开场盖着时先记下主题想要的颜色,结束再还原 */
 function setThemeColor(color){
+  if (plumThemeHold !== null){ plumThemeHold = color; return; }
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", color);
 }
@@ -10294,6 +10295,12 @@ function playPlumIntro(){
   plumLeaving = false;
   box.getAnimations().forEach(a => a.cancel());
   box.classList.add("on"); box.classList.remove("go"); void box.offsetWidth; box.classList.add("go");
+  if (plumThemeHold === null){
+    const m = document.querySelector('meta[name="theme-color"]');
+    const was = m ? m.getAttribute("content") : "#000000";
+    if (m) m.setAttribute("content", "#0e0e10");
+    plumThemeHold = was;
+  }
   const word = box.querySelector(".pi-word");
   word.getAnimations().forEach(a => a.cancel());
   word.animate([{ opacity:0, filter:"blur(3px)", transform:"translateY(6px)" }, { opacity:1, filter:"none", transform:"none" }],
@@ -10317,6 +10324,7 @@ function leavePlumIntro(){
   plumLeaving = true;
   plumTimers.forEach(clearTimeout); clearInterval(plumLoop);
   const an = box.animate([{ opacity:1 }, { opacity:0 }], { duration:900, easing:"ease", fill:"forwards" });
+  const c = plumThemeHold; plumThemeHold = null; if (c) setThemeColor(c);
   an.onfinish = () => { box.classList.remove("on", "go"); an.cancel(); plumLeaving = false; };
 }
 $("#plumIntro").addEventListener("click", leavePlumIntro);
@@ -10355,7 +10363,7 @@ function paintPin(){
 function showLogin(msg){
   document.documentElement.classList.remove("booting");
   plumShown = false;
-  { const b = $("#plumIntro"); if (b && b.classList.contains("on")){ plumTimers.forEach(clearTimeout); clearInterval(plumLoop); b.classList.remove("on","go"); } }
+  { const b = $("#plumIntro"); if (b && b.classList.contains("on")){ plumTimers.forEach(clearTimeout); clearInterval(plumLoop); b.classList.remove("on","go"); const c = plumThemeHold; plumThemeHold = null; if (c) setThemeColor(c); } }
   appEl.classList.add("hidden");
   loginEl.classList.remove("hidden");
   $("#secretInput").value = "";
