@@ -2242,6 +2242,10 @@
   .cal-add input::placeholder{ color: var(--text-faint); font-style: italic; }
   .cal-add button{ flex:none; border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: var(--fs-s); color: var(--bg); background: var(--text); cursor: pointer; }
 
+  /* 门厅/房间/收藏馆底下垫一层同样的墙纸:两页交替淡入淡出时,聊天页不会从中间透出来(以前看着像闪一下) */
+  .tab-backdrop{ position: fixed; inset: 0; z-index: 189; pointer-events: none; opacity: 1; transition: opacity .24s ease;
+    background-color: var(--bg); background-image: var(--menu-wall-default); background-size: cover; background-position: center; }
+  :root[data-tab="chat"] .tab-backdrop, :root:not([data-tab]) .tab-backdrop{ opacity: 0; }
   /* ── 页面切换:门厅 / 房间 / 收藏馆 是盖在聊天上的面板,淡入淡出 ── */
   .tab-panel{ transform: none; transition: opacity .24s ease; }
   .tab-panel .menu-scroll{ padding-bottom: calc(env(safe-area-inset-bottom) + 114px); }
@@ -4176,6 +4180,7 @@
 </div>
 
 <!-- ── Menu (hub / 主菜单页 · 聊天页左箭头进入) ── -->
+<div class="tab-backdrop" aria-hidden="true"></div>
 <div class="menu-panel tab-panel hidden" id="menuPanel" role="dialog" aria-modal="true" aria-label="主菜单">
   <div class="menu-page">
     <div class="menu-scroll">
@@ -4939,26 +4944,12 @@ function hidePanel(el){
 }
 function setTab(tab){
   if (tab !== "chat" && !TAB_PANELS[tab]) tab = "home";
-  const prevTab = currentTab;
   currentTab = tab;
   if (tab !== "chat") lastPlaceTab = tab;
   document.documentElement.setAttribute("data-tab", tab);
-  /* 门厅/房间/收藏馆之间切换:旧的那页先别淡出,让新的一页在上面淡进来,盖满了再收掉旧的;
-     不然两页一起半透明,底下的聊天页会透出来,看着像闪了一下 */
-  const swap = tab !== "chat" && prevTab !== tab && !!TAB_PANELS[prevTab];
   for (const [name, el] of Object.entries(TAB_PANELS)){
     if (!el) continue;
-    if (name === tab){ el.style.zIndex = swap ? "191" : ""; showPanel(el); }
-    else if (swap && name === prevTab && el.classList.contains("open")){
-      el.style.zIndex = "190";
-      clearTimeout(panelTimers.get(el));
-      panelTimers.set(el, setTimeout(() => {
-        if (currentTab === name) return;
-        el.style.transition = "none"; el.classList.remove("open"); el.classList.add("hidden");
-        void el.offsetWidth; el.style.transition = ""; el.style.zIndex = "";
-      }, 320));
-    }
-    else hidePanel(el);
+    if (name === tab) showPanel(el); else hidePanel(el);
   }
   if (tabbar) tabbar.querySelectorAll(".tab").forEach((b) => {
     if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
