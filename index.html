@@ -3842,6 +3842,12 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 
+  /* 键盘弹起来时,底部那条横杠的位置被键盘盖住了,不用再给它留空,输入框贴着键盘 */
+  .app.kb .composer{ padding-bottom: 8px; }
+  .app.kb{ --composer-zone: calc(var(--composer-h) + 16px + var(--keyboard-offset)); }
+  .app.kb.composing.has-model{ --composer-zone: calc(var(--composer-h) + 16px + 38px + var(--keyboard-offset)); }
+  .app.kb.has-tray{ --composer-zone: calc(var(--composer-h) + 16px + 66px + var(--keyboard-offset)); }
+  .app.kb.has-tray.composing.has-model{ --composer-zone: calc(var(--composer-h) + 16px + 104px + var(--keyboard-offset)); }
   /* ════════ 白梅开场:进主页前先看一枝梅,点一下才进去 ════════ */
   #plumIntro{position:fixed;inset:calc(-1 * env(safe-area-inset-top, 0px)) 0 calc(-1 * env(safe-area-inset-bottom, 0px));z-index:10000;background:#0e0e10;overflow:hidden;display:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
   #plumIntro.on{display:block}
