@@ -4939,17 +4939,31 @@ function hidePanel(el){
 }
 function setTab(tab){
   if (tab !== "chat" && !TAB_PANELS[tab]) tab = "home";
+  const prevTab = currentTab;
   currentTab = tab;
   if (tab !== "chat") lastPlaceTab = tab;
   document.documentElement.setAttribute("data-tab", tab);
+  /* 门厅/房间/收藏馆之间切换:旧的那页先别淡出,让新的一页在上面淡进来,盖满了再收掉旧的;
+     不然两页一起半透明,底下的聊天页会透出来,看着像闪了一下 */
+  const swap = tab !== "chat" && prevTab !== tab && !!TAB_PANELS[prevTab];
   for (const [name, el] of Object.entries(TAB_PANELS)){
     if (!el) continue;
-    if (name === tab) showPanel(el); else hidePanel(el);
+    if (name === tab){ el.style.zIndex = swap ? "191" : ""; showPanel(el); }
+    else if (swap && name === prevTab && el.classList.contains("open")){
+      el.style.zIndex = "190";
+      clearTimeout(panelTimers.get(el));
+      panelTimers.set(el, setTimeout(() => {
+        if (currentTab === name) return;
+        el.style.transition = "none"; el.classList.remove("open"); el.classList.add("hidden");
+        void el.offsetWidth; el.style.transition = ""; el.style.zIndex = "";
+      }, 320));
+    }
+    else hidePanel(el);
   }
   if (tabbar) tabbar.querySelectorAll(".tab").forEach((b) => {
     if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
-  if (tab === "home"){ refreshDays(); refreshHome(); setTimeout(fitHome, 420); }
+  if (tab === "home"){ refreshDays(); refreshHome(); fitHome(); setTimeout(fitHome, 420); }
   else if (tab === "room") refreshRoom();
   else if (tab === "archive"){ refreshArchive(); pullCalendarKV(); }
 }
@@ -5080,12 +5094,15 @@ function refreshHome(){
 function fitHome(){
   const home = document.querySelector("#menuPanel .home");
   if (!home || currentTab !== "home") return;
+  /* 同一帧里量完再设,不让浏览器在中间画出"没缩放"的那一下(切页面会闪) */
+  const prev = home.style.zoom;
   home.style.zoom = "";
   const sc = home.parentElement, cs = getComputedStyle(sc);
   const avail = sc.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const h = home.scrollHeight;
   const z = Math.max(.6, Math.min(1, avail / h));
-  if (z < .995) home.style.zoom = z.toFixed(3);
+  const next = z < .995 ? z.toFixed(3) : "";
+  home.style.zoom = (prev && next && Math.abs(parseFloat(prev) - parseFloat(next)) < .01) ? prev : next;
 }
 let fitTimer = null;
 function fitHomeSoon(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHome, 60); }
