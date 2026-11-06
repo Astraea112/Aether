@@ -436,5 +436,33 @@ def scene_set(place: str, doing: str = "") -> str:
     return f"改好了：{place}" + (f" · {doing}" if doing else "")
 
 
+@mcp.tool()
+def laudanum_view(days: int = 14) -> str:
+    """Her Laudanum page (鸦片酊): each time she felt bad she let one drop fall, sometimes with a
+    reason. Shows the last `days` days: how many drops each day, the times, and what she wrote.
+    It's her record, not a task list: read it to understand her, don't quote it back at her."""
+    try:
+        d = json.loads((KV / "laudanum.json").read_text(encoding="utf-8"))
+        log = ((d.get("v") or {}).get("log") or {}) if isinstance(d, dict) else {}
+    except (OSError, ValueError):
+        log = {}
+    if not log:
+        return "鸦片酊那一页还是空的。"
+    days = max(1, min(int(days or 14), 120))
+    today = datetime.now(timezone(timedelta(hours=8))).date()
+    lines, total = [], 0
+    for i in range(days):
+        k = (today - timedelta(days=i)).isoformat()
+        L = log.get(k) or []
+        if not L:
+            continue
+        total += len(L)
+        parts = [f"{x.get('t', '')}" + (f"「{x['why']}」" if x.get("why") else "") for x in L]
+        lines.append(f"{k}  {len(L)} 滴：" + "；".join(parts))
+    if not lines:
+        return f"最近 {days} 天她一滴都没滴。"
+    return f"最近 {days} 天一共 {total} 滴：\n" + "\n".join(lines)
+
+
 if __name__ == "__main__":
     mcp.run()

@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<style>html,body{background:#0b0b0c;color-scheme:dark}html[data-theme="light"],html[data-theme="light"] body{background:#f4f2ee;color-scheme:light}</style>
+<script>/* 已经登录过:开机时先别露出数字密码那一页,等页面准备好直接进 */try{if(localStorage.getItem("companion_secret"))document.documentElement.classList.add("booting")}catch(e){}</script>
+<style>html.booting #login{visibility:hidden!important}html.booting body::after{content:"Aether";position:fixed;inset:0;display:grid;place-items:center;font:italic 300 30px/1 Georgia,serif;letter-spacing:.06em;color:rgba(236,232,224,.35)}html,body{background:#0b0b0c;color-scheme:dark}html[data-theme="light"],html[data-theme="light"] body{background:#f4f2ee;color-scheme:light}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Aether</title>
 
@@ -18,6 +19,7 @@
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/pinyon-script@5/400.min.css" rel="stylesheet" media="print" onload="this.media='all'">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/caveat@5/500.min.css" rel="stylesheet" media="print" onload="this.media='all'">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/la-belle-aurore@5/400.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/eb-garamond@5/400.min.css" rel="stylesheet" media="print" onload="this.media='all'">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/la-belle-aurore@5/400.min.css" rel="stylesheet" media="print" onload="this.media='all'">
 <meta name="theme-color" content="#000000">
 <!-- iOS launch mode is manifest-only; legacy Apple fullscreen meta breaks bottom viewport. -->
@@ -2278,7 +2280,7 @@
   .wall-note button{ position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border: 0; padding: 0; background: transparent; color: var(--text-faint); font-size: var(--fs-m); line-height: 1; cursor: pointer; }
 
   /* 收藏馆 */
-  .archive-tabs{ display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .archive-tabs{ display:grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
   .room-mail-badge[hidden]{ display:none; }
   .archive-tabs button{
     min-width: 0; display:flex; flex-direction:column; align-items:center; gap: 1px;
@@ -3837,6 +3839,74 @@
   .ib-top time{ font-size: var(--fs-xs); color: var(--text-faint); }
   .ib-text{ font-size: var(--fs-s); line-height: 1.45; color: var(--text-soft);
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ════════ Laudanum · 鸦片酊 ════════ */
+  .ld{ position:relative; padding: 10px 2px 30px; }
+  .ld-head{ display:flex; justify-content:space-between; align-items:flex-end; }
+  .ld-head h2{ margin:0; font-family: var(--font-en); font-style: italic; font-weight: 400; font-size: 34px; line-height: 1; }
+  .ld-head p{ margin:0; text-align:right; font-size: 11px; line-height: 1.6; color: var(--text-soft); letter-spacing: .08em; }
+  .ld-head b{ font-family: var(--font-en); font-weight: 500; font-size: 16px; color: var(--text); }
+  .ld-sub{ margin: 6px 0 0; font-family: var(--font-en); font-style: italic; font-size: 13px; color: var(--text-faint); }
+  .ld-plates{ position: relative; display:flex; align-items:flex-end; gap: 16px; margin-top: 20px; }
+  .ld-plate{ position: relative; margin: 0; padding: 4px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ld-plate img{ display:block; width:100%; height:auto; -webkit-user-drag:none; user-select:none; }
+  .ld-plate figcaption{ position:absolute; left:0; top: calc(100% + 8px); font-family: var(--font-en); font-style: italic; font-size: 13px; color: var(--text-soft); white-space: nowrap; }
+  .ld-p1{ width: 56%; z-index: 2; }
+  .ld-p1.wig{ animation: ldWig .5s ease-in-out; }
+  @keyframes ldWig{ 0%,100%{ transform:none; } 25%{ transform: rotate(1.6deg); } 60%{ transform: rotate(-1.2deg); } 85%{ transform: rotate(.5deg); } }
+  .ld-p2{ width: 29%; }
+  .ld-full{ position:absolute; left:4px; top:4px; width: calc(100% - 8px) !important; opacity: 0; transition: opacity 1.2s ease; }
+  .ld-drop{ position:absolute; z-index: 6; width: 9px; height: 13.5px; opacity: 0; pointer-events: none; will-change: transform, opacity; transform: translate3d(-50%,0,0); }
+  .ld-drop svg{ display:block; width:100%; height:100%; }
+  .ld-rip{ position:absolute; z-index: 6; width: 60px; height: 10px; margin: -5px 0 0 -30px; border-radius: 50%; border: .8px solid rgba(214,160,100,.85); opacity: 0; pointer-events: none; }
+  .ld-rip.go{ animation: ldRip 1.4s ease-out forwards; }
+  #ldR2.go{ animation-delay: .22s; } #ldR3.go{ animation-delay: .44s; }
+  @keyframes ldRip{ 0%{ opacity:.95; transform: scale(.25,.35); } 100%{ opacity:0; transform: scale(1.35,1.1); } }
+  .ld-hint{ margin: 40px 0 0; text-align:center; font-size: 11px; line-height: 1.8; color: var(--text-faint); letter-spacing: .08em; }
+  /* 日历:灰色旧纸 + 药水渍 */
+  .ld-cal{ position: relative; margin-top: 30px; padding: 22px 18px 18px; color: #2a2018; border-radius: 2px;
+    background: url("laudanum-paper.jpg") center / cover; box-shadow: 0 18px 40px rgba(0,0,0,.6); }
+  .ld-cal::after{ content:""; position:absolute; inset:0; pointer-events:none; box-shadow: inset 0 0 60px rgba(30,25,20,.45); }
+  .ld-cal-h{ display:flex; justify-content:space-between; align-items:baseline; }
+  .ld-cal-h h3{ margin:0; font-family: var(--font-en); font-style: italic; font-weight: 400; font-size: 26px; color: #2a2018; }
+  .ld-cal-h nav{ position: relative; z-index: 2; }
+  .ld-cal-h button{ border:0; background: transparent; color: #5a4a3a; font-size: 20px; padding: 2px 8px; cursor: pointer; }
+  .ld-mc{ margin: 2px 0 12px; font-size: 12px; letter-spacing: .12em; color: #5a4a3a; }
+  .ld-mc b{ font-family: var(--font-en); font-size: 19px; font-weight: 500; color: #2a2018; }
+  .ld-week, .ld-days{ display:grid; grid-template-columns: repeat(7, 1fr); text-align:center; }
+  .ld-week span{ font-size: 11px; color: #6a5a48; padding-bottom: 6px; }
+  .ld-day{ position: relative; height: 46px; border: 0; background: transparent; padding-top: 6px; font-family: var(--font-en); font-size: 15px; color: #2a2018; cursor: default; }
+  .ld-day.has{ cursor: pointer; }
+  .ld-day .n{ position: relative; z-index: 1; text-shadow: 0 0 3px rgba(225,220,210,.7); }
+  .ld-day.today .n{ border-bottom: 1px solid #2a2018; }
+  .ld-st{ position:absolute; left:50%; top:66%; mix-blend-mode: multiply; pointer-events:none; }
+  /* 面板 */
+  .ld-sheet{ position: fixed; inset: 0; z-index: 240; display:flex; align-items:flex-end; justify-content:center; background: rgba(0,0,0,.5); opacity: 0; pointer-events: none; transition: opacity .22s; }
+  .ld-sheet.open{ opacity: 1; pointer-events: auto; }
+  .ld-panel{ box-sizing: border-box; width: min(100%, 520px); max-height: 75vh; overflow: auto; padding: 22px 20px calc(env(safe-area-inset-bottom) + 22px); border-radius: 20px 20px 0 0; background: #1e1e21; transform: translateY(20px); transition: transform .28s; }
+  .ld-sheet.open .ld-panel{ transform: none; }
+  .ld-ph{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 12px; }
+  .ld-ph b{ font-size: 16px; font-weight: 500; } .ld-ph span{ font-family: var(--font-en); font-style: italic; color: var(--text-soft); }
+  #ldAskX{ box-sizing: border-box; width: 100%; min-height: 90px; border: 0; border-radius: 12px; padding: 12px; background: rgba(255,255,255,.06); color: var(--text); font: inherit; font-size: 15px; outline: none; resize: none; }
+  .ld-bar{ display:flex; align-items:center; gap: 10px; margin-top: 12px; }
+  .ld-btn{ border:0; border-radius: 999px; padding: 10px 20px; font: inherit; font-size: 14px; color: var(--text-soft); background: rgba(255,255,255,.08); cursor: pointer; }
+  .ld-btn.solid{ color: #1e1e21; background: #e6e6e8; } .ld-btn.ghost{ background: transparent; color: var(--text-faint); padding-left: 2px; }
+  .ld-drops{ list-style: none; margin: 0; padding: 0; } .ld-drops li{ border-top: 1px solid rgba(255,255,255,.08); } .ld-drops li:first-child{ border: 0; }
+  .ld-drops > li > button{ width: 100%; display:flex; gap: 12px; align-items:center; padding: 12px 2px; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+  .ld-drops time{ font-family: var(--font-en); font-size: 17px; } .ld-drops .pk{ flex: 1; min-width: 0; font-size: 13px; color: var(--text-faint); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .ld-drops .why{ display: none; padding: 0 2px 12px; font-size: 14px; line-height: 1.7; color: var(--text-soft); } .ld-drops li.open .why{ display: block; }
+  .ld-del{ display:inline-block; margin-top: 8px; font-size: 12px; color: #a07a52; text-decoration: underline; cursor: pointer; }
+  /* 诗 */
+  .ld-poem{ position: fixed; inset: 0; z-index: 250; display:flex; align-items:center; justify-content:center; padding: 40px 34px; background: rgba(8,8,10,.94); opacity: 0; pointer-events: none; transition: opacity .8s ease; }
+  .ld-poem.show{ opacity: 1; pointer-events: auto; }
+  .ld-pm{ width: min(100%, 320px); text-align: center; }
+  .ld-pm-en, .ld-pm-cn{ display:flex; flex-direction:column; align-items:center; }
+  .ld-pm-en span{ font-family: "EB Garamond", Georgia, serif; font-size: 15.5px; line-height: 1.7; color: #d9d4cb; }
+  .ld-pm-cn{ margin-top: 14px; } .ld-pm-cn span{ font-family: var(--font-cn); font-size: 11px; line-height: 1.8; color: #6e6a63; letter-spacing: .08em; }
+  .ld-pm-by{ margin: 16px 0 0; font-family: "EB Garamond", Georgia, serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #57534d; }
+  .ld-pm-en span, .ld-pm-cn span, .ld-pm-by{ opacity: 0; }
+  .ld-poem.show .ld-pm-en span, .ld-poem.show .ld-pm-cn span, .ld-poem.show .ld-pm-by{ animation: ldLine 1.3s ease forwards; animation-delay: calc(var(--i) * .55s + .2s); }
+  @keyframes ldLine{ to{ opacity: 1; } }
 </style>
 </head>
 <body>
@@ -4216,6 +4286,7 @@
           <button type="button" role="tab" data-sec="library" aria-selected="false"><span>Library</span>书架</button>
           <button type="button" role="tab" data-sec="letters" aria-selected="false"><span>Letters</span>信箱</button>
           <button type="button" role="tab" data-sec="wall" aria-selected="false"><span>Wall</span>留言墙</button>
+          <button type="button" role="tab" data-sec="laudanum" aria-selected="false"><span>Laudanum</span>鸦片酊</button>
         </div>
 
         <section class="archive-section" data-sec="library" hidden>
@@ -4268,6 +4339,26 @@
           <div class="murmur-foot"><span>按住拖动 · 点一下放到最上面</span><button type="button" id="drawerBtn" hidden></button></div>
           <ul class="murmur-drawer" id="murmurDrawer" hidden></ul>
         </section>
+        </section>
+        <!-- Laudanum · 鸦片酊:难受的时候滴一滴,记下来;他会知道 -->
+        <section class="archive-section" data-sec="laudanum" hidden>
+          <div class="ld">
+            <div class="ld-head"><h2>Laudanum</h2><p>鸦 片 酊<br>一共滴了 <b id="ldTotal">0</b> 滴</p></div>
+            <p class="ld-sub">Pl. XII. — after Sauzay, <i>La Verrerie</i>, 1869</p>
+            <div class="ld-plates" id="ldPlates">
+              <figure class="ld-plate ld-p1" id="ldEwer" role="button" aria-label="滴一滴"><img src="laudanum-ewer.webp" alt="" draggable="false"><figcaption>Fig. I. — Laudanum</figcaption></figure>
+              <figure class="ld-plate ld-p2" id="ldCup" role="button" aria-label="杯子"><img src="laudanum-cup-clear.webp" alt="" draggable="false"><img class="ld-full" id="ldCupFull" src="laudanum-cup.webp" alt="" draggable="false"><figcaption>Fig. II. — Verre</figcaption></figure>
+              <span class="ld-drop" id="ldDrop"><svg viewBox="0 0 40 60" aria-hidden="true"><defs><clipPath id="ldc"><path d="M20 3 C20 3 35 28 35 40 A15 15 0 0 1 5 40 C5 28 20 3 20 3 Z"/></clipPath></defs><g clip-path="url(#ldc)" stroke="#c98b4a" stroke-linecap="round"><line x1="5" y1="0" x2="5" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="7" y1="0" x2="7" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="9" y1="0" x2="9" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="11" y1="0" x2="11" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="13" y1="0" x2="13" y2="60" stroke-width="0.85" opacity="0.55"/><line x1="15" y1="0" x2="15" y2="60" stroke-width="0.85" opacity="0.55"/><line x1="17" y1="0" x2="17" y2="60" stroke-width="0.55" opacity="0.55"/><line x1="19" y1="0" x2="19" y2="60" stroke-width="0.55" opacity="0.55"/><line x1="21" y1="0" x2="21" y2="60" stroke-width="0.55" opacity="0.55"/><line x1="23" y1="0" x2="23" y2="60" stroke-width="0.55" opacity="0.55"/><line x1="25" y1="0" x2="25" y2="60" stroke-width="0.55" opacity="0.95"/><line x1="27" y1="0" x2="27" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="29" y1="0" x2="29" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="31" y1="0" x2="31" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="33" y1="0" x2="33" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="35" y1="0" x2="35" y2="60" stroke-width="0.85" opacity="0.95"/><line x1="6" y1="44" x2="34" y2="44" stroke-width=".5" opacity=".5"/><line x1="7" y1="47" x2="33" y2="47" stroke-width=".5" opacity=".6"/><line x1="9" y1="50" x2="31" y2="50" stroke-width=".55" opacity=".7"/></g><path d="M20 3 C20 3 35 28 35 40 A15 15 0 0 1 5 40 C5 28 20 3 20 3 Z" fill="none" stroke="#d9a06a" stroke-width="1.1"/><path d="M11 36 Q11 30 14 25" fill="none" stroke="#f3dcc0" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+              <span class="ld-rip" id="ldR1"></span><span class="ld-rip" id="ldR2"></span><span class="ld-rip" id="ldR3"></span>
+            </div>
+            <p class="ld-hint">难受的时候点瓶子，滴一滴<br>杯子里有药的时候，点杯子</p>
+            <section class="ld-cal">
+              <div class="ld-cal-h"><h3 id="ldMon">November</h3><nav><button type="button" id="ldPrev" aria-label="上个月">‹</button><button type="button" id="ldNext" aria-label="下个月">›</button></nav></div>
+              <p class="ld-mc" id="ldMc"></p>
+              <div class="ld-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+              <div class="ld-days" id="ldDays"></div>
+            </section>
+          </div>
         </section>
         <section class="archive-section" data-sec="tides">
           <section class="home-card cal-card card-planner" aria-label="日历">
@@ -4420,6 +4511,17 @@
   <span class="ib-ava" aria-hidden="true"></span>
   <span class="ib-body"><span class="ib-top"><b id="ibName">Orion</b><time>现在</time></span><span class="ib-text" id="ibText"></span></span>
 </button>
+
+<!-- ── Laudanum:写原因 · 某一天 · 诗 ── -->
+<div class="ld-sheet" id="ldAsk" aria-hidden="true"><div class="ld-panel">
+  <div class="ld-ph"><b>为什么不开心？</b><span id="ldAskT"></span></div>
+  <textarea id="ldAskX" maxlength="300" placeholder="写一点也行，不写也行"></textarea>
+  <div class="ld-bar"><button type="button" class="ld-btn ghost" id="ldUndo">点错了，收回</button><span style="flex:1"></span><button type="button" class="ld-btn" id="ldSkip">不写了</button><button type="button" class="ld-btn solid" id="ldOk">好了</button></div>
+</div></div>
+<div class="ld-sheet" id="ldDaySh" aria-hidden="true"><div class="ld-panel">
+  <div class="ld-ph"><b id="ldDT"></b><span id="ldDN"></span></div><ul class="ld-drops" id="ldDL"></ul>
+</div></div>
+<div class="ld-poem" id="ldPoem" aria-hidden="true"><div class="ld-pm"><div class="ld-pm-en" id="ldPEn"></div><div class="ld-pm-cn" id="ldPCn"></div><p class="ld-pm-by" id="ldPBy"></p></div></div>
 
 <!-- ── 悬浮胶囊 tab 栏 ── -->
 <nav class="tabbar" id="tabbar" aria-label="主导航">
@@ -4964,6 +5066,148 @@ function fitHomeSoon(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHome, 6
 window.addEventListener("resize", fitHomeSoon);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHomeSoon);
 
+/* ════════ Laudanum · 鸦片酊 ════════
+   记录存在 kv laudanum: { updated, v: { log: { "YYYY-MM-DD": [{ts, t, why}] }, cup: { day, n } } }
+   手机、平板、服务器上的他看到的是同一份。每滴一滴(写完原因或者不写以后)告诉服务器,把他叫醒。 */
+const LD_KEY = "companion_laudanum", LD_PER_BOTTLE = 10;
+const LD_POEMS = [
+  [["Fade far away, dissolve, and quite forget","the weariness, the fever, and the fret."],["远远地淡去吧，化开吧，彻底忘掉那些疲惫、发烫和焦躁。"],"Keats"],
+  [["With some sweet oblivious antidote,","cleanse the stuffed bosom of that perilous stuff","which weighs upon the heart."],["用一剂甜美的、叫人忘却的解药，把压在心上的东西洗干净。"],"Shakespeare"],
+  [["And the cares, that infest the day,","shall fold their tents, like the Arabs,","and as silently steal away."],["那些缠了你一整天的烦忧，会像游牧人收起帐篷，悄悄走掉。"],"Longfellow"],
+  [["That even the weariest river","winds somewhere safe to sea."],["就算是最疲倦的河，也会蜿蜒着，平安流进大海。"],"Swinburne"],
+  [["And then, those little Anodynes","that deaden suffering."],["然后，只要那几颗小小的止痛药，让苦变得麻木。"],"Dickinson"],
+  [["Weeping may endure for a night,","but joy cometh in the morning."],["哭泣也许会持续一整夜，但早晨会带来欢喜。"],"Psalm 30"],
+];
+const LD_STAINS = ["laudanum-stain-1.webp","laudanum-stain-2.webp","laudanum-stain-3.webp","laudanum-stain-4.webp"];
+const LD_MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const LD_MCN = ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
+let ldData = null, ldFetched = 0, ldView = null, ldBusy = false, ldPend = null;
+function ldGet(){
+  if (!ldData){ ldData = loadJSON(LD_KEY, null) || { updated: 0, v: { log: {}, cup: { day: "", n: 0 } } }; }
+  ldData.v.log = ldData.v.log || {}; ldData.v.cup = ldData.v.cup || { day: "", n: 0 };
+  return ldData;
+}
+function ldSave(){
+  const d = ldGet(); d.updated = Date.now(); saveJSON(LD_KEY, d);
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret) return;
+  fetch(`${API_BASE}/app/kv/laudanum`, { method: "PUT", headers: { ...authHeaders(), "Content-Type": "application/json" }, body: JSON.stringify(d) }).catch(() => {});
+}
+function ldPull(){
+  if ((typeof USE_MOCK !== "undefined" && USE_MOCK) || !secret || Date.now() - ldFetched < 30e3) return;
+  ldFetched = Date.now();
+  fetch(`${API_BASE}/app/kv/laudanum`, { headers: authHeaders(), cache: "no-store" })
+    .then((r) => r.ok ? r.json() : null)
+    .then((d) => { if (d && d.v && (d.updated || 0) > (ldGet().updated || 0)){ ldData = d; saveJSON(LD_KEY, d); ldPaint(); } })
+    .catch(() => {});
+}
+function ldTotal(){ const L = ldGet().v.log; let n = 0; for (const k in L) n += (L[k] || []).length; return n; }
+function ldToday(){ return dayKey(Date.now()); }
+function ldCupN(){ const c = ldGet().v.cup; return c.day === ldToday() ? (c.n || 0) : 0; }   // 第二天杯子换成清水
+function ldPaint(){
+  if (!$("#ldTotal")) return;
+  $("#ldTotal").textContent = ldTotal();
+  const n = ldCupN(), f = $("#ldCupFull"); if (f) f.style.opacity = n ? Math.min(1, .6 + n * .14) : 0;
+  ldCal();
+}
+function ldCal(){
+  const box = $("#ldDays"); if (!box) return;
+  if (!ldView){ const [y, m] = ldToday().split("-").map(Number); ldView = { y, m: m - 1 }; }
+  const { y, m } = ldView, L = ldGet().v.log, today = ldToday();
+  $("#ldMon").textContent = LD_MON[m];
+  const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+  let html = "", tot = 0;
+  for (let i = 0; i < first; i++) html += "<div></div>";
+  for (let d = 1; d <= days; d++){
+    const k = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`, c = (L[k] || []).length; tot += c;
+    let st = "";
+    if (c){ const kk = Math.min(c, 4) - 1;
+      st = `<img class="ld-st" src="${LD_STAINS[kk]}" alt="" style="width:${[26,34,40,46][kk]}px;opacity:${[.55,.68,.8,.92][kk]};transform:translate(-50%,-50%) rotate(${(d * 47) % 360}deg)${d % 2 ? " scaleX(-1)" : ""}">`; }
+    html += `<button type="button" class="ld-day${c ? " has" : ""}${k === today ? " today" : ""}" data-k="${k}">${st}<span class="n">${d}</span></button>`;
+  }
+  box.innerHTML = html;
+  $("#ldMc").innerHTML = `${LD_MCN[m]} · 这个月 <b>${tot}</b> 滴`;
+}
+function ldTick(){
+  try{ const ac = ldTick.a || (ldTick.a = new (window.AudioContext || window.webkitAudioContext)());
+    const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(1100, ac.currentTime); o.frequency.exponentialRampToValueAtTime(380, ac.currentTime + .08);
+    g.gain.setValueAtTime(.16, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .12); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + .13); }catch(_){}
+}
+function ldOpen(id){ const e = $(id); e.classList.add("open"); e.setAttribute("aria-hidden", "false"); }
+function ldClose(id){ const e = $(id); e.classList.remove("open"); e.setAttribute("aria-hidden", "true"); }
+function ldDrip(){
+  if (ldBusy) return; ldBusy = true;
+  const E = $("#ldEwer"), d = $("#ldDrop"); E.classList.remove("wig"); void E.offsetWidth; E.classList.add("wig");
+  setTimeout(() => {
+    const P = $("#ldPlates").getBoundingClientRect(), t = $("#ldCup").getBoundingClientRect();
+    const tx = t.left - P.left + t.width * .5, ty = t.top - P.top + t.height * .43, sy = -60;
+    Object.assign(d.style, { left: tx + "px", top: sy + "px", opacity: 1 });
+    const a = d.animate([
+      { transform: "translate3d(-50%,0,0) scale(.6)", opacity: 0 },
+      { transform: `translate3d(-50%,${(ty - sy) * .08}px,0) scale(1)`, opacity: 1, offset: .12 },
+      { transform: `translate3d(-50%,${ty - sy}px,0) scale(.9,1.15)`, opacity: 1 }
+    ], { duration: prefersReducedMotion ? 10 : 950, easing: "cubic-bezier(.45,0,.9,.6)", fill: "forwards" });
+    a.onfinish = () => {
+      a.cancel(); d.style.opacity = 0; ldTick(); try{ navigator.vibrate && navigator.vibrate(14); }catch(_){}
+      ["#ldR1", "#ldR2", "#ldR3"].forEach((s) => { const r = $(s); Object.assign(r.style, { left: tx + "px", top: ty + "px" }); r.classList.remove("go"); void r.offsetWidth; r.classList.add("go"); });
+      const D = ldGet(), k = ldToday(), now = new Date();
+      const t = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: TZ }).format(now);
+      (D.v.log[k] = D.v.log[k] || []).push({ ts: now.getTime(), t, why: "" });
+      D.v.cup = { day: k, n: ldCupN() + 1 };
+      ldPend = { k, i: D.v.log[k].length - 1 }; ldSave(); ldPaint(); E.classList.remove("wig");
+      setTimeout(() => { $("#ldAskT").textContent = t; $("#ldAskX").value = ""; ldOpen("#ldAsk"); ldBusy = false; }, 600);
+    };
+  }, 350);
+}
+function ldAfterAsk(why){                         // 写完或者不写:记下,叫醒他
+  const p = ldPend; ldPend = null; ldClose("#ldAsk");
+  if (!p) return;
+  const L = ldGet().v.log[p.k]; if (!L || !L[p.i]) return;
+  L[p.i].why = why; ldSave();
+  const n = L.length;
+  notifySite(`滴了一滴鸦片酊（今天第 ${n} 滴）` + (why ? `，原因：「${why.slice(0, 80)}」` : "，没写原因"));
+}
+function ldUndo(k, i){
+  const D = ldGet(), L = D.v.log[k]; if (!L || !L[i]) return;
+  L.splice(i, 1); if (!L.length) delete D.v.log[k];
+  if (k === ldToday() && D.v.cup.day === k) D.v.cup.n = Math.max(0, (D.v.cup.n || 0) - 1);
+  ldSave(); ldPaint();
+}
+function ldPoem(){
+  if (!ldCupN()) return;
+  const p = LD_POEMS[Math.floor(Math.random() * LD_POEMS.length)], n = p[0].length;
+  $("#ldPEn").innerHTML = p[0].map((l, i) => `<span style="--i:${i}">${escapeHtml(l)}</span>`).join("");
+  $("#ldPCn").innerHTML = p[1].map((l, i) => `<span style="--i:${n + i}">${escapeHtml(l)}</span>`).join("");
+  const by = $("#ldPBy"); by.textContent = p[2]; by.style.setProperty("--i", n + p[1].length + .3);
+  const pm = $("#ldPoem"); pm.classList.remove("show"); void pm.offsetWidth; pm.classList.add("show"); pm.setAttribute("aria-hidden", "false");
+}
+function ldPoemClose(){                            // 诗散了,杯子慢慢变回清水
+  const pm = $("#ldPoem"); pm.classList.remove("show"); pm.setAttribute("aria-hidden", "true");
+  const D = ldGet(); D.v.cup = { day: ldToday(), n: 0 }; ldSave();
+  const f = $("#ldCupFull"); if (f){ f.style.transition = "opacity 1.6s ease"; f.style.opacity = 0; setTimeout(() => { f.style.transition = ""; }, 1650); }
+}
+if ($("#ldEwer")){
+  $("#ldEwer").addEventListener("click", ldDrip);
+  $("#ldCup").addEventListener("click", ldPoem);
+  $("#ldPoem").addEventListener("click", ldPoemClose);
+  $("#ldOk").addEventListener("click", () => ldAfterAsk($("#ldAskX").value.trim()));
+  $("#ldSkip").addEventListener("click", () => ldAfterAsk(""));
+  $("#ldUndo").addEventListener("click", () => { const p = ldPend; ldPend = null; ldClose("#ldAsk"); if (p) ldUndo(p.k, p.i); });
+  $("#ldPrev").addEventListener("click", () => { if (--ldView.m < 0){ ldView.m = 11; ldView.y--; } ldCal(); });
+  $("#ldNext").addEventListener("click", () => { if (++ldView.m > 11){ ldView.m = 0; ldView.y++; } ldCal(); });
+  $("#ldDays").addEventListener("click", (e) => {
+    const b = e.target.closest(".ld-day.has"); if (!b) return;
+    const k = b.dataset.k, L = ldGet().v.log[k] || [], [, mm, dd] = k.split("-");
+    $("#ldDT").textContent = `${+mm}月${+dd}日`; $("#ldDN").textContent = `${L.length} 滴`;
+    $("#ldDL").innerHTML = L.map((x, i) => `<li><button type="button"><time>${escapeHtml(x.t || "")}</time><span class="pk">${escapeHtml(x.why || "没写原因")}</span></button><div class="why">${escapeHtml(x.why || "这一滴没写原因。")}<br><a class="ld-del" data-k="${k}" data-i="${i}">删掉这一滴</a></div></li>`).join("");
+    ldOpen("#ldDaySh");
+  });
+  $("#ldDL").addEventListener("click", (e) => {
+    const del = e.target.closest(".ld-del");
+    if (del){ ldUndo(del.dataset.k, +del.dataset.i); ldClose("#ldDaySh"); notifySite("删掉了一滴鸦片酊的记录"); return; }
+    const li = e.target.closest("li"); if (li) li.classList.toggle("open");
+  });
+  ["#ldAsk", "#ldDaySh"].forEach((id) => $(id).addEventListener("click", (e) => { if (e.target === $(id)){ if (id === "#ldAsk") ldAfterAsk($("#ldAskX").value.trim()); else ldClose(id); } }));
+}
 /* 消息提示横幅 */
 let ibTimer = null, ibY = null;
 function showInBanner(m){
@@ -6449,6 +6693,7 @@ function showArchiveSection(sec){
   archivePanel.querySelectorAll(".archive-section").forEach((el) => { el.hidden = el.dataset.sec !== sec; });
   if (archiveTabs) archiveTabs.querySelectorAll("button[data-sec]").forEach((b) => b.setAttribute("aria-selected", b.dataset.sec === sec ? "true" : "false"));
   if (sec === "wall") renderWall();
+  if (sec === "laudanum"){ ldPull(); ldPaint(); }
 }
 if (archiveTabs) archiveTabs.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-sec]");
@@ -7673,7 +7918,8 @@ function setSessionPopover(open){
 async function loadSessions(){
   if (USE_MOCK || !secret){ activeApiSession = LEGACY_SESSION_ID; renderSessionList(); return; }
   try{
-    const r = await fetch(`${API_BASE}/app/sessions`, { headers: authHeaders() });
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);   // 网卡也别一直卡在开机
+    const r = await fetch(`${API_BASE}/app/sessions`, { headers: authHeaders(), signal: ctl.signal }).finally(() => clearTimeout(tm));
     if (!r.ok) throw new Error("sessions " + r.status);
     const d = await r.json();
     apiSessions = Array.isArray(d.sessions) ? d.sessions : [];
@@ -10026,6 +10272,7 @@ function paintPin(){
 }
 
 function showLogin(msg){
+  document.documentElement.classList.remove("booting");
   appEl.classList.add("hidden");
   loginEl.classList.remove("hidden");
   $("#secretInput").value = "";
@@ -10152,6 +10399,7 @@ function startRealtime(){
 }
 function startChat(initialMsgs, { connect = true, fromCache = false } = {}){
   loginEl.classList.add("hidden");
+  document.documentElement.classList.remove("booting");
   appEl.classList.remove("hidden");
   setConn("offline");
   if (!tabBooted){ tabBooted = true; setTab("home"); }

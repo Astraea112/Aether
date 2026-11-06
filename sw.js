@@ -2,7 +2,7 @@
    IMPORTANT: bump CACHE on every front-end change, or installed clients keep the
    old shell (the precached index.html won't refresh until the SW reinstalls). */
 const AI_NAME = "Orion";           // push-title fallback; keep in sync with index.html CONFIG.AI_NAME
-const CACHE = "companion-v82-scene-sync";
+const CACHE = "companion-v83-laudanum";
 const PRECACHE = [
   "./index.html",
   "./chat-light.webp", "./chat-lily.webp",
@@ -10,6 +10,8 @@ const PRECACHE = [
   "./ribbon-drift.svg", "./ribbon-bow.svg", "./ribbon-line.svg",
   "./avatar-sea.png", "./avatar-lily.webp",
   "./letter-mailbox.webp", "./letter-envelope.webp", "./letter-paper.webp", "./letter-pen.webp",
+  "./laudanum-ewer.webp", "./laudanum-cup.webp", "./laudanum-cup-clear.webp", "./laudanum-paper.jpg",
+  "./laudanum-stain-1.webp", "./laudanum-stain-2.webp", "./laudanum-stain-3.webp", "./laudanum-stain-4.webp",
 ];
 
 // Two caches: the shell (index.html, versioned with CACHE) and the images (ASSETS, kept across
