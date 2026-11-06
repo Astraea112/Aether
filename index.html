@@ -3841,6 +3841,12 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   /* ════════ Laudanum · 鸦片酊 ════════ */
+  #archivePanel.ld-on .menu-page{
+    background-color:#0e0e10;
+    background-image: radial-gradient(70% 45% at 0% 8%, rgba(255,255,255,.04), transparent 70%),
+                      radial-gradient(120% 90% at 50% 40%, transparent 50%, rgba(0,0,0,.55));
+  }
+  #archivePanel.ld-on .menu-page::before{ background:none; }
   .ld{ position:relative; padding: 10px 2px 30px; }
   .ld-head{ display:flex; justify-content:space-between; align-items:flex-end; }
   .ld-head h2{ margin:0; font-family: var(--font-en); font-style: italic; font-weight: 400; font-size: 34px; line-height: 1; }
@@ -6694,6 +6700,7 @@ function showArchiveSection(sec){
   if (archiveTabs) archiveTabs.querySelectorAll("button[data-sec]").forEach((b) => b.setAttribute("aria-selected", b.dataset.sec === sec ? "true" : "false"));
   if (sec === "wall") renderWall();
   if (sec === "laudanum"){ ldPull(); ldPaint(); }
+  archivePanel.classList.toggle("ld-on", sec === "laudanum");
 }
 if (archiveTabs) archiveTabs.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-sec]");
